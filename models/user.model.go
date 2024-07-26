@@ -48,7 +48,6 @@ type UserResponse struct {
 	Avatar     string    `json:"photo,omitempty"`
 	Verified   bool      `json:"verified"`
 	HasProfile bool      `json:"has_profile"`
-	Provider   string    `json:"provider"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }
