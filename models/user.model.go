@@ -22,8 +22,9 @@ type User struct {
 }
 
 type SignUpInput struct {
-	Phone    string `json:"phone" binding:"required"`
-	Password string `json:"password" binding:"required,min=8"`
+	Phone           string `json:"phone" binding:"required"`
+	Password        string `json:"password" binding:"required,min=8"`
+	PasswordConfirm string `json:"passwordConfirm" binding:"required,min=8"`
 }
 
 type SignInInput struct {
@@ -38,16 +39,16 @@ type BotSignUpInput struct {
 }
 
 type BotSignInInput struct {
-	TelegramUserId string `json:"email"  binding:"required"`
+	TelegramUserId string `json:"telegramUserId"  binding:"required"`
 }
 
 type UserResponse struct {
-	ID         uuid.UUID `json:"id"`
-	Name       string    `json:"name"`
-	Phone      string    `json:"phone"`
-	Avatar     string    `json:"photo,omitempty"`
-	Verified   bool      `json:"verified"`
-	HasProfile bool      `json:"has_profile"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Phone     string    `json:"phone"`
+	Password  string    `json:"password,omitempty"`
+	Avatar    string    `json:"photo,omitempty"`
+	Verified  bool      `json:"verified"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
