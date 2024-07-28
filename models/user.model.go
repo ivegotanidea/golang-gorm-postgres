@@ -35,7 +35,7 @@ type SignInInput struct {
 type BotSignUpInput struct {
 	Name           string `json:"name" binding:"required,min=10"`
 	Phone          string `json:"phone" binding:"required"`
-	TelegramUserId string `json:"email" binding:"required"`
+	TelegramUserId string `json:"telegramUserId" binding:"required"`
 }
 
 type BotSignInInput struct {
