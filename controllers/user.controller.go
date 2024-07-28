@@ -54,42 +54,28 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(users), "data": users})
 }
 
-func (uc *UserController) FindById(ctx *gin.Context) {
-	userId := ctx.Param("userId")
+func (uc *UserController) FindUser(ctx *gin.Context) {
+	userId := ctx.Query("userId")
+	telegramUserId := ctx.Query("telegramUserId")
+	phone := ctx.Query("phone")
 
 	var user models.User
-	result := uc.DB.First(&user, "id = ?", userId)
 
-	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that id exists"})
+	var result *gorm.DB
+
+	if userId != "" {
+		result = uc.DB.First(&user, "id = ?", userId)
+	} else if telegramUserId != "" {
+		result = uc.DB.First(&user, "telegramUserId = ?", telegramUserId)
+	} else if phone != "" {
+		result = uc.DB.First(&user, "phone = ?", phone)
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": user})
-}
-
-func (uc *UserController) FindByTelegramId(ctx *gin.Context) {
-	userId := ctx.Param("telegramUserId")
-
-	var user models.User
-	result := uc.DB.First(&user, "TelegramUserId = ?", userId)
-
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that id exists"})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": user})
-}
-
-func (uc *UserController) FindByPhone(ctx *gin.Context) {
-	phone := ctx.Param("phone")
-
-	var user models.User
-	result := uc.DB.First(&user, "Phone = ?", phone)
-
-	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that phone exists"})
 		return
 	}
 
@@ -98,14 +84,28 @@ func (uc *UserController) FindByPhone(ctx *gin.Context) {
 
 // todo only available for moderators / admins
 func (uc *UserController) DeleteUser(ctx *gin.Context) {
-	userId := ctx.Param("userId")
+	userId := ctx.Query("userId")
+	telegramUserId := ctx.Query("telegramUserId")
+	phone := ctx.Query("phone")
+
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
 	if currentUser.ID.String() == userId {
 		fmt.Printf("User %v has commited self-deletion", currentUser.ID)
 	}
 
-	result := uc.DB.Delete(&models.Post{}, "id = ?", userId)
+	var result *gorm.DB
+
+	if userId != "" {
+		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
+	} else if telegramUserId != "" {
+		result = uc.DB.Delete(&models.User{}, "telegramUserId = ?", telegramUserId)
+	} else if phone != "" {
+		result = uc.DB.Delete(&models.User{}, "phone = ?", phone)
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
+		return
+	}
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})

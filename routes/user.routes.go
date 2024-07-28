@@ -19,11 +19,7 @@ func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 
 	router.GET("/me", middleware.DeserializeUser(), uc.userController.GetMe)
 	router.GET("/", middleware.DeserializeUser(), uc.userController.GetUsers)
-	router.GET("/:userId", middleware.DeserializeUser(), uc.userController.FindById)
-	router.GET("/:telegramUserId", middleware.DeserializeUser(), uc.userController.FindByTelegramId)
-	router.GET("/:phone", middleware.DeserializeUser(), uc.userController.FindByPhone)
-	router.DELETE("/:userId", uc.userController.DeleteUser)
-	router.DELETE("/:telegramUserId", uc.userController.DeleteUserByTelegramId)
-	router.PUT("/:userId", uc.userController.UpdateUser)
-	router.PUT("/:telegramUserId", uc.userController.UpdateUserByTelegramId)
+	router.GET("/user", middleware.DeserializeUser(), uc.userController.FindUser)
+	router.DELETE("/user", uc.userController.DeleteUser)
+	router.PUT("/user", uc.userController.UpdateUser)
 }

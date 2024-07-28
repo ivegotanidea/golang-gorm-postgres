@@ -43,6 +43,18 @@ func init() {
 	server = gin.Default()
 }
 
+func healthCheckHandler(ctx *gin.Context) {
+
+	var message string
+
+	if ctx.Request.Method == "GET" {
+		message = "Welcome to Golang with Gorm and Postgres"
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
+	} else if ctx.Request.Method == "HEAD" {
+		ctx.Status(http.StatusOK)
+	}
+}
+
 func main() {
 	config, err := initializers.LoadConfig(".")
 	if err != nil {
@@ -56,10 +68,8 @@ func main() {
 	server.Use(cors.New(corsConfig))
 
 	router := server.Group("/api")
-	router.GET("/healthchecker", func(ctx *gin.Context) {
-		message := "Welcome to Golang with Gorm and Postgres"
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
-	})
+	router.HEAD("/healthchecker", healthCheckHandler)
+	router.GET("/healthchecker", healthCheckHandler)
 
 	AuthRouteController.AuthRoute(router)
 	UserRouteController.UserRoute(router)
