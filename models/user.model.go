@@ -9,8 +9,8 @@ import (
 type User struct {
 	ID             uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	Name           string    `gorm:"type:varchar(20);not null"`
-	Phone          string    `gorm:"type:varchar(255)"`
-	TelegramUserId int64     `gorm:"type:bigint;not null"`
+	Phone          string    `gorm:"type:varchar(30);uniqueIndex"`
+	TelegramUserId int64     `gorm:"type:bigint;not null;uniqueIndex"`
 	Password       string    `gorm:"type:varchar(42);not null"`
 	Verified       bool      `gorm:"type:boolean"`
 	CreatedAt      time.Time `gorm:"type:timestamp;not null"`
@@ -33,7 +33,7 @@ type SignInInput struct {
 }
 
 type BotSignUpInput struct {
-	Name           string `json:"name" binding:"required"`
+	Name           string `json:"name" binding:"required,min=10"`
 	Phone          string `json:"phone" binding:"required"`
 	TelegramUserId string `json:"email" binding:"required"`
 }
@@ -50,5 +50,14 @@ type UserResponse struct {
 	Avatar    string    `json:"photo,omitempty"`
 	Verified  bool      `json:"verified"`
 	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type UpdateUser struct {
+	Name      string    `json:"name,omitempty"`
+	Phone     string    `json:"phone,omitempty"`
+	Password  string    `json:"password,omitempty"`
+	Avatar    string    `json:"photo,omitempty"`
+	Verified  bool      `json:"verified,omitempty"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
