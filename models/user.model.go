@@ -11,7 +11,7 @@ type User struct {
 	Name           string    `gorm:"type:varchar(20);not null"`
 	Phone          string    `gorm:"type:varchar(30);uniqueIndex"`
 	TelegramUserId int64     `gorm:"type:bigint;not null;uniqueIndex"`
-	Password       string    `gorm:"type:varchar(42);not null"`
+	Password       string    `gorm:"type:varchar(255);not null"`
 	Verified       bool      `gorm:"type:boolean"`
 	CreatedAt      time.Time `gorm:"type:timestamp;not null"`
 	UpdatedAt      time.Time `gorm:"type:timestamp;not null"`
@@ -22,19 +22,19 @@ type User struct {
 }
 
 type SignUpInput struct {
-	Phone           string `json:"phone" binding:"required"`
+	Phone           string `json:"phone" binding:"required,min=11,max=11"`
 	Password        string `json:"password" binding:"required,min=8"`
 	PasswordConfirm string `json:"passwordConfirm" binding:"required,min=8"`
 }
 
 type SignInInput struct {
-	Phone    string `json:"phone" binding:"required"`
+	Phone    string `json:"phone" binding:"required,min=11,max=11"`
 	Password string `json:"password" binding:"required,min=8"`
 }
 
 type BotSignUpInput struct {
-	Name           string `json:"name" binding:"required,min=10"`
-	Phone          string `json:"phone" binding:"required"`
+	Name           string `json:"name" binding:"required,min=5"`
+	Phone          string `json:"phone" binding:"required,min=11,max=11"`
 	TelegramUserId string `json:"telegramUserId" binding:"required"`
 }
 

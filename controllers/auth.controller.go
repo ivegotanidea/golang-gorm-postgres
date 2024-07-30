@@ -5,6 +5,7 @@ import (
 	"github.com/wpcodevo/golang-gorm-postgres/initializers"
 	"github.com/wpcodevo/golang-gorm-postgres/models"
 	"github.com/wpcodevo/golang-gorm-postgres/utils"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -32,7 +33,8 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 		return
 	}
 
-	generatedPassword := "" // todo generate password
+	random := rand.New(rand.NewSource(time.Now().UnixNano()))
+	generatedPassword := utils.GenerateRandomStringWithPrefix(random, 13, "")
 	hashedPassword, err := utils.HashPassword(generatedPassword)
 
 	if err != nil {
@@ -56,6 +58,8 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 		Avatar:         defaultUserAvatar,
 		CreatedAt:      now,
 		UpdatedAt:      now,
+		Profiles:       nil,
+		Services:       nil,
 	}
 
 	result := ac.DB.Create(&newUser)
@@ -144,7 +148,7 @@ func (ac *AuthController) BotSignInUser(ctx *gin.Context) {
 	}
 
 	var user models.User
-	result := ac.DB.First(&user, "telegramUserId = ?", strings.ToLower(payload.TelegramUserId))
+	result := ac.DB.First(&user, "telegram_user_id = ?", strings.ToLower(payload.TelegramUserId))
 	if result.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid phone or Password"})
 		return
