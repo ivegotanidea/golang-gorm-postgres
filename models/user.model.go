@@ -19,6 +19,7 @@ type User struct {
 	HasProfile     bool      `gorm:"type:boolean"`
 	Profiles       []Profile `gorm:"foreignKey:UserID"`
 	Services       []Service `gorm:"foreignKey:ClientUserID"`
+	Tier           string    `gorm:"type:varchar(50);not null;default:'basic'"`
 }
 
 type SignUpInput struct {
