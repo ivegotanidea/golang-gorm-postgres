@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -11,7 +11,7 @@ func GenerateRandomStringWithPrefix(r *rand.Rand, length int, prefix string) str
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = charset[r.Intn(len(charset))]
+		b[i] = charset[r.IntN(len(charset))]
 	}
 	return prefix + string(b)
 }

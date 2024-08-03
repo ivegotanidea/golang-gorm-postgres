@@ -9,17 +9,17 @@ import (
 	"github.com/wpcodevo/golang-gorm-postgres/controllers"
 	"github.com/wpcodevo/golang-gorm-postgres/initializers"
 	"github.com/wpcodevo/golang-gorm-postgres/models"
-	"gorm.io/gorm"
+	utils "github.com/wpcodevo/golang-gorm-postgres/utils"
 	"log"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 )
 
-// SetupRouter sets up the router for testing.
-func SetupRouter(authController *controllers.AuthController) *gin.Engine {
+// SetupACRouter sets up the router for testing.
+func SetupACRouter(authController *controllers.AuthController) *gin.Engine {
 	r := gin.Default()
 
 	authRouteController := NewAuthRouteController(*authController)
@@ -30,7 +30,7 @@ func SetupRouter(authController *controllers.AuthController) *gin.Engine {
 	return r
 }
 
-func SetupController() controllers.AuthController {
+func SetupAuthController() controllers.AuthController {
 	var err error
 	config, err := initializers.LoadConfig("../.")
 	if err != nil {
@@ -49,68 +49,21 @@ func SetupController() controllers.AuthController {
 	return authController
 }
 
-func cleanupTestUsers(db *gorm.DB) {
-	db.Where("name LIKE ?", "test%").Delete(&models.User{})
-}
-
-func dropAllTables(db *gorm.DB) {
-
-	tables, err := db.Migrator().GetTables()
-
-	if err != nil {
-		message, _ := fmt.Printf("failed to get tables: %s", err)
-		panic(message)
-	}
-
-	for _, table := range tables {
-		err = db.Migrator().DropTable(table)
-		if err != nil {
-			message, _ := fmt.Printf("failed to drop table: %s", err)
-			panic(message)
-		}
-	}
-}
-
-func generateRandomPhoneNumber(r *rand.Rand, length int) string {
-
-	if length <= 0 {
-		length = 11 // Default length
-	}
-
-	minLen := int64(1)
-
-	for i := 1; i < length; i++ {
-		minLen *= 10
-	}
-
-	maxLen := minLen * 10
-	return fmt.Sprintf("%0*d", length, r.Int63n(maxLen-minLen)+minLen)
-}
-
-func generateRandomStringWithPrefix(r *rand.Rand, length int, prefix string) string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[r.Intn(len(charset))]
-	}
-	return prefix + string(b)
-}
-
 func TestAuthRoutes(t *testing.T) {
 
-	ac := SetupController()
-	router := SetupRouter(&ac)
-	random := rand.New(rand.NewSource(time.Now().UnixNano()))
+	ac := SetupAuthController()
+	router := SetupACRouter(&ac)
+	random := rand.New(rand.NewPCG(1, uint64(time.Now().Nanosecond())))
 
 	t.Cleanup(func() {
-		cleanupTestUsers(ac.DB)
-		dropAllTables(ac.DB)
+		utils.CleanupTestUsers(ac.DB)
+		utils.DropAllTables(ac.DB)
 	})
 
 	t.Run("POST /api/auth/register: successful registration OK ", func(t *testing.T) {
 		name := "testiculous-andrew"
-		phone := generateRandomPhoneNumber(random, 0)
-		telegramUserId := fmt.Sprintf("%d", rand.Int63())
+		phone := utils.GenerateRandomPhoneNumber(random, 0)
+		telegramUserId := fmt.Sprintf("%d", rand.Int64())
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
@@ -136,9 +89,9 @@ func TestAuthRoutes(t *testing.T) {
 
 	t.Run("POST /api/auth/register: empty name registration FAIL ", func(t *testing.T) {
 		name := ""
-		phone := generateRandomPhoneNumber(random, 0)
+		phone := utils.GenerateRandomPhoneNumber(random, 0)
 
-		telegramUserId := fmt.Sprintf("%d", rand.Int63())
+		telegramUserId := fmt.Sprintf("%d", rand.Int64())
 		errMessage := "Key: 'BotSignUpInput.Name' Error:Field validation for 'Name' failed on the 'required' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
@@ -161,10 +114,10 @@ func TestAuthRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/auth/register: empty phone registration FAIL ", func(t *testing.T) {
-		name := generateRandomStringWithPrefix(random, 10, "test-")
+		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 		phone := ""
 
-		telegramUserId := fmt.Sprintf("%d", rand.Int63())
+		telegramUserId := fmt.Sprintf("%d", rand.Int64())
 		errMessage := "Key: 'BotSignUpInput.Phone' Error:Field validation for 'Phone' failed on the 'required' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
@@ -187,10 +140,10 @@ func TestAuthRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/auth/register: phone of 10 symbols registration FAIL ", func(t *testing.T) {
-		name := generateRandomStringWithPrefix(random, 10, "test-")
-		phone := generateRandomPhoneNumber(random, 10)
+		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
+		phone := utils.GenerateRandomPhoneNumber(random, 10)
 
-		telegramUserId := fmt.Sprintf("%d", rand.Int63())
+		telegramUserId := fmt.Sprintf("%d", rand.Int64())
 		errMessage := "Key: 'BotSignUpInput.Phone' Error:Field validation for 'Phone' failed on the 'min' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
@@ -213,10 +166,10 @@ func TestAuthRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/auth/register: phone of 12 symbols registration FAIL ", func(t *testing.T) {
-		name := generateRandomStringWithPrefix(random, 10, "test-")
-		phone := generateRandomPhoneNumber(random, 12)
+		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
+		phone := utils.GenerateRandomPhoneNumber(random, 12)
 
-		telegramUserId := fmt.Sprintf("%d", rand.Int63())
+		telegramUserId := fmt.Sprintf("%d", rand.Int64())
 		errMessage := "Key: 'BotSignUpInput.Phone' Error:Field validation for 'Phone' failed on the 'max' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
@@ -239,8 +192,8 @@ func TestAuthRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/auth/register: empty telegramId registration FAIL ", func(t *testing.T) {
-		name := generateRandomStringWithPrefix(random, 10, "test-")
-		phone := generateRandomPhoneNumber(random, 0)
+		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
+		phone := utils.GenerateRandomPhoneNumber(random, 0)
 		telegramUserId := ""
 		errMessage := "Key: 'BotSignUpInput.TelegramUserId' Error:Field validation for 'TelegramUserId' failed on the 'required' tag"
 
@@ -289,9 +242,9 @@ func TestAuthRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/auth/login + GET api/auth/refresh + GET api/auth/logout", func(t *testing.T) {
-		name := generateRandomStringWithPrefix(random, 10, "test-")
-		phone := generateRandomPhoneNumber(random, 0)
-		telegramUserId := fmt.Sprintf("%d", rand.Int63())
+		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
+		phone := utils.GenerateRandomPhoneNumber(random, 0)
+		telegramUserId := fmt.Sprintf("%d", rand.Int64())
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 

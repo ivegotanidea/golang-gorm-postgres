@@ -7,6 +7,9 @@ import (
 )
 
 type Config struct {
+	CasbinModelPath  string `mapstructure:"CASBIN_MODEL_PATH"`
+	CasbinPolicyPath string `mapstructure:"CASBIN_POLICY_PATH"`
+
 	DBHost         string `mapstructure:"POSTGRES_HOST"`
 	DBUserName     string `mapstructure:"POSTGRES_USER"`
 	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`

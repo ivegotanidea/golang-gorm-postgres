@@ -1,0 +1,40 @@
+# post, get, getPart, list, query, update, updatePart, delete
+
+# -------- BASIC
+# rate service
+p, basic, service, rateAndReport, basic
+
+# get profile rating
+p, basic, profile, getRating, basic
+p, basic, profile, listRating, basic
+
+# -------- EXPERT
+p, expert, profile, query, client
+p, expert, profile, listReports, client
+
+# profile props
+p, expert, visibility, set, seller
+
+# user props
+p, expert, rating, get, expert
+p, expert, rating, list, expert
+
+# -------- GURU
+
+p, guru, report, list, guru
+p, guru, visibility, set, guru
+
+
+p, guru, offerReports, readOwned, guru
+p, guru, supportChannel, access, guru
+p, guru, options, getFree, guru
+p, guru, reports, rate, guru
+
+
+p, moderator, reviews, edit, moderator
+p, moderator, profiles, edit, moderator
+p, moderator, profiles, verify, moderator
+p, moderator, users, activateDeactivate, moderator
+p, moderator, profiles, activateDeactivate, moderator
+
+p, admin, *, *, admin

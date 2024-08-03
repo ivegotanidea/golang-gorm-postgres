@@ -5,7 +5,7 @@ import (
 	"github.com/wpcodevo/golang-gorm-postgres/initializers"
 	"github.com/wpcodevo/golang-gorm-postgres/models"
 	"github.com/wpcodevo/golang-gorm-postgres/utils"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"strconv"
 	"strings"
@@ -33,7 +33,7 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 		return
 	}
 
-	random := rand.New(rand.NewSource(time.Now().UnixNano()))
+	random := rand.New(rand.NewPCG(1, uint64(time.Now().Nanosecond())))
 	generatedPassword := utils.GenerateRandomStringWithPrefix(random, 13, "")
 	hashedPassword, err := utils.HashPassword(generatedPassword)
 
