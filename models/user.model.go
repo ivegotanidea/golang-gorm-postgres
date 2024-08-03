@@ -50,6 +50,7 @@ type UserResponse struct {
 	Password  string    `json:"password,omitempty"`
 	Avatar    string    `json:"photo,omitempty"`
 	Verified  bool      `json:"verified"`
+	Tier      string    `json:"tier"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

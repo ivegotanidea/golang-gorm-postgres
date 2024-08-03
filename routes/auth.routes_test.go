@@ -40,10 +40,11 @@ func SetupAuthController() controllers.AuthController {
 	initializers.ConnectDB(&config)
 
 	authController := controllers.NewAuthController(initializers.DB)
+	authController.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	// Migrate the schema
 	if err := authController.DB.AutoMigrate(&models.User{}); err != nil {
-		panic("failed to migrate database")
+		panic("failed to migrate database: " + err.Error())
 	}
 
 	return authController

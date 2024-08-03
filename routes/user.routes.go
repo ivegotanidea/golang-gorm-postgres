@@ -20,8 +20,8 @@ func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 	router.Use(middleware.DeserializeUser())
 
 	router.GET("/me", uc.userController.GetMe)
-	router.GET("/", uc.userController.GetUsers)
+	router.GET("/", middleware.AbacMiddleware("users", "list"), uc.userController.GetUsers)
 	router.GET("/user", uc.userController.FindUser)
-	router.DELETE("/user", uc.userController.DeleteUser)
+	router.DELETE("/user", middleware.AbacMiddleware("users", "delete"), uc.userController.DeleteUser)
 	router.PUT("/user", uc.userController.UpdateUser)
 }

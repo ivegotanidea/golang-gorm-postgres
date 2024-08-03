@@ -8,7 +8,7 @@ import (
 
 func AbacMiddleware(obj string, act string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		sub, exists := c.Get("currentUserID")
+		_, exists := c.Get("currentUserID")
 		if !exists {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 			c.Abort()
@@ -24,7 +24,7 @@ func AbacMiddleware(obj string, act string) gin.HandlerFunc {
 		}
 
 		// Check if the user has permission
-		ok, err := initializers.Enforcer.Enforce(sub, obj, act, tier)
+		ok, err := initializers.Enforcer.Enforce(tier, obj, act, tier)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while checking permissions"})
 			c.Abort()

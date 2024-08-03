@@ -60,6 +60,7 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 		UpdatedAt:      now,
 		Profiles:       nil,
 		Services:       nil,
+		Tier:           "basic",
 	}
 
 	result := ac.DB.Create(&newUser)
@@ -81,6 +82,7 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 		Verified:  newUser.Verified,
 		CreatedAt: newUser.CreatedAt,
 		UpdatedAt: newUser.UpdatedAt,
+		Tier:      newUser.Tier,
 	}
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": gin.H{"user": userResponse}})
 }
@@ -115,6 +117,7 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		Avatar:         "",
 		CreatedAt:      now,
 		UpdatedAt:      now,
+		Tier:           "basic",
 	}
 
 	result := ac.DB.Create(&newUser)
@@ -135,6 +138,7 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		Verified:  newUser.Verified,
 		CreatedAt: newUser.CreatedAt,
 		UpdatedAt: newUser.UpdatedAt,
+		Tier:      newUser.Tier,
 	}
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": gin.H{"user": userResponse}})
 }

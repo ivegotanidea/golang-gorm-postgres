@@ -3,10 +3,11 @@
 # -------- BASIC
 # rate service
 p, basic, service, rateAndReport, basic
+# p, basic, users, list, basic
 
 # get profile rating
-p, basic, profile, getRating, basic
-p, basic, profile, listRating, basic
+p, basic, rating, get, basic
+p, basic, rating, list, basic
 
 # -------- EXPERT
 p, expert, profile, query, client
@@ -34,6 +35,7 @@ p, guru, reports, rate, guru
 p, moderator, reviews, edit, moderator
 p, moderator, profiles, edit, moderator
 p, moderator, profiles, verify, moderator
+p, moderator, users, list, moderator
 p, moderator, users, activateDeactivate, moderator
 p, moderator, profiles, activateDeactivate, moderator
 
