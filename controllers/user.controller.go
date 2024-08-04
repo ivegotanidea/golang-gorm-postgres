@@ -55,7 +55,7 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 }
 
 func (uc *UserController) FindUser(ctx *gin.Context) {
-	userId := ctx.Query("userId")
+	userId := ctx.Query("id")
 	telegramUserId := ctx.Query("telegramUserId")
 	phone := ctx.Query("phone")
 
