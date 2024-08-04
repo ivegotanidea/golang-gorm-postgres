@@ -43,6 +43,12 @@ type BotSignInInput struct {
 	TelegramUserId string `json:"telegramUserId"  binding:"required"`
 }
 
+type FindUserQuery struct {
+	Id             string `form:"id"`
+	Phone          string `form:"phone"`
+	TelegramUserId int64  `form:"telegramUserId"`
+}
+
 type UserResponse struct {
 	ID             uuid.UUID `json:"id"`
 	TelegramUserID int64     `json:"telegramUserId"`

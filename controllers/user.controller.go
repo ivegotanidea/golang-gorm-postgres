@@ -55,9 +55,21 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 }
 
 func (uc *UserController) FindUser(ctx *gin.Context) {
-	userId := ctx.Query("id")
-	telegramUserId := ctx.Query("telegramUserId")
-	phone := ctx.Query("phone")
+	var query *models.FindUserQuery
+
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	userId := query.Id
+	telegramUserId := query.TelegramUserId
+	phone := query.Phone
+
+	if userId == "" && telegramUserId == 0 && phone == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
+		return
+	}
 
 	var user models.User
 
@@ -65,13 +77,10 @@ func (uc *UserController) FindUser(ctx *gin.Context) {
 
 	if userId != "" {
 		result = uc.DB.First(&user, "id = ?", userId)
-	} else if telegramUserId != "" {
+	} else if telegramUserId != 0 {
 		result = uc.DB.First(&user, "telegram_user_id = ?", telegramUserId)
 	} else if phone != "" {
 		result = uc.DB.First(&user, "phone = ?", phone)
-	} else {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
-		return
 	}
 
 	if result.Error != nil {
