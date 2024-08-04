@@ -66,7 +66,7 @@ func (uc *UserController) FindUser(ctx *gin.Context) {
 	if userId != "" {
 		result = uc.DB.First(&user, "id = ?", userId)
 	} else if telegramUserId != "" {
-		result = uc.DB.First(&user, "telegramUserId = ?", telegramUserId)
+		result = uc.DB.First(&user, "telegram_user_id = ?", telegramUserId)
 	} else if phone != "" {
 		result = uc.DB.First(&user, "phone = ?", phone)
 	} else {
@@ -75,7 +75,13 @@ func (uc *UserController) FindUser(ctx *gin.Context) {
 	}
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that id exists"})
+
+		if result.Error.Error() == "record not found" && result.RowsAffected == 0 {
+			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that id exists"})
+			return
+		}
+
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail"})
 		return
 	}
 
