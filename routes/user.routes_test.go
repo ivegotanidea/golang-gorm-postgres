@@ -18,6 +18,18 @@ import (
 	"time"
 )
 
+type UserResponse struct {
+	Status string `json:"status"`
+	Data   struct {
+		User models.UserResponse `json:"user"`
+	} `json:"data"`
+}
+
+type FindUserResponse struct {
+	Status string              `json:"status"`
+	Data   models.UserResponse `json:"data"`
+}
+
 // SetupUCRouter sets up the router for testing.
 func SetupUCRouter(userController *controllers.UserController) *gin.Engine {
 	r := gin.Default()
@@ -49,6 +61,29 @@ func SetupUCController() controllers.UserController {
 	}
 
 	return userController
+}
+
+func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T) models.UserResponse {
+	name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
+	phone := utils.GenerateRandomPhoneNumber(random, 0)
+	telegramUserId := fmt.Sprintf("%d", rand.Int64())
+
+	payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+	req.Header.Set("Content-Type", "application/json")
+	authRouter.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	var userResponse UserResponse
+	err := json.Unmarshal(w.Body.Bytes(), &userResponse)
+	assert.NoError(t, err)
+
+	user := userResponse.Data.User
+
+	return user
 }
 
 func TestUserRoutes(t *testing.T) {
@@ -145,6 +180,21 @@ func TestUserRoutes(t *testing.T) {
 
 		data = jsonResponse["data"].(map[string]interface{})
 		assert.NotEmpty(t, data)
+
+	})
+
+	t.Run("GET /api/user: no access_token, forbidden to list users", func(t *testing.T) {
+
+		w := httptest.NewRecorder()
+		meReq, _ := http.NewRequest("GET", "/api/users/", nil)
+		meReq.Header.Set("Content-Type", "application/json")
+		userRouter.ServeHTTP(w, meReq)
+
+		jsonResponse := make(map[string]interface{})
+		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+		assert.Nil(t, err)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
 
 	})
 
@@ -282,7 +332,7 @@ func TestUserRoutes(t *testing.T) {
 
 	})
 
-	t.Run("POST /api/auth/login + GET api/auth/refresh + GET api/auth/logout", func(t *testing.T) {
+	t.Run("GET /api/user: admin, success list users", func(t *testing.T) {
 		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
 		telegramUserId := fmt.Sprintf("%d", rand.Int64())
@@ -307,7 +357,11 @@ func TestUserRoutes(t *testing.T) {
 		// Check name and phone
 		assert.Equal(t, name, user["name"])
 		assert.Equal(t, phone, user["phone"])
-		assert.NotEmptyf(t, user["password"], "")
+
+		tx := initializers.DB.Model(&models.User{}).Where("id = ?", user["id"]).Update("tier", "admin")
+
+		assert.NoError(t, tx.Error)
+		assert.Equal(t, int64(1), tx.RowsAffected)
 
 		w = httptest.NewRecorder()
 		password := user["password"].(string)
@@ -316,6 +370,7 @@ func TestUserRoutes(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		authRouter.ServeHTTP(w, loginReq)
 
+		jsonResponse = make(map[string]interface{})
 		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		status := jsonResponse["status"]
 
@@ -325,23 +380,6 @@ func TestUserRoutes(t *testing.T) {
 
 		// Extract refresh_token from cookies
 		cookies := w.Result().Cookies()
-		var refreshTokenCookie *http.Cookie
-		for _, cookie := range cookies {
-			if cookie.Name == "refresh_token" {
-				refreshTokenCookie = cookie
-				break
-			}
-		}
-		assert.NotNil(t, refreshTokenCookie)
-		assert.NotEmpty(t, refreshTokenCookie.Value)
-
-		w = httptest.NewRecorder()
-		refreshReq, _ := http.NewRequest("GET", "/api/auth/refresh", nil)
-		refreshReq.AddCookie(&http.Cookie{Name: refreshTokenCookie.Name, Value: refreshTokenCookie.Value})
-		authRouter.ServeHTTP(w, refreshReq)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-		cookies = w.Result().Cookies()
 		var accessTokenCookie *http.Cookie
 		for _, cookie := range cookies {
 			if cookie.Name == "access_token" {
@@ -350,37 +388,105 @@ func TestUserRoutes(t *testing.T) {
 			}
 		}
 
-		assert.NotNil(t, accessTokenCookie)
-		assert.NotEmpty(t, accessTokenCookie.Value)
-
-		logoutReq, err := http.NewRequest("GET", "/api/auth/logout", nil)
-		logoutReq.AddCookie(accessTokenCookie)
-		logoutReq.Header.Set("Content-Type", "application/json")
-
 		w = httptest.NewRecorder()
-		authRouter.ServeHTTP(w, logoutReq)
+		meReq, _ := http.NewRequest("GET", "/api/users/", nil)
+		meReq.Header.Set("Content-Type", "application/json")
+		meReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, meReq)
+
+		jsonResponse = make(map[string]interface{})
+		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+		assert.Nil(t, err)
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		reqWithClearedCookie, _ := http.NewRequest("GET", "/api/auth/refresh", nil)
+	})
 
-		// Ensure cookies are cleared after logout
-		cookies = w.Result().Cookies()
+	t.Run("GET /api/users/user: fail without access token", func(t *testing.T) {
+		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
+		phone := utils.GenerateRandomPhoneNumber(random, 0)
+		telegramUserId := fmt.Sprintf("%d", rand.Int64())
+
+		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req.Header.Set("Content-Type", "application/json")
+		authRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusCreated, w.Code)
+
+		var jsonResponse map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+		assert.NoError(t, err)
+
+		data := jsonResponse["data"].(map[string]interface{})
+		user := data["user"].(map[string]interface{})
+
+		assert.NotEmpty(t, data)
+		assert.NotEmpty(t, user)
+
+		w = httptest.NewRecorder()
+
+		jsonResponse = make(map[string]interface{})
+		url := fmt.Sprintf("/api/users/user?phone=%s", user["phone"])
+		findUserReq, _ := http.NewRequest("GET", url, nil)
+		findUserReq.Header.Set("Content-Type", "application/json")
+		userRouter.ServeHTTP(w, findUserReq)
+
+		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+		assert.Nil(t, err)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+
+	})
+
+	t.Run("GET /api/users/user: success with access token", func(t *testing.T) {
+		firstUser := generateUser(random, authRouter, t)
+		secondUser := generateUser(random, authRouter, t)
+
+		var jsonResponse map[string]interface{}
+
+		w := httptest.NewRecorder()
+		password := firstUser.Password
+		telegramUserId := firstUser.TelegramUserID
+		payloadLogin := fmt.Sprintf(`{"telegramUserId": "%d", "password": "%s"}`, telegramUserId, password)
+		loginReq, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte(payloadLogin)))
+		loginReq.Header.Set("Content-Type", "application/json")
+		authRouter.ServeHTTP(w, loginReq)
+
+		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+
+		assert.NoError(t, err)
+		status := jsonResponse["status"]
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, status, "success")
+		assert.NotEmpty(t, jsonResponse["access_token"])
+
+		// Extract refresh_token from cookies
+		cookies := w.Result().Cookies()
+		var accessTokenCookie *http.Cookie
 		for _, cookie := range cookies {
-			if cookie.Name == "access_token" || cookie.Name == "refresh_token" || cookie.Name == "logged_in" {
-				assert.Empty(t, cookie.Value)
-				assert.Equal(t, -1, cookie.MaxAge)
-
-				reqWithClearedCookie.AddCookie(cookie)
+			if cookie.Name == "access_token" {
+				accessTokenCookie = cookie
+				break
 			}
 		}
 
-		// Attempt to access a protected route after logout
-		reqWithClearedCookie.Header.Set("Content-Type", "application/json")
-
 		w = httptest.NewRecorder()
-		authRouter.ServeHTTP(w, reqWithClearedCookie)
 
-		assert.Equal(t, http.StatusForbidden, w.Code)
+		url := fmt.Sprintf("/api/users/user?phone=%s", secondUser.Phone)
+		findUserReq, _ := http.NewRequest("GET", url, nil)
+		findUserReq.Header.Set("Content-Type", "application/json")
+		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, findUserReq)
+
+		var userResponse FindUserResponse
+		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
+		assert.Nil(t, err)
+		assert.NotEmpty(t, userResponse)
+
+		assert.Equal(t, http.StatusOK, w.Code)
 	})
 }

@@ -79,7 +79,19 @@ func (uc *UserController) FindUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": user})
+	userResponse := &models.UserResponse{
+		ID:             user.ID,
+		TelegramUserID: user.TelegramUserId,
+		Name:           user.Name,
+		Phone:          user.Phone,
+		Avatar:         user.Avatar,
+		Verified:       user.Verified,
+		CreatedAt:      user.CreatedAt,
+		UpdatedAt:      user.UpdatedAt,
+		Tier:           user.Tier,
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": userResponse})
 }
 
 // todo only available for moderators / admins

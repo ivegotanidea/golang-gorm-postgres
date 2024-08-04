@@ -44,15 +44,16 @@ type BotSignInInput struct {
 }
 
 type UserResponse struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Password  string    `json:"password,omitempty"`
-	Avatar    string    `json:"photo,omitempty"`
-	Verified  bool      `json:"verified"`
-	Tier      string    `json:"tier"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID             uuid.UUID `json:"id"`
+	TelegramUserID int64     `json:"telegramUserId"`
+	Name           string    `json:"name"`
+	Phone          string    `json:"phone"`
+	Password       string    `json:"password,omitempty"`
+	Avatar         string    `json:"photo,omitempty"`
+	Verified       bool      `json:"verified"`
+	Tier           string    `json:"tier"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 type UpdateUser struct {

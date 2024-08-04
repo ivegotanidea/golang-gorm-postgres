@@ -74,15 +74,16 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 	}
 
 	userResponse := &models.UserResponse{
-		ID:        newUser.ID,
-		Name:      newUser.Name,
-		Phone:     newUser.Phone,
-		Password:  generatedPassword,
-		Avatar:    newUser.Avatar,
-		Verified:  newUser.Verified,
-		CreatedAt: newUser.CreatedAt,
-		UpdatedAt: newUser.UpdatedAt,
-		Tier:      newUser.Tier,
+		ID:             newUser.ID,
+		TelegramUserID: newUser.TelegramUserId,
+		Name:           newUser.Name,
+		Phone:          newUser.Phone,
+		Password:       generatedPassword,
+		Avatar:         newUser.Avatar,
+		Verified:       newUser.Verified,
+		CreatedAt:      newUser.CreatedAt,
+		UpdatedAt:      newUser.UpdatedAt,
+		Tier:           newUser.Tier,
 	}
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": gin.H{"user": userResponse}})
 }
