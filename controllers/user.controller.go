@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/wpcodevo/golang-gorm-postgres/initializers"
 	"github.com/wpcodevo/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 	"net/http"
@@ -109,26 +110,17 @@ func (uc *UserController) FindUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": userResponse})
 }
 
-// todo only available for moderators / admins
-func (uc *UserController) DeleteUser(ctx *gin.Context) {
-	userId := ctx.Query("userId")
-	telegramUserId := ctx.Query("telegramUserId")
-	phone := ctx.Query("phone")
+func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 
 	currentUser := ctx.MustGet("currentUser").(models.User)
+	userId := currentUser.ID.String()
 
-	if currentUser.ID.String() == userId {
-		fmt.Printf("User %v has commited self-deletion", currentUser.ID)
-	}
+	fmt.Printf("User %v has commited self-deletion", currentUser.ID)
 
 	var result *gorm.DB
 
 	if userId != "" {
 		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
-	} else if telegramUserId != "" {
-		result = uc.DB.Delete(&models.User{}, "telegramUserId = ?", telegramUserId)
-	} else if phone != "" {
-		result = uc.DB.Delete(&models.User{}, "phone = ?", phone)
 	} else {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
 		return
@@ -142,16 +134,36 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, nil)
 }
 
-// todo only available for moderators / admins
-func (uc *UserController) DeleteUserByTelegramId(ctx *gin.Context) {
-	userId := ctx.Param("telegramUserId")
+func (uc *UserController) DeleteUser(ctx *gin.Context) {
+	userId := ctx.Param("id")
+
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
-	if strconv.FormatInt(currentUser.TelegramUserId, 10) == userId {
-		fmt.Printf("User %v has commited self-deletion", currentUser.ID)
+	var targetUser models.User
+
+	if err := initializers.DB.First(&targetUser, "id = ?", userId).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
+		return
 	}
 
-	result := uc.DB.Delete(&models.Post{}, "telegramUserId = ?", userId)
+	if currentUser.Tier == "moderator" && (targetUser.Tier == "moderator" || targetUser.Tier == "admin") {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
+		return
+	}
+
+	if currentUser.Tier == "admin" && targetUser.Tier == "admin" {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
+		return
+	}
+
+	var result *gorm.DB
+
+	if userId != "" {
+		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
+		return
+	}
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
@@ -171,46 +183,6 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	}
 	var updatedPost models.Post
 	result := uc.DB.First(&updatedPost, "id = ?", userId)
-	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
-		return
-	}
-
-	now := time.Now()
-
-	type UpdateUser struct {
-		Name      string    `json:"name,omitempty"`
-		Phone     string    `json:"phone,omitempty"`
-		Password  string    `json:"password,omitempty"`
-		Avatar    string    `json:"photo,omitempty"`
-		Verified  bool      `json:"verified,omitempty"`
-		UpdatedAt time.Time `json:"updated_at"`
-	}
-
-	userToUpdate := models.User{
-		Name:      payload.Name,
-		Phone:     payload.Phone,
-		Password:  payload.Password,
-		Avatar:    payload.Avatar,
-		Verified:  payload.Verified,
-		UpdatedAt: now,
-	}
-
-	uc.DB.Model(&updatedPost).Updates(userToUpdate)
-
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedPost})
-}
-
-func (uc *UserController) UpdateUserByTelegramId(ctx *gin.Context) {
-	userId := ctx.Param("telegramUserId")
-
-	var payload *models.UpdateUser
-	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
-		return
-	}
-	var updatedPost models.Post
-	result := uc.DB.First(&updatedPost, "telegramUserId = ?", userId)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
 		return
