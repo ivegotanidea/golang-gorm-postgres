@@ -35,7 +35,7 @@ type FindUserResponse struct {
 
 func getOwnerUser() models.User {
 	return models.User{
-		ID:             uuid.New(),
+		ID:             uuid.Max,
 		Name:           "He Who Remains",
 		Phone:          "77778889900",
 		TelegramUserId: 6794234746,
@@ -1145,6 +1145,66 @@ func TestUserRoutes(t *testing.T) {
 		assert.Nil(t, jsonResponse)
 
 		assert.Equal(t, http.StatusNoContent, w.Code)
+	})
+
+	t.Run("DELETE /api/users/user: fail moderator deletes owner", func(t *testing.T) {
+		firstUser := generateUser(random, authRouter, t)
+		secondUser := getOwnerUser()
+
+		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "moderator")
+		assert.NoError(t, tx.Error)
+		assert.Equal(t, int64(1), tx.RowsAffected)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w := httptest.NewRecorder()
+
+		url := fmt.Sprintf("/api/users/user/%s", secondUser.ID)
+		delUserReq, _ := http.NewRequest(http.MethodDelete, url, nil)
+		delUserReq.Header.Set("Content-Type", "application/json")
+		delUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, delUserReq)
+
+		var jsonResponse map[string]interface{}
+
+		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+		assert.Equal(t, jsonResponse["status"], "fail")
+
+		assert.Equal(t, http.StatusForbidden, w.Code)
+	})
+
+	t.Run("DELETE /api/users/user: fail admin deletes owner", func(t *testing.T) {
+		firstUser := generateUser(random, authRouter, t)
+		secondUser := getOwnerUser()
+
+		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "admin")
+		assert.NoError(t, tx.Error)
+		assert.Equal(t, int64(1), tx.RowsAffected)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w := httptest.NewRecorder()
+
+		url := fmt.Sprintf("/api/users/user/%s", secondUser.ID)
+		delUserReq, _ := http.NewRequest(http.MethodDelete, url, nil)
+		delUserReq.Header.Set("Content-Type", "application/json")
+		delUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, delUserReq)
+
+		var jsonResponse map[string]interface{}
+
+		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+		assert.Equal(t, jsonResponse["status"], "fail")
+
+		assert.Equal(t, http.StatusForbidden, w.Code)
 	})
 
 }

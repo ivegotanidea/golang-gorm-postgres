@@ -146,12 +146,12 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	if currentUser.Tier == "moderator" && (targetUser.Tier == "moderator" || targetUser.Tier == "admin") {
+	if currentUser.Tier == "moderator" && (targetUser.Tier == "moderator" || targetUser.Tier == "admin" || targetUser.Tier == "owner") {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
 		return
 	}
 
-	if currentUser.Tier == "admin" && targetUser.Tier == "admin" {
+	if currentUser.Tier == "admin" && (targetUser.Tier == "admin" || targetUser.Tier == "owner") {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
 		return
 	}
