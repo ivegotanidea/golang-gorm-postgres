@@ -114,6 +114,35 @@ func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T) model
 	return user
 }
 
+func loginUserGetAccessToken(t *testing.T, password string, telegramUserId int64, authRouter *gin.Engine) (*http.Cookie, error) {
+	var jsonResponse map[string]interface{}
+
+	w := httptest.NewRecorder()
+	payloadLogin := fmt.Sprintf(`{"telegramUserId": "%d", "password": "%s"}`, telegramUserId, password)
+	loginReq, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte(payloadLogin)))
+	loginReq.Header.Set("Content-Type", "application/json")
+	authRouter.ServeHTTP(w, loginReq)
+
+	err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+
+	assert.NoError(t, err)
+	status := jsonResponse["status"]
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, status, "success")
+	assert.NotEmpty(t, jsonResponse["access_token"])
+
+	// Extract refresh_token from cookies
+	cookies := w.Result().Cookies()
+
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" {
+			return cookie, err
+		}
+	}
+	return nil, errors.New("cookie not found")
+}
+
 func TestUserRoutes(t *testing.T) {
 
 	ac := SetupAuthController()
@@ -1118,33 +1147,4 @@ func TestUserRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusNoContent, w.Code)
 	})
 
-}
-
-func loginUserGetAccessToken(t *testing.T, password string, telegramUserId int64, authRouter *gin.Engine) (*http.Cookie, error) {
-	var jsonResponse map[string]interface{}
-
-	w := httptest.NewRecorder()
-	payloadLogin := fmt.Sprintf(`{"telegramUserId": "%d", "password": "%s"}`, telegramUserId, password)
-	loginReq, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte(payloadLogin)))
-	loginReq.Header.Set("Content-Type", "application/json")
-	authRouter.ServeHTTP(w, loginReq)
-
-	err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
-
-	assert.NoError(t, err)
-	status := jsonResponse["status"]
-
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, status, "success")
-	assert.NotEmpty(t, jsonResponse["access_token"])
-
-	// Extract refresh_token from cookies
-	cookies := w.Result().Cookies()
-
-	for _, cookie := range cookies {
-		if cookie.Name == "access_token" {
-			return cookie, err
-		}
-	}
-	return nil, errors.New("cookie not found")
 }
