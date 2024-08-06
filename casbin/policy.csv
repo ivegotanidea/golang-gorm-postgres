@@ -1,10 +1,15 @@
 # moderator
 
 p, moderator, users, list, moderator
+p, moderator, users, delete, moderator
 
 # admin
 
 p, admin, *, *, admin
+
+# owner
+
+p, owner, *, *, owner
 
 
 
