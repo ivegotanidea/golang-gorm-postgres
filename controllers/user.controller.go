@@ -7,6 +7,7 @@ import (
 	"github.com/wpcodevo/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -173,8 +174,67 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, nil)
 }
 
+func (uc *UserController) UpdateSelf(ctx *gin.Context) {
+
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	userId := currentUser.ID.String()
+
+	var payload *models.UpdateUser
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+	var updatedUser models.User
+
+	result := uc.DB.First(&updatedUser, "id = ?", userId)
+
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		return
+	}
+
+	if payload.Avatar != "" {
+		if _, err := url.ParseRequestURI(payload.Avatar); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid avatar URL"})
+			return
+		}
+	}
+
+	if payload.Avatar == updatedUser.Avatar && updatedUser.Avatar != "" {
+		if _, err := url.ParseRequestURI(payload.Avatar); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Avatar URL can't be same"})
+			return
+		}
+	}
+
+	now := time.Now()
+
+	userToUpdate := models.User{
+		Name:      payload.Name,
+		Phone:     payload.Phone,
+		Avatar:    payload.Avatar,
+		UpdatedAt: now,
+	}
+
+	uc.DB.Model(&updatedUser).Updates(userToUpdate)
+
+	userResponse := &models.UserResponse{
+		ID:             updatedUser.ID,
+		TelegramUserID: updatedUser.TelegramUserId,
+		Name:           updatedUser.Name,
+		Phone:          updatedUser.Phone,
+		Avatar:         updatedUser.Avatar,
+		Verified:       updatedUser.Verified,
+		CreatedAt:      updatedUser.CreatedAt,
+		UpdatedAt:      updatedUser.UpdatedAt,
+		Tier:           updatedUser.Tier,
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": userResponse})
+}
+
 func (uc *UserController) UpdateUser(ctx *gin.Context) {
-	userId := ctx.Param("userId")
+	userId := ctx.Param("id")
 
 	var payload *models.UpdateUser
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -190,21 +250,10 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 
 	now := time.Now()
 
-	type UpdateUser struct {
-		Name      string    `json:"name,omitempty"`
-		Phone     string    `json:"phone,omitempty"`
-		Password  string    `json:"password,omitempty"`
-		Avatar    string    `json:"photo,omitempty"`
-		Verified  bool      `json:"verified,omitempty"`
-		UpdatedAt time.Time `json:"updated_at"`
-	}
-
 	userToUpdate := models.User{
 		Name:      payload.Name,
 		Phone:     payload.Phone,
-		Password:  payload.Password,
 		Avatar:    payload.Avatar,
-		Verified:  payload.Verified,
 		UpdatedAt: now,
 	}
 

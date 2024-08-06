@@ -62,11 +62,22 @@ type UserResponse struct {
 	UpdatedAt      time.Time `json:"updated_at"`
 }
 
+type UpdateUserPrivileged struct {
+	Name           string `json:"name,omitempty"`
+	Phone          string `json:"phone,omitempty"`
+	TelegramUserId string `json:"telegramUserId,omitempty"`
+	Avatar         string `json:"photo,omitempty"`
+	Verified       bool   `json:"verified,omitempty"`
+	Tier           string `json:"tier,omitempty"`
+}
+
 type UpdateUser struct {
-	Name      string    `json:"name,omitempty"`
-	Phone     string    `json:"phone,omitempty"`
-	Password  string    `json:"password,omitempty"`
-	Avatar    string    `json:"photo,omitempty"`
-	Verified  bool      `json:"verified,omitempty"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Name   string `json:"name,omitempty"`
+	Phone  string `json:"phone,omitempty"`
+	Avatar string `json:"photo,omitempty"`
+}
+
+type UpdateUserPassword struct {
+	OldPassword string `json:"password" binding:"required,min=8"`
+	NewPassword string `json:"newPassword" binding:"required,min=8"`
 }

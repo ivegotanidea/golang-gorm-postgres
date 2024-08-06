@@ -1207,4 +1207,148 @@ func TestUserRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusForbidden, w.Code)
 	})
 
+	t.Run("UPDATE /api/users/user: fail with access token and empty update", func(t *testing.T) {
+		firstUser := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w := httptest.NewRecorder()
+
+		url := fmt.Sprintf("/api/users/user")
+		updUserReq, _ := http.NewRequest(http.MethodPut, url, nil)
+		updUserReq.Header.Set("Content-Type", "application/json")
+		updUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, updUserReq)
+
+		assert.Equal(t, http.StatusBadGateway, w.Code)
+
+	})
+
+	t.Run("UPDATE /api/users/user: fail without access token", func(t *testing.T) {
+
+		w := httptest.NewRecorder()
+
+		url := fmt.Sprintf("/api/users/user")
+		updUserReq, _ := http.NewRequest(http.MethodPut, url, nil)
+		updUserReq.Header.Set("Content-Type", "application/json")
+		userRouter.ServeHTTP(w, updUserReq)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
+
+	t.Run("UPDATE /api/users/user: success with access token, update name", func(t *testing.T) {
+		firstUser := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w := httptest.NewRecorder()
+
+		payload := &models.UpdateUser{
+			Name: fmt.Sprintf("%s-new", firstUser.Name),
+		}
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		url := fmt.Sprintf("/api/users/user")
+		updUserReq, _ := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonPayload))
+		updUserReq.Header.Set("Content-Type", "application/json")
+		updUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, updUserReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var userResponse FindUserResponse
+
+		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
+		assert.Nil(t, err)
+		assert.Equal(t, userResponse.Status, "success")
+		assert.Equal(t, userResponse.Data.Name, payload.Name)
+	})
+
+	t.Run("UPDATE /api/users/user: success with access token, update phone", func(t *testing.T) {
+		firstUser := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w := httptest.NewRecorder()
+
+		payload := &models.UpdateUser{
+			Phone: "77000000101",
+		}
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		url := fmt.Sprintf("/api/users/user")
+		updUserReq, _ := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonPayload))
+		updUserReq.Header.Set("Content-Type", "application/json")
+		updUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, updUserReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var userResponse FindUserResponse
+
+		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
+		assert.Nil(t, err)
+		assert.Equal(t, userResponse.Status, "success")
+		assert.Equal(t, userResponse.Data.Phone, payload.Phone)
+	})
+
+	t.Run("UPDATE /api/users/user: success with access token, update phone", func(t *testing.T) {
+		firstUser := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w := httptest.NewRecorder()
+
+		payload := &models.UpdateUser{
+			Avatar: "https://jollycontrarian.com/images/6/6c/Rickroll.jpg",
+		}
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		url := fmt.Sprintf("/api/users/user")
+		updUserReq, _ := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonPayload))
+		updUserReq.Header.Set("Content-Type", "application/json")
+		updUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, updUserReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var userResponse FindUserResponse
+
+		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
+		assert.Nil(t, err)
+		assert.Equal(t, userResponse.Status, "success")
+		assert.Equal(t, userResponse.Data.Avatar, payload.Avatar)
+	})
+
 }

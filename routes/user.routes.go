@@ -27,6 +27,6 @@ func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 	router.DELETE("/user", uc.userController.DeleteSelf)
 	router.DELETE("/user/:id", middleware.AbacMiddleware("users", "delete"), uc.userController.DeleteUser)
 
-	router.PUT("/user", uc.userController.UpdateUser)
+	router.PUT("/user", uc.userController.UpdateSelf)
 	router.PUT("/user/:id", uc.userController.UpdateUser)
 }
