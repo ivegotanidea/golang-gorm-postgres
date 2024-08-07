@@ -1314,7 +1314,7 @@ func TestUserRoutes(t *testing.T) {
 		assert.Equal(t, userResponse.Data.Phone, payload.Phone)
 	})
 
-	t.Run("UPDATE /api/users/user: success with access token, update phone", func(t *testing.T) {
+	t.Run("UPDATE /api/users/user: success with access token, update avatar", func(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)

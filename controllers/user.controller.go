@@ -20,6 +20,23 @@ func NewUserController(DB *gorm.DB) UserController {
 	return UserController{DB}
 }
 
+func checkAvatar(newAvatarUrl string, oldAvatarUrl string) (string, string) {
+
+	if newAvatarUrl == "" {
+		return defaultUserAvatar, ""
+	}
+
+	if newAvatarUrl == oldAvatarUrl && oldAvatarUrl != defaultUserAvatar {
+		return newAvatarUrl, ""
+	}
+
+	if _, err := url.ParseRequestURI(newAvatarUrl); err != nil {
+		return "", err.Error()
+	}
+
+	return newAvatarUrl, ""
+}
+
 func (uc *UserController) GetMe(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
@@ -167,7 +184,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	}
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
 		return
 	}
 
@@ -189,22 +206,15 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	result := uc.DB.First(&updatedUser, "id = ?", userId)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
 		return
 	}
 
-	if payload.Avatar != "" {
-		if _, err := url.ParseRequestURI(payload.Avatar); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid avatar URL"})
-			return
-		}
-	}
+	avatarUrl, err := checkAvatar(payload.Avatar, updatedUser.Avatar)
 
-	if payload.Avatar == updatedUser.Avatar && updatedUser.Avatar != "" {
-		if _, err := url.ParseRequestURI(payload.Avatar); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Avatar URL can't be same"})
-			return
-		}
+	if err != "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err})
+		return
 	}
 
 	now := time.Now()
@@ -212,7 +222,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	userToUpdate := models.User{
 		Name:      payload.Name,
 		Phone:     payload.Phone,
-		Avatar:    payload.Avatar,
+		Avatar:    avatarUrl,
 		UpdatedAt: now,
 	}
 
