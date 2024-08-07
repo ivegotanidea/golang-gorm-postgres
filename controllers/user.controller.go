@@ -246,7 +246,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 
-	var payload *models.UpdateUser
+	var payload *models.UpdateUserPrivileged
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 		return
