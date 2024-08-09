@@ -3,8 +3,10 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/wpcodevo/golang-gorm-postgres/initializers"
 	"github.com/wpcodevo/golang-gorm-postgres/models"
+	"github.com/wpcodevo/golang-gorm-postgres/utils"
 	"gorm.io/gorm"
 	"net/http"
 	"net/url"
@@ -13,11 +15,20 @@ import (
 )
 
 type UserController struct {
-	DB *gorm.DB
+	DB        *gorm.DB
+	validator *validator.Validate
 }
 
 func NewUserController(DB *gorm.DB) UserController {
-	return UserController{DB}
+
+	v := validator.New()
+	err := v.RegisterValidation("imageurl", utils.ValidateImageURL)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return UserController{DB, v}
 }
 
 func checkAvatar(newAvatarUrl string, oldAvatarUrl string) (string, string) {
@@ -201,6 +212,12 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
+
+	if err := uc.validator.Struct(payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
 	var updatedUser models.User
 
 	result := uc.DB.First(&updatedUser, "id = ?", userId)
@@ -251,23 +268,50 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
-	var updatedPost models.Post
-	result := uc.DB.First(&updatedPost, "id = ?", userId)
-	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+
+	if err := uc.validator.Struct(payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
+	}
+
+	var updatedUser models.User
+	result := uc.DB.First(&updatedUser, "id = ?", userId)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
+		return
+	}
+
+	var newTelegramId int64
+	var err error
+
+	if payload.TelegramUserId != "" {
+
+		newTelegramId, err = strconv.ParseInt(payload.TelegramUserId, 10, 64)
+
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid telegram id"})
+			return
+		}
 	}
 
 	now := time.Now()
 
 	userToUpdate := models.User{
-		Name:      payload.Name,
-		Phone:     payload.Phone,
-		Avatar:    payload.Avatar,
-		UpdatedAt: now,
+		Name:           payload.Name,
+		Phone:          payload.Phone,
+		Avatar:         payload.Avatar,
+		TelegramUserId: newTelegramId,
+		Verified:       payload.Verified,
+		Tier:           payload.Tier,
+		Active:         payload.Active,
+		UpdatedAt:      now,
 	}
 
-	uc.DB.Model(&updatedPost).Updates(userToUpdate)
+	tx := uc.DB.Model(&updatedUser).Updates(userToUpdate)
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedPost})
+	if tx.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": tx.Error.Error()})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedUser})
 }

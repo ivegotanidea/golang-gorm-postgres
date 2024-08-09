@@ -12,7 +12,8 @@ type User struct {
 	Phone          string    `gorm:"type:varchar(30);uniqueIndex"`
 	TelegramUserId int64     `gorm:"type:bigint;not null;uniqueIndex"`
 	Password       string    `gorm:"type:varchar(255);not null"`
-	Verified       bool      `gorm:"type:boolean"`
+	Active         bool      `gorm:"type:boolean;default:true"`
+	Verified       bool      `gorm:"type:boolean;default:false"`
 	CreatedAt      time.Time `gorm:"type:timestamp;not null"`
 	UpdatedAt      time.Time `gorm:"type:timestamp;not null"`
 	Avatar         string    `gorm:"type:varchar(255)"`
@@ -57,24 +58,26 @@ type UserResponse struct {
 	Password       string    `json:"password,omitempty"`
 	Avatar         string    `json:"photo,omitempty"`
 	Verified       bool      `json:"verified"`
+	Active         bool      `json:"active"`
 	Tier           string    `json:"tier"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 type UpdateUserPrivileged struct {
-	Name           string `json:"name,omitempty"`
-	Phone          string `json:"phone,omitempty"`
-	TelegramUserId string `json:"telegramUserId,omitempty"`
-	Avatar         string `json:"photo,omitempty"`
-	Verified       bool   `json:"verified,omitempty"`
-	Tier           string `json:"tier,omitempty"`
+	Name           string `json:"name,omitempty" validate:"omitempty,min=3,max=20"`
+	Phone          string `json:"phone,omitempty" validate:"omitempty,min=11,max=11"`
+	TelegramUserId string `json:"telegramUserId,omitempty" validate:"omitempty,min=6"`
+	Avatar         string `json:"photo,omitempty"  validate:"omitempty,imageurl"`
+	Verified       bool   `json:"verified,omitempty" validate:"omitempty,boolean"`
+	Tier           string `json:"tier,omitempty" validate:"omitempty,oneof=basic experienced guru moderator admin"`
+	Active         bool   `json:"active,omitempty" validate:"omitempty,boolean"`
 }
 
 type UpdateUser struct {
-	Name   string `json:"name,omitempty"`
-	Phone  string `json:"phone,omitempty"`
-	Avatar string `json:"photo,omitempty"`
+	Name   string `json:"name,omitempty" validate:"omitempty,min=3,max=20"`
+	Phone  string `json:"phone,omitempty" validate:"omitempty,min=11,max=11"`
+	Avatar string `json:"photo,omitempty"  validate:"omitempty,imageurl"`
 }
 
 type UpdateUserPassword struct {
