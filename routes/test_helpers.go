@@ -18,10 +18,8 @@ import (
 )
 
 type UserResponse struct {
-	Status string `json:"status"`
-	Data   struct {
-		User models.UserResponse `json:"user"`
-	} `json:"data"`
+	Status string              `json:"status"`
+	Data   models.UserResponse `json:"data"`
 }
 
 func getOwnerUser() models.User {
@@ -34,17 +32,20 @@ func getOwnerUser() models.User {
 		Avatar:         "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202311/tom-hiddleston-in-a-still-from-loki-2-27480244-16x9_0.jpg",
 		Verified:       true,
 		HasProfile:     false,
-		Tier:           "owner",
+		Tier:           "guru",
+		Role:           "owner",
 	}
 }
 
-func createOwnerUser(db *gorm.DB) {
+func createOwnerUser(db *gorm.DB) models.User {
 
 	owner := getOwnerUser()
 
-	if err := db.Where("tier = ?", "owner").FirstOrCreate(&owner).Error; err != nil {
+	if err := db.Where("role = ?", "owner").FirstOrCreate(&owner).Error; err != nil {
 		panic(err)
 	}
+
+	return owner
 }
 
 func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T) models.UserResponse {
@@ -65,9 +66,51 @@ func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T) model
 	err := json.Unmarshal(w.Body.Bytes(), &userResponse)
 	assert.NoError(t, err)
 
-	user := userResponse.Data.User
+	user := userResponse.Data
 
 	return user
+}
+
+func assignRole(db *gorm.DB, t *testing.T, authRouter *gin.Engine, userRouter *gin.Engine, id string, role string) models.UserResponse {
+	owner := createOwnerUser(db)
+
+	accessTokenCookie, err := loginUserGetAccessToken(t, owner.Password, owner.TelegramUserId, authRouter)
+
+	if err != nil {
+		panic(err)
+	}
+
+	w := httptest.NewRecorder()
+
+	payload := &models.AssignRole{
+		Id:   id,
+		Role: role,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+
+	if err != nil {
+		fmt.Println("Error marshaling payload:", err)
+		return models.UserResponse{}
+	}
+
+	url := "/api/users/role"
+	assignRoleReq, _ := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonPayload))
+	assignRoleReq.Header.Set("Content-Type", "application/json")
+	assignRoleReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+	userRouter.ServeHTTP(w, assignRoleReq)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var userResponse UserResponse
+	err = json.Unmarshal(w.Body.Bytes(), &userResponse)
+	assert.Nil(t, err)
+	assert.Equal(t, userResponse.Status, "success")
+	assert.NotEmpty(t, userResponse)
+	assert.Equal(t, role, userResponse.Data.Role)
+	assert.Equal(t, "guru", userResponse.Data.Tier)
+
+	return userResponse.Data
 }
 
 func loginUserGetAccessToken(t *testing.T, password string, telegramUserId int64, authRouter *gin.Engine) (*http.Cookie, error) {

@@ -13,6 +13,7 @@ import (
 
 func DeserializeUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
 		var access_token string
 		cookie, err := ctx.Cookie("access_token")
 
@@ -47,6 +48,7 @@ func DeserializeUser() gin.HandlerFunc {
 		ctx.Set("currentUser", user)
 		ctx.Set("currentUserID", user.ID)
 		ctx.Set("currentUserTier", user.Tier)
+		ctx.Set("currentUserRole", user.Role)
 		ctx.Next()
 	}
 }

@@ -20,8 +20,8 @@ type User struct {
 	HasProfile     bool      `gorm:"type:boolean"`
 	Profiles       []Profile `gorm:"foreignKey:UserID"`
 	Services       []Service `gorm:"foreignKey:ClientUserID"`
-	Tier           string    `gorm:"type:varchar(50);not null;default:'basic'"` // oneOf: basic, expert, guru
-	Role           string    `gorm:"type:varchar(50);not null;default:'user'"`  // oneOf: user, moderator, admin
+	Tier           string    `gorm:"type:varchar(50);not null;default:basic"` // oneOf: basic, expert, guru
+	Role           string    `gorm:"type:varchar(50);not null;default:user"`  // oneOf: user, moderator, admin
 }
 
 type SignUpInput struct {
@@ -85,4 +85,9 @@ type UpdateUser struct {
 type UpdateUserPassword struct {
 	OldPassword string `json:"password" binding:"required,min=8"`
 	NewPassword string `json:"newPassword" binding:"required,min=8"`
+}
+
+type AssignRole struct {
+	Id   string `form:"id" binding:"required" validate:"required,uuid"`
+	Role string `json:"role" binding:"required" validate:"required,oneof=moderator admin"`
 }

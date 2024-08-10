@@ -18,11 +18,6 @@ import (
 	"time"
 )
 
-type FindUserResponse struct {
-	Status string              `json:"status"`
-	Data   models.UserResponse `json:"data"`
-}
-
 // SetupUCRouter sets up the router for testing.
 func SetupUCRouter(userController *controllers.UserController) *gin.Engine {
 	r := gin.Default()
@@ -155,10 +150,7 @@ func TestUserRoutes(t *testing.T) {
 	t.Run("GET /api/user: moderator, success list users", func(t *testing.T) {
 		user := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", user.ID).Update("tier", "moderator")
-
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		user = assignRole(initializers.DB, t, authRouter, userRouter, user.ID.String(), "moderator")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 
@@ -183,10 +175,7 @@ func TestUserRoutes(t *testing.T) {
 	t.Run("GET /api/user: admin, success list users", func(t *testing.T) {
 		user := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", user.ID).Update("tier", "admin")
-
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		user = assignRole(initializers.DB, t, authRouter, userRouter, user.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 
@@ -226,10 +215,8 @@ func TestUserRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		assert.NoError(t, err)
 
-		data := jsonResponse["data"].(map[string]interface{})
-		user := data["user"].(map[string]interface{})
+		user := jsonResponse["data"].(map[string]interface{})
 
-		assert.NotEmpty(t, data)
 		assert.NotEmpty(t, user)
 
 		w = httptest.NewRecorder()
@@ -265,7 +252,7 @@ func TestUserRoutes(t *testing.T) {
 		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		userRouter.ServeHTTP(w, findUserReq)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
 		assert.NotEmpty(t, userResponse)
@@ -291,7 +278,7 @@ func TestUserRoutes(t *testing.T) {
 		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		userRouter.ServeHTTP(w, findUserReq)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
 		assert.NotEmpty(t, userResponse)
@@ -317,7 +304,7 @@ func TestUserRoutes(t *testing.T) {
 		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		userRouter.ServeHTTP(w, findUserReq)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
 		assert.NotEmpty(t, userResponse)
@@ -470,9 +457,7 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -500,7 +485,7 @@ func TestUserRoutes(t *testing.T) {
 		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		userRouter.ServeHTTP(w, findUserReq)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
 		assert.Equal(t, userResponse.Status, "fail")
@@ -512,13 +497,8 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "moderator")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
-
-		tx = initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "moderator")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "moderator")
+		secondUser = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "moderator")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -578,13 +558,8 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
-
-		tx = initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "moderator")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
+		secondUser = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "moderator")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -612,13 +587,8 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
-
-		tx = initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
+		secondUser = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -646,9 +616,7 @@ func TestUserRoutes(t *testing.T) {
 		owner := getOwnerUser()
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		secondUser = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, owner.Password, owner.TelegramUserId, authRouter)
 
@@ -705,9 +673,7 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := getOwnerUser()
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -793,7 +759,7 @@ func TestUserRoutes(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
@@ -830,7 +796,7 @@ func TestUserRoutes(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
@@ -867,7 +833,7 @@ func TestUserRoutes(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
@@ -910,9 +876,7 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "moderator")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "moderator")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -945,9 +909,7 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -982,7 +944,7 @@ func TestUserRoutes(t *testing.T) {
 		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		userRouter.ServeHTTP(w, findUserReq)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
 		assert.Equal(t, userResponse.Status, "success")
@@ -990,13 +952,11 @@ func TestUserRoutes(t *testing.T) {
 		assert.Equal(t, userResponse.Data.Active, false)
 	})
 
-	t.Run("UPDATE /api/users/user: admin success with access token, deactivate user", func(t *testing.T) {
+	t.Run("UPDATE /api/users/user: admin success with access token, verify user", func(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -1031,7 +991,7 @@ func TestUserRoutes(t *testing.T) {
 		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		userRouter.ServeHTTP(w, findUserReq)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
 		assert.Equal(t, userResponse.Status, "success")
@@ -1043,9 +1003,7 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "admin")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -1080,7 +1038,7 @@ func TestUserRoutes(t *testing.T) {
 		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		userRouter.ServeHTTP(w, findUserReq)
 
-		var userResponse FindUserResponse
+		var userResponse UserResponse
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
 		assert.Equal(t, userResponse.Status, "success")

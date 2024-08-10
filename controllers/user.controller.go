@@ -61,10 +61,9 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 		UpdatedAt: currentUser.UpdatedAt,
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"user": userResponse}})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": userResponse})
 }
 
-// todo available only for moderators / admins
 func (uc *UserController) GetUsers(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -175,12 +174,12 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	if currentUser.Tier == "moderator" && (targetUser.Tier == "moderator" || targetUser.Tier == "admin" || targetUser.Tier == "owner") {
+	if currentUser.Role == "moderator" && (targetUser.Role == "moderator" || targetUser.Role == "admin" || targetUser.Role == "owner") {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
 		return
 	}
 
-	if currentUser.Tier == "admin" && (targetUser.Tier == "admin" || targetUser.Tier == "owner") {
+	if currentUser.Role == "admin" && (targetUser.Role == "admin" || targetUser.Role == "owner") {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
 		return
 	}
@@ -314,4 +313,51 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedUser})
+}
+
+func (uc *UserController) AssignRole(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+
+	var payload models.AssignRole
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	if err := uc.validator.Struct(payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	var targetUser models.User
+	if err := initializers.DB.First(&targetUser, "id = ?", payload.Id).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
+		return
+	}
+
+	if currentUser.Role == "admin" && (targetUser.Role == "admin" || targetUser.Role == "owner") {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
+		return
+	}
+
+	if targetUser.HasProfile {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "User has profile"})
+		return
+	}
+
+	// Assign the role to the targetUser
+	targetUser.Role = payload.Role
+
+	// Automatically assign the "guru" tier if the role is "moderator"
+	if payload.Role == "moderator" || payload.Role == "admin" {
+		targetUser.Tier = "guru"
+	}
+
+	if err := initializers.DB.Save(&targetUser).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to change user's role"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": targetUser})
+
 }

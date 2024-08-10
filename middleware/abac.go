@@ -3,28 +3,43 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/wpcodevo/golang-gorm-postgres/initializers"
+	"github.com/wpcodevo/golang-gorm-postgres/models"
 	"net/http"
 )
 
 func AbacMiddleware(obj string, act string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		_, exists := c.Get("currentUserID")
+
+		user, exists := c.Get("currentUser")
+
 		if !exists {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 			c.Abort()
 			return
 		}
 
-		// Fetch the user's tier
-		tier, exists := c.Get("currentUserTier")
-		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User tier not found"})
+		currentUser, ok := user.(models.User)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while getting user"})
 			c.Abort()
 			return
 		}
 
+		initializers.Enforcer.EnableLog(true)
+
+		hasProfileStr := "false"
+		if currentUser.HasProfile {
+			hasProfileStr = "true"
+		}
+
 		// Check if the user has permission
-		ok, err := initializers.Enforcer.Enforce(tier, obj, act, tier)
+		ok, err := initializers.Enforcer.Enforce(
+			currentUser.Role, // sub
+			obj,              // obj
+			act,              // act
+			currentUser.Tier, // tier
+			hasProfileStr)    // hasProfile
+
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while checking permissions"})
 			c.Abort()

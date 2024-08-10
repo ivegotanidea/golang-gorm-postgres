@@ -32,7 +32,7 @@ func CreateOwnerUser(db *gorm.DB) {
 		Tier:           "owner",
 	}
 
-	if err := db.Where("tier = ?", "owner").FirstOrCreate(&owner).Error; err != nil {
+	if err := db.Where("role = ?", "owner").FirstOrCreate(&owner).Error; err != nil {
 		panic(err)
 	}
 }

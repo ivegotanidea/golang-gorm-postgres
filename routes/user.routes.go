@@ -29,4 +29,6 @@ func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 
 	router.PUT("/user", uc.userController.UpdateSelf)
 	router.PUT("/user/:id", middleware.AbacMiddleware("users", "update"), uc.userController.UpdateUser)
+
+	router.PUT("/role", middleware.AbacMiddleware("users", "promote"), uc.userController.AssignRole)
 }
