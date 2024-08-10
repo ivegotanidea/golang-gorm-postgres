@@ -20,7 +20,8 @@ type User struct {
 	HasProfile     bool      `gorm:"type:boolean"`
 	Profiles       []Profile `gorm:"foreignKey:UserID"`
 	Services       []Service `gorm:"foreignKey:ClientUserID"`
-	Tier           string    `gorm:"type:varchar(50);not null;default:'basic'"`
+	Tier           string    `gorm:"type:varchar(50);not null;default:'basic'"` // oneOf: basic, expert, guru
+	Role           string    `gorm:"type:varchar(50);not null;default:'user'"`  // oneOf: user, moderator, admin
 }
 
 type SignUpInput struct {
@@ -60,6 +61,7 @@ type UserResponse struct {
 	Verified       bool      `json:"verified"`
 	Active         bool      `json:"active"`
 	Tier           string    `json:"tier"`
+	Role           string    `json:"role"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -70,7 +72,7 @@ type UpdateUserPrivileged struct {
 	TelegramUserId string `json:"telegramUserId,omitempty" validate:"omitempty,min=6"`
 	Avatar         string `json:"photo,omitempty"  validate:"omitempty,imageurl"`
 	Verified       bool   `json:"verified,omitempty" validate:"omitempty,boolean"`
-	Tier           string `json:"tier,omitempty" validate:"omitempty,oneof=basic experienced guru"`
+	Tier           string `json:"tier,omitempty" validate:"omitempty,oneof=basic expert guru"`
 	Active         bool   `json:"active,omitempty" validate:"omitempty,boolean"`
 }
 
