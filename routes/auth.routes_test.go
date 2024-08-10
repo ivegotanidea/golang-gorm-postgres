@@ -9,7 +9,7 @@ import (
 	"github.com/wpcodevo/golang-gorm-postgres/controllers"
 	"github.com/wpcodevo/golang-gorm-postgres/initializers"
 	"github.com/wpcodevo/golang-gorm-postgres/models"
-	utils "github.com/wpcodevo/golang-gorm-postgres/utils"
+	"github.com/wpcodevo/golang-gorm-postgres/utils"
 	"log"
 	"math/rand/v2"
 	"net/http"

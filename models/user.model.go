@@ -70,7 +70,7 @@ type UpdateUserPrivileged struct {
 	TelegramUserId string `json:"telegramUserId,omitempty" validate:"omitempty,min=6"`
 	Avatar         string `json:"photo,omitempty"  validate:"omitempty,imageurl"`
 	Verified       bool   `json:"verified,omitempty" validate:"omitempty,boolean"`
-	Tier           string `json:"tier,omitempty" validate:"omitempty,oneof=basic experienced guru moderator admin"`
+	Tier           string `json:"tier,omitempty" validate:"omitempty,oneof=basic experienced guru"`
 	Active         bool   `json:"active,omitempty" validate:"omitempty,boolean"`
 }
 
