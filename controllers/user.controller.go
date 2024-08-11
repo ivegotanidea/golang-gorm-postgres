@@ -65,6 +65,9 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 }
 
 func (uc *UserController) GetUsers(ctx *gin.Context) {
+
+	currentUser := ctx.MustGet("currentUser").(models.User)
+
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
 
@@ -73,7 +76,14 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 	offset := (intPage - 1) * intLimit
 
 	var users []models.User
-	results := uc.DB.Limit(intLimit).Offset(offset).Find(&users)
+
+	var results *gorm.DB
+
+	if currentUser.Role == "user" {
+		results = uc.DB.Limit(intLimit).Offset(offset).Find(&users, "role = ?", "user")
+	} else {
+		results = uc.DB.Limit(intLimit).Offset(offset).Find(&users, "role != ?", "owner")
+	}
 
 	if results.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})

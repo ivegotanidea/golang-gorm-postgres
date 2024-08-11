@@ -999,7 +999,7 @@ func TestUserRoutes(t *testing.T) {
 		assert.Equal(t, userResponse.Data.Verified, true)
 	})
 
-	t.Run("UPDATE /api/users/user: admin success with access token, deactivate user", func(t *testing.T) {
+	t.Run("GET /api/users/users: guru success list users with access token", func(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
@@ -1014,7 +1014,7 @@ func TestUserRoutes(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		payload := &models.UpdateUserPrivileged{
-			Active: false,
+			Tier: "expert",
 		}
 
 		jsonPayload, err := json.Marshal(payload)
@@ -1043,6 +1043,26 @@ func TestUserRoutes(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, userResponse.Status, "success")
 		assert.NotEmpty(t, userResponse)
-		assert.Equal(t, false, userResponse.Data.Active)
+		assert.Equal(t, "expert", userResponse.Data.Tier)
+
+		accessTokenCookie, err = loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w = httptest.NewRecorder()
+		meReq, _ := http.NewRequest("GET", "/api/users/", nil)
+		meReq.Header.Set("Content-Type", "application/json")
+		meReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, meReq)
+
+		var jsonResponse map[string]interface{}
+		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+		assert.Nil(t, err)
+
+		assert.NotEmpty(t, jsonResponse["data"])
+		assert.Equal(t, http.StatusOK, w.Code)
+
 	})
 }

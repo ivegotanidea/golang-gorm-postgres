@@ -11,3 +11,8 @@ p, admin, *, *, *, *
 # owner
 
 p, owner, *, *, *, *
+
+# tiers
+
+p, user, users, list, expert, false
+p, user, users, list, guru, false
