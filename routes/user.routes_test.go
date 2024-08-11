@@ -999,7 +999,7 @@ func TestUserRoutes(t *testing.T) {
 		assert.Equal(t, userResponse.Data.Verified, true)
 	})
 
-	t.Run("GET /api/users/users: guru success list users with access token", func(t *testing.T) {
+	t.Run("GET /api/users/users: expert success list users with access token", func(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
@@ -1044,6 +1044,73 @@ func TestUserRoutes(t *testing.T) {
 		assert.Equal(t, userResponse.Status, "success")
 		assert.NotEmpty(t, userResponse)
 		assert.Equal(t, "expert", userResponse.Data.Tier)
+
+		accessTokenCookie, err = loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w = httptest.NewRecorder()
+		meReq, _ := http.NewRequest("GET", "/api/users/", nil)
+		meReq.Header.Set("Content-Type", "application/json")
+		meReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, meReq)
+
+		var jsonResponse map[string]interface{}
+		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
+		assert.Nil(t, err)
+
+		assert.NotEmpty(t, jsonResponse["data"])
+		assert.Equal(t, http.StatusOK, w.Code)
+
+	})
+
+	t.Run("GET /api/users/users: guru success list users with access token", func(t *testing.T) {
+		firstUser := generateUser(random, authRouter, t)
+		secondUser := generateUser(random, authRouter, t)
+
+		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w := httptest.NewRecorder()
+
+		payload := &models.UpdateUserPrivileged{
+			Tier: "guru",
+		}
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		url := fmt.Sprintf("/api/users/user/%s", secondUser.ID)
+		updUserReq, _ := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonPayload))
+		updUserReq.Header.Set("Content-Type", "application/json")
+		updUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, updUserReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		w = httptest.NewRecorder()
+		url = fmt.Sprintf("/api/users/user?phone=%s", secondUser.Phone)
+		findUserReq, _ := http.NewRequest("GET", url, nil)
+		findUserReq.Header.Set("Content-Type", "application/json")
+		findUserReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		userRouter.ServeHTTP(w, findUserReq)
+
+		var userResponse UserResponse
+		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
+		assert.Nil(t, err)
+		assert.Equal(t, userResponse.Status, "success")
+		assert.NotEmpty(t, userResponse)
+		assert.Equal(t, payload.Tier, userResponse.Data.Tier)
 
 		accessTokenCookie, err = loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
 
