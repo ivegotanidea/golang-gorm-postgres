@@ -64,7 +64,7 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": userResponse})
 }
 
-func (uc *UserController) GetUsers(ctx *gin.Context) {
+func (uc *UserController) FindUsers(ctx *gin.Context) {
 
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
@@ -93,7 +93,7 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(users), "data": users, "page": page, "limit": limit})
 }
 
-func (uc *UserController) FindUser(ctx *gin.Context) {
+func (uc *UserController) GetUser(ctx *gin.Context) {
 	var query *models.FindUserQuery
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {
