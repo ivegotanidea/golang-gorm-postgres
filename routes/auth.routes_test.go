@@ -43,7 +43,7 @@ func SetupAuthController() controllers.AuthController {
 	authController.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	// Migrate the schema
-	if err := authController.DB.AutoMigrate(&models.User{}); err != nil {
+	if err := authController.DB.AutoMigrate(&models.User{}, &models.Profile{}, &models.Service{}, &models.Photo{}, &models.ProfileOption{}, &models.UserRating{}, &models.ProfileRating{}); err != nil {
 		panic("failed to migrate database: " + err.Error())
 	}
 
@@ -58,7 +58,7 @@ func TestAuthRoutes(t *testing.T) {
 
 	t.Cleanup(func() {
 		utils.CleanupTestUsers(ac.DB)
-		utils.DropAllTables(ac.DB)
+		//utils.DropAllTables(ac.DB)
 	})
 
 	t.Run("POST /api/auth/register: successful registration OK ", func(t *testing.T) {
@@ -79,8 +79,7 @@ func TestAuthRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		assert.NoError(t, err)
 
-		data := jsonResponse["data"].(map[string]interface{})
-		user := data["user"].(map[string]interface{})
+		user := jsonResponse["data"].(map[string]interface{})
 
 		assert.Equal(t, "success", jsonResponse["status"])
 		// Check name and phone
@@ -260,8 +259,7 @@ func TestAuthRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		assert.NoError(t, err)
 
-		data := jsonResponse["data"].(map[string]interface{})
-		user := data["user"].(map[string]interface{})
+		user := jsonResponse["data"].(map[string]interface{})
 
 		assert.Equal(t, "success", jsonResponse["status"])
 		// Check name and phone

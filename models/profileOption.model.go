@@ -7,7 +7,7 @@ import (
 type ProfileOption struct {
 	ProfileID    uuid.UUID `gorm:"primaryKey;type:uuid"`
 	ProfileTagID uuid.UUID `gorm:"foreignKey:ProfileTagID"`
-	Price        int64     `gorm:"type:int64"`
+	Price        int64     `gorm:"type:bigint"`
 	Comment      string    `gorm:"type:text"`
 }
 
