@@ -26,11 +26,11 @@ func SetupDB() controllers.AuthController {
 
 	initializers.ConnectDB(&config)
 
-	authController := controllers.NewAuthController(initializers.DB)
-	authController.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
+	controller := controllers.NewAuthController(initializers.DB)
+	controller.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	// Migrate the schema
-	if err := authController.DB.AutoMigrate(
+	if err := controller.DB.AutoMigrate(
 		&models.User{},
 		&models.Profile{},
 		&models.Service{},
@@ -41,7 +41,7 @@ func SetupDB() controllers.AuthController {
 		panic("failed to migrate database: " + err.Error())
 	}
 
-	return authController
+	return controller
 }
 
 func TestDbMigrations(t *testing.T) {
