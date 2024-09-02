@@ -5,8 +5,8 @@ import (
 )
 
 type ProfileOption struct {
-	ProfileID    uuid.UUID  `gorm:"type:uuid;primaryKey"` // Part of composite primary key
-	ProfileTagID uuid.UUID  `gorm:"type:uuid;primaryKey"` // Part of composite primary key, and also a foreign key
+	ProfileID    uuid.UUID  `gorm:"primaryKey;type:uuid"` // Part of composite primary key
+	ProfileTagID uuid.UUID  `gorm:"primaryKey;type:uuid"` // Part of composite primary key, and also a foreign key
 	Price        int64      `gorm:"type:bigint"`
 	Comment      string     `gorm:"type:text"`
 	ProfileTag   ProfileTag `gorm:"foreignKey:ProfileTagID;references:ID"`
