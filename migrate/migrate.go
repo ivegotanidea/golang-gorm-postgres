@@ -21,7 +21,7 @@ func init() {
 func CreateOwnerUser(db *gorm.DB) {
 
 	owner := models.User{
-		ID:             uuid.New(),
+		ID:             uuid.Max,
 		Name:           "He Who Remains",
 		Phone:          "77778889900",
 		TelegramUserId: 6794234746,
@@ -39,7 +39,17 @@ func CreateOwnerUser(db *gorm.DB) {
 
 func Init() {
 	initializers.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
-	err := initializers.DB.AutoMigrate(&models.User{}, &models.Post{})
+
+	err := initializers.DB.AutoMigrate(
+		&models.Post{},
+		&models.User{},
+		&models.Profile{},
+		&models.Service{},
+		&models.Photo{},
+		&models.ProfileOption{},
+		&models.UserRating{},
+		&models.ProfileRating{},
+		&models.ProfileTag{})
 
 	// Auto-migrate the User model
 	if err != nil {

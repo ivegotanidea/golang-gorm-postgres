@@ -2,15 +2,18 @@ package models
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
 type Profile struct {
+	City             string    `gorm:"type:varchar(50);not null;default:''"`
+	ParsedUrl        string    `gorm:"type:varchar(255);not null;default:''"`
 	ID               uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	UserID           uuid.UUID `gorm:"type:uuid;not null"`
 	Active           bool      `gorm:"type:boolean;default:true"`
-	Phone            string    `gorm:"type:varchar(30)"`
-	Name             string    `gorm:"type:varchar(30)"`
+	Phone            string    `gorm:"type:varchar(30)"` // ;index:,unique,composite:idx_single_profile"
+	Name             string    `gorm:"type:varchar(50)"`
 	Age              int       `gorm:"type:int;not null"`
 	Height           int       `gorm:"type:int;not null"`
 	Weight           int       `gorm:"type:int;not null"`
@@ -44,12 +47,13 @@ type Profile struct {
 	Moderated bool `gorm:"type:boolean;default:false"`
 	Verified  bool `gorm:"type:boolean;default:false"`
 
-	CreatedAt time.Time `gorm:"type:timestamp;not null"`
-	UpdatedAt time.Time `gorm:"type:timestamp;not null"`
-	UpdatedBy uuid.UUID `gorm:"type:uuid;not null"`
+	CreatedAt time.Time      `gorm:"type:timestamp;not null"`
+	UpdatedAt time.Time      `gorm:"type:timestamp;not null"`
+	UpdatedBy uuid.UUID      `gorm:"type:uuid;not null"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	Photos         []Photo         `gorm:"foreignKey:ProfileID"`
-	ProfileOptions []ProfileOption `gorm:"foreignKey:ProfileID"`
+	Photos         []Photo         `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
+	ProfileOptions []ProfileOption `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
 	Services       []Service       `gorm:"foreignKey:ProfileID"`
 }
 

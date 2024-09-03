@@ -37,7 +37,8 @@ func SetupDB() controllers.AuthController {
 		&models.Photo{},
 		&models.ProfileOption{},
 		&models.UserRating{},
-		&models.ProfileRating{}); err != nil {
+		&models.ProfileRating{},
+		&models.ProfileTag{}); err != nil {
 		panic("failed to migrate database: " + err.Error())
 	}
 
@@ -52,10 +53,11 @@ func TestDbMigrations(t *testing.T) {
 
 	t.Cleanup(func() {
 		utils.CleanupTestUsers(ac.DB)
-		utils.DropAllTables(ac.DB)
+		//utils.DropAllTables(ac.DB)
 	})
 
 	t.Run("POST /api/auth/register: successful registration OK ", func(t *testing.T) {
+
 		name := "testiculous-andrew"
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
 		telegramUserId := fmt.Sprintf("%d", rand.Int64())

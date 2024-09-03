@@ -6,5 +6,5 @@ import (
 
 type ProfileTag struct {
 	ID   uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Name string    `gorm:"type:varchar(30)"`
+	Name string    `gorm:"uniqueIndex;type:varchar(50)"`
 }
