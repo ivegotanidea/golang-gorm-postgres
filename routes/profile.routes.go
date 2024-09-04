@@ -16,7 +16,7 @@ func NewRouteProfileController(profileController controllers.ProfileController) 
 
 func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 
-	router := rg.Group("posts")
+	router := rg.Group("profiles")
 	router.Use(middleware.DeserializeUser())
 
 	router.POST("/", pc.profileController.CreateProfile)

@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -20,31 +19,103 @@ func NewProfileController(DB *gorm.DB) ProfileController {
 }
 
 func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
+	// Get the current user
 	currentUser := ctx.MustGet("currentUser").(models.User)
-	var payload *models.CreatePostRequest
+	var payload *models.CreateProfileRequest
 
+	// Bind and validate the input payload
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
 
+	// Start a transaction
+	tx := pc.DB.Begin()
+
+	// Create the profile
 	now := time.Now()
 	newProfile := models.Profile{
-		UserID:    currentUser.ID,
-		CreatedAt: now,
-		UpdatedAt: now,
+		UserID:              currentUser.ID,
+		CreatedAt:           now,
+		UpdatedAt:           now,
+		City:                payload.City,
+		Active:              payload.Active,
+		Phone:               payload.Phone,
+		Name:                payload.Name,
+		Age:                 payload.Age,
+		Height:              payload.Height,
+		Weight:              payload.Weight,
+		Bust:                payload.Bust,
+		Type:                payload.Type,
+		Ethnos:              payload.Ethnos,
+		Bio:                 payload.Bio,
+		AddressLatitude:     payload.AddressLatitude,
+		AddressLongitude:    payload.AddressLongitude,
+		PriceInHouseContact: payload.PriceInHouseContact,
+		PriceInHouseHour:    payload.PriceInHouseHour,
+		PriceSaunaContact:   payload.PriceSaunaContact,
+		PriceSaunaHour:      payload.PriceSaunaHour,
+		PriceVisitContact:   payload.PriceVisitContact,
+		PriceVisitHour:      payload.PriceVisitHour,
+		PriceCarContact:     payload.PriceCarContact,
+		PriceCarHour:        payload.PriceCarHour,
+		ContactPhone:        payload.ContactPhone,
+		ContactWA:           payload.ContactWA,
+		ContactTG:           payload.ContactTG,
+		Moderated:           false,
+		Verified:            false,
 	}
 
-	result := pc.DB.Create(&newProfile)
-	if result.Error != nil {
-		if strings.Contains(result.Error.Error(), "duplicate key") {
-			ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "Post with that title already exists"})
-			return
-		}
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+	// Insert profile into the database
+	if err := tx.Create(&newProfile).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile"})
 		return
 	}
 
+	// Insert associated photos
+	var photos []models.Photo
+	for _, photoReq := range payload.Photos {
+		photo := models.Photo{
+			ProfileID: newProfile.ID,
+			URL:       photoReq.URL,
+			CreatedAt: time.Now(),
+		}
+		photos = append(photos, photo)
+	}
+
+	// Batch insert photos
+	if err := tx.Create(&photos).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create photos"})
+		return
+	}
+
+	// Insert associated profile options
+	var options []models.ProfileOption
+	for _, optionReq := range payload.Options {
+		option := models.ProfileOption{
+			ProfileID:    newProfile.ID,
+			ProfileTagID: optionReq.ProfileTagID,
+			Price:        optionReq.Price,
+		}
+		options = append(options, option)
+	}
+
+	// Batch insert options
+	if err := tx.Create(&options).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile options"})
+		return
+	}
+
+	// Commit the transaction if everything was successful
+	if err := tx.Commit().Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to commit transaction"})
+		return
+	}
+
+	// Return the created profile in the response
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newProfile})
 }
 

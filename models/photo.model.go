@@ -16,6 +16,5 @@ type Photo struct {
 }
 
 type CreatePhotoRequest struct {
-	ProfileID uuid.UUID `json:"profile_id" binding:"required" validate:"required,uuid"`
-	URL       string    `json:"url" binding:"required" validate:"required,imageurl"`
+	URL string `json:"url" binding:"required" validate:"required,imageurl"`
 }

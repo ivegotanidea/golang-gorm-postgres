@@ -61,25 +61,30 @@ type CreateProfileRequest struct {
 	Phone  string  `json:"phone"  binding:"required"`
 	Name   string  `json:"name"  binding:"required"`
 	Age    int     `json:"age"  binding:"required"`
+	City   string  `json:"city"  binding:"required"`
 	Height int     `json:"height"  binding:"required"`
 	Weight int     `json:"weight"  binding:"required"`
 	Bust   float64 `json:"bust"  binding:"required"`
 	Type   string  `json:"type"  binding:"required"`
 	Ethnos string  `json:"ethnos"  binding:"required"`
 	Bio    string  `json:"bio"  binding:"required"`
+	Active bool    `json:"active"  binding:"required"`
 
-	PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
-	PriceInHouseContact    int     `json:"priceInHouseContact,omitempty"`
-	PriceInHouseHour       int     `json:"priceInHouseHour,omitempty"`
-	PrinceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
-	PriceSaunaContact      int     `json:"priceSaunaContact,omitempty"`
-	PriceSaunaHour         int     `json:"priceSaunaHour,omitempty"`
-	PriceVisitNightRatio   float64 `json:"priceVisitNightRatio,omitempty"`
-	PriceVisitContact      int     `json:"priceVisitContact,omitempty"`
-	PriceVisitHour         int     `json:"priceVisitHour,omitempty"`
-	PriceCarNightRatio     float64 `json:"priceCarNightRatio,omitempty"`
-	PriceCarContact        int     `json:"priceCarContact,omitempty"`
-	PriceCarHour           int     `json:"priceCarHour,omitempty"`
+	AddressLatitude  string `json:"latitude,omitempty"`
+	AddressLongitude string `json:"longitude,omitempty"`
+
+	//PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
+	PriceInHouseContact int `json:"priceInHouseContact,omitempty"`
+	PriceInHouseHour    int `json:"priceInHouseHour,omitempty"`
+	//PrinceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
+	PriceSaunaContact int `json:"priceSaunaContact,omitempty"`
+	PriceSaunaHour    int `json:"priceSaunaHour,omitempty"`
+	//PriceVisitNightRatio   float64 `json:"priceVisitNightRatio,omitempty"`
+	PriceVisitContact int `json:"priceVisitContact,omitempty"`
+	PriceVisitHour    int `json:"priceVisitHour,omitempty"`
+	//PriceCarNightRatio     float64 `json:"priceCarNightRatio,omitempty"`
+	PriceCarContact int `json:"priceCarContact,omitempty"`
+	PriceCarHour    int `json:"priceCarHour,omitempty"`
 
 	ContactPhone string `json:"contactPhone" binding:"required"`
 	ContactTG    string `json:"contactTG" binding:"required"`
