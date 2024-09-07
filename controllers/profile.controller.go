@@ -134,6 +134,12 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		return
 	}
 
+	if err := tx.Preload("ProfileTag").Find(&options).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to load profile tag data: " + err.Error()})
+		return
+	}
+
 	newProfile.ProfileOptions = options
 
 	// Commit the transaction if everything was successful
