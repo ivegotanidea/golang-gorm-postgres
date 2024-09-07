@@ -38,15 +38,18 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		UserID:              currentUser.ID,
 		CreatedAt:           now,
 		UpdatedAt:           now,
-		City:                payload.City,
-		Active:              payload.Active,
+		CityID:              payload.CityID,
+		Active:              true,
 		Phone:               payload.Phone,
 		Name:                payload.Name,
 		Age:                 payload.Age,
 		Height:              payload.Height,
 		Weight:              payload.Weight,
 		Bust:                payload.Bust,
-		Type:                payload.Type,
+		BodyTypeId:          payload.BodyTypeId,
+		EthnosId:            payload.EthnosId,
+		HairColorId:         payload.HairColorId,
+		IntimateHairCutId:   payload.IntimateHairCutId,
 		Ethnos:              payload.Ethnos,
 		Bio:                 payload.Bio,
 		AddressLatitude:     payload.AddressLatitude,
@@ -74,6 +77,26 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	}
 
 	// Insert associated photos
+	var bodyArts []models.ProfileBodyArt
+	for _, bodyArtReq := range payload.BodyArts {
+		profileBodyArt := models.ProfileBodyArt{
+			BodyArtID: bodyArtReq.ID,
+			ProfileID: newProfile.ID,
+		}
+
+		bodyArts = append(bodyArts, profileBodyArt)
+	}
+
+	newProfile.BodyArt = bodyArts
+
+	// Batch insert options
+	if err := tx.Create(&bodyArts).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create body arts connection" + err.Error()})
+		return
+	}
+
+	// Insert associated photos
 	var photos []models.Photo
 	for _, photoReq := range payload.Photos {
 		photo := models.Photo{
@@ -91,12 +114,14 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		return
 	}
 
+	newProfile.Photos = photos
+
 	// Insert associated profile options
 	var options []models.ProfileOption
 	for _, optionReq := range payload.Options {
 		option := models.ProfileOption{
 			ProfileID:    newProfile.ID,
-			ProfileTagID: optionReq.ProfileTagID,
+			ProfileTagID: int(optionReq.ProfileTagID),
 			Price:        optionReq.Price,
 		}
 		options = append(options, option)
@@ -105,9 +130,11 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Batch insert options
 	if err := tx.Create(&options).Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile options"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile options" + err.Error()})
 		return
 	}
+
+	newProfile.ProfileOptions = options
 
 	// Commit the transaction if everything was successful
 	if err := tx.Commit().Error; err != nil {

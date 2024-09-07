@@ -41,7 +41,13 @@ func Init() {
 	initializers.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	err := initializers.DB.AutoMigrate(
-		&models.Post{},
+		&models.HairColor{},
+		&models.IntimateHairCut{},
+		&models.Ethnos{},
+		&models.BodyType{},
+		&models.ProfileBodyArt{},
+		&models.BodyArt{},
+		&models.City{},
 		&models.User{},
 		&models.Profile{},
 		&models.Service{},

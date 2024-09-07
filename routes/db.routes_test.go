@@ -31,6 +31,13 @@ func SetupDB() controllers.AuthController {
 
 	// Migrate the schema
 	if err := controller.DB.AutoMigrate(
+		&models.HairColor{},
+		&models.IntimateHairCut{},
+		&models.Ethnos{},
+		&models.BodyType{},
+		&models.ProfileBodyArt{},
+		&models.BodyArt{},
+		&models.City{},
 		&models.User{},
 		&models.Profile{},
 		&models.Service{},

@@ -7,7 +7,15 @@ import (
 )
 
 type Profile struct {
-	City             string    `gorm:"type:varchar(50);not null;default:''"`
+	BodyTypeId        uint `gorm:"type:integer;default:null"`
+	EthnosId          uint `gorm:"type:integer;default:null"` // todo: not null by default
+	HairColorId       uint `gorm:"type:integer;default:null"`
+	IntimateHairCutId uint `gorm:"type:integer;default:null"`
+
+	// deprecate
+	Ethnos string `gorm:"type:varchar(30);not null"`
+
+	CityID           uint      `gorm:"type:integer; not null"`
 	ParsedUrl        string    `gorm:"type:varchar(255);not null;default:''"`
 	ID               uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	UserID           uuid.UUID `gorm:"type:uuid;not null"`
@@ -18,8 +26,6 @@ type Profile struct {
 	Height           int       `gorm:"type:int;not null"`
 	Weight           int       `gorm:"type:int;not null"`
 	Bust             float64   `gorm:"type:float"`
-	Type             string    `gorm:"type:varchar(30);not null"`
-	Ethnos           string    `gorm:"type:varchar(30);not null"`
 	Bio              string    `gorm:"type:varchar(2000)"`
 	AddressLatitude  string    `gorm:"type:varchar(10)"`
 	AddressLongitude string    `gorm:"type:varchar(10)"`
@@ -52,23 +58,28 @@ type Profile struct {
 	UpdatedBy uuid.UUID      `gorm:"type:uuid;not null"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	Photos         []Photo         `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
-	ProfileOptions []ProfileOption `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
-	Services       []Service       `gorm:"foreignKey:ProfileID"`
+	BodyArt        []ProfileBodyArt `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
+	Photos         []Photo          `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
+	ProfileOptions []ProfileOption  `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
+	Services       []Service        `gorm:"foreignKey:ProfileID"`
 }
 
 type CreateProfileRequest struct {
 	Phone  string  `json:"phone"  binding:"required"`
 	Name   string  `json:"name"  binding:"required"`
 	Age    int     `json:"age"  binding:"required"`
-	City   string  `json:"city"  binding:"required"`
+	CityID uint    `json:"cityId"  binding:"required"`
 	Height int     `json:"height"  binding:"required"`
 	Weight int     `json:"weight"  binding:"required"`
 	Bust   float64 `json:"bust"  binding:"required"`
-	Type   string  `json:"type"  binding:"required"`
-	Ethnos string  `json:"ethnos"  binding:"required"`
-	Bio    string  `json:"bio"  binding:"required"`
-	Active bool    `json:"active"  binding:"required"`
+	Ethnos string  `json:"ethnos"  binding:"omitempty"`
+
+	EthnosId          uint `json:"ethnosId"  binding:"required"`
+	HairColorId       uint `json:"hairColorId"  binding:"omitempty"`
+	BodyTypeId        uint `json:"bodyTypeId"  binding:"omitempty"`
+	IntimateHairCutId uint `json:"intimateHairCutId"  binding:"omitempty"`
+
+	Bio string `json:"bio"  binding:"required"`
 
 	AddressLatitude  string `json:"latitude,omitempty"`
 	AddressLongitude string `json:"longitude,omitempty"`
@@ -90,20 +101,22 @@ type CreateProfileRequest struct {
 	ContactTG    string `json:"contactTG" binding:"required"`
 	ContactWA    string `json:"contactWA,omitempty"`
 
-	Photos  []CreatePhotoRequest  `json:"photos" binding:"required,dive"`
-	Options []CreateProfileOption `json:"profileOptions" binding:"required,dive"`
+	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty"`
+	Photos   []CreatePhotoRequest   `json:"photos" binding:"required,dive"`
+	Options  []CreateProfileOption  `json:"profileOptions" binding:"required,dive"`
 }
 
 type UpdateProfileRequest struct {
-	Phone  string  `json:"phone"  binding:"required"`
-	Name   string  `json:"name"  binding:"required"`
-	Age    int     `json:"age"  binding:"required"`
-	Height int     `json:"height"  binding:"required"`
-	Weight int     `json:"weight"  binding:"required"`
-	Bust   float64 `json:"bust"  binding:"required"`
-	Type   string  `json:"type"  binding:"required"`
-	Ethnos string  `json:"ethnos"  binding:"required"`
-	Bio    string  `json:"bio"  binding:"required"`
+	CityID     int     `json:"cityId"  binding:"required"`
+	Phone      string  `json:"phone"  binding:"required"`
+	Name       string  `json:"name"  binding:"required"`
+	Age        int     `json:"age"  binding:"required"`
+	Height     int     `json:"height"  binding:"required"`
+	Weight     int     `json:"weight"  binding:"required"`
+	Bust       float64 `json:"bust"  binding:"required"`
+	BodyTypeId int     `json:"bodyTypeId"  binding:"omitempty"`
+	Ethnos     string  `json:"ethnos"  binding:"required"`
+	Bio        string  `json:"bio"  binding:"required"`
 
 	PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
 	PriceInHouseContact    int     `json:"priceInHouseContact,omitempty"`
