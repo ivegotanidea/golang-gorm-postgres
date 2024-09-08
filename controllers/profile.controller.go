@@ -124,6 +124,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 			ProfileID:    newProfile.ID,
 			ProfileTagID: int(optionReq.ProfileTagID),
 			Price:        optionReq.Price,
+			Comment:      optionReq.Comment,
 		}
 		options = append(options, option)
 	}

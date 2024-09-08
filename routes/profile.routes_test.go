@@ -670,8 +670,34 @@ func TestProfileRoutes(t *testing.T) {
 		assert.NotNil(t, profileResponse.Data.UpdatedAt)
 		assert.Equal(t, profileResponse.Data.UpdatedBy, user.ID)
 		assert.Equal(t, len(profileResponse.Data.ProfileOptions), len(payload.Options))
+
+		for i := 0; i < len(payload.Options); i++ {
+			assert.Equal(t, profileResponse.Data.ProfileOptions[i].Comment, payload.Options[i].Comment)
+			assert.NotNil(t, profileResponse.Data.ProfileOptions[i].ProfileTag.ID)
+			assert.NotNil(t, profileResponse.Data.ProfileOptions[i].ProfileTag.Name)
+		}
+
 		assert.Equal(t, len(profileResponse.Data.BodyArts), len(payload.BodyArts))
+
+		for i := 0; i < len(payload.BodyArts); i++ {
+			assert.NotNil(t, profileResponse.Data.BodyArts[i].ProfileID)
+			assert.Equal(t, profileResponse.Data.BodyArts[i].BodyArtID, payload.BodyArts[i].ID)
+		}
+
 		assert.Equal(t, len(profileResponse.Data.Photos), len(payload.Photos))
+
+		for i := 0; i < len(payload.Photos); i++ {
+			assert.NotNil(t, profileResponse.Data.Photos[i].ID)
+			assert.NotNil(t, profileResponse.Data.Photos[i].ProfileID)
+			assert.NotNil(t, profileResponse.Data.Photos[i].CreatedAt)
+
+			assert.False(t, profileResponse.Data.Photos[i].Approved)
+			assert.False(t, profileResponse.Data.Photos[i].Deleted)
+			assert.False(t, profileResponse.Data.Photos[i].Disabled)
+
+			assert.Equal(t, profileResponse.Data.Photos[i].URL, payload.Photos[i].URL)
+		}
+
 		assert.Equal(t, profileResponse.Data.BodyTypeID, payload.BodyTypeID)
 		assert.Equal(t, profileResponse.Data.EthnosID, payload.EthnosID)
 		assert.Equal(t, profileResponse.Data.HairColorID, payload.HairColorID)
