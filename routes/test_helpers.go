@@ -22,6 +22,11 @@ type UserResponse struct {
 	Data   models.UserResponse `json:"data"`
 }
 
+type CreateProfileResponse struct {
+	Status string         `json:"status"`
+	Data   models.Profile `json:"data"`
+}
+
 func getOwnerUser() models.User {
 	return models.User{
 		ID:             uuid.Max,
@@ -105,10 +110,10 @@ func generateCreateProfileRequest(
 		Weight:              57,
 		CityID:              cities[random.IntN(len(cities))].ID,
 		Bust:                2.5,
-		BodyTypeId:          bodyTypes[random.IntN(len(bodyTypes))].ID,
-		EthnosId:            ethnos[random.IntN(len(ethnos))].ID,
-		HairColorId:         hairColors[random.IntN(len(hairColors))].ID,
-		IntimateHairCutId:   intimateHairCuts[random.IntN(len(intimateHairCuts))].ID,
+		BodyTypeID:          bodyTypes[random.IntN(len(bodyTypes))].ID,
+		EthnosID:            ethnos[random.IntN(len(ethnos))].ID,
+		HairColorID:         hairColors[random.IntN(len(hairColors))].ID,
+		IntimateHairCutID:   intimateHairCuts[random.IntN(len(intimateHairCuts))].ID,
 		Bio:                 bio,
 		PriceInHouseContact: 10000,
 		PriceInHouseHour:    20000,

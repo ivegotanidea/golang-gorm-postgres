@@ -38,6 +38,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		UserID:              currentUser.ID,
 		CreatedAt:           now,
 		UpdatedAt:           now,
+		UpdatedBy:           currentUser.ID,
 		CityID:              payload.CityID,
 		Active:              true,
 		Phone:               payload.Phone,
@@ -46,10 +47,10 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		Height:              payload.Height,
 		Weight:              payload.Weight,
 		Bust:                payload.Bust,
-		BodyTypeId:          payload.BodyTypeId,
-		EthnosId:            payload.EthnosId,
-		HairColorId:         payload.HairColorId,
-		IntimateHairCutId:   payload.IntimateHairCutId,
+		BodyTypeID:          payload.BodyTypeID,
+		EthnosID:            payload.EthnosID,
+		HairColorID:         payload.HairColorID,
+		IntimateHairCutID:   payload.IntimateHairCutID,
 		Ethnos:              payload.Ethnos,
 		Bio:                 payload.Bio,
 		AddressLatitude:     payload.AddressLatitude,
@@ -87,7 +88,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		bodyArts = append(bodyArts, profileBodyArt)
 	}
 
-	newProfile.BodyArt = bodyArts
+	newProfile.BodyArts = bodyArts
 
 	// Batch insert options
 	if err := tx.Create(&bodyArts).Error; err != nil {

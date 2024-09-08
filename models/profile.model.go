@@ -7,10 +7,10 @@ import (
 )
 
 type Profile struct {
-	BodyTypeId        uint `gorm:"type:integer;default:null"`
-	EthnosId          uint `gorm:"type:integer;default:null"` // todo: not null by default
-	HairColorId       uint `gorm:"type:integer;default:null"`
-	IntimateHairCutId uint `gorm:"type:integer;default:null"`
+	BodyTypeID        uint `gorm:"type:integer;default:null"`
+	EthnosID          uint `gorm:"type:integer;default:null"` // todo: not null by default
+	HairColorID       uint `gorm:"type:integer;default:null"`
+	IntimateHairCutID uint `gorm:"type:integer;default:null"`
 
 	// deprecate
 	Ethnos string `gorm:"type:varchar(30);not null"`
@@ -58,7 +58,7 @@ type Profile struct {
 	UpdatedBy uuid.UUID      `gorm:"type:uuid;not null"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	BodyArt        []ProfileBodyArt `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
+	BodyArts       []ProfileBodyArt `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
 	Photos         []Photo          `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
 	ProfileOptions []ProfileOption  `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
 	Services       []Service        `gorm:"foreignKey:ProfileID"`
@@ -74,10 +74,10 @@ type CreateProfileRequest struct {
 	Bust   float64 `json:"bust"  binding:"required"`
 	Ethnos string  `json:"ethnos"  binding:"omitempty"`
 
-	EthnosId          uint `json:"ethnosId"  binding:"required"`
-	HairColorId       uint `json:"hairColorId"  binding:"omitempty"`
-	BodyTypeId        uint `json:"bodyTypeId"  binding:"omitempty"`
-	IntimateHairCutId uint `json:"intimateHairCutId"  binding:"omitempty"`
+	EthnosID          uint `json:"ethnosId"  binding:"required"`
+	HairColorID       uint `json:"hairColorId"  binding:"omitempty"`
+	BodyTypeID        uint `json:"bodyTypeId"  binding:"omitempty"`
+	IntimateHairCutID uint `json:"intimateHairCutId"  binding:"omitempty"`
 
 	Bio string `json:"bio"  binding:"required"`
 

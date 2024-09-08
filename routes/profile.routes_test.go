@@ -651,6 +651,59 @@ func TestProfileRoutes(t *testing.T) {
 
 		profileRouter.ServeHTTP(w, createProfileReq)
 
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		assert.Equal(t, profileResponse.Status, "success")
+		assert.NotNil(t, profileResponse.Data.ID)
+		assert.Equal(t, profileResponse.Data.UserID, user.ID)
+
+		assert.Equal(t, profileResponse.Data.Active, true)
+		assert.Equal(t, profileResponse.Data.Verified, false)
+		assert.Equal(t, profileResponse.Data.Moderated, false)
+		assert.Equal(t, profileResponse.Data.Name, payload.Name)
+		assert.Equal(t, profileResponse.Data.Phone, payload.Phone)
+		assert.Equal(t, profileResponse.Data.ContactPhone, payload.ContactPhone)
+		assert.Equal(t, profileResponse.Data.ContactTG, payload.ContactTG)
+		assert.Equal(t, profileResponse.Data.ContactWA, payload.ContactWA)
+		assert.NotNil(t, profileResponse.Data.CreatedAt)
+		assert.NotNil(t, profileResponse.Data.UpdatedAt)
+		assert.Equal(t, profileResponse.Data.UpdatedBy, user.ID)
+		assert.Equal(t, len(profileResponse.Data.ProfileOptions), len(payload.Options))
+		assert.Equal(t, len(profileResponse.Data.BodyArts), len(payload.BodyArts))
+		assert.Equal(t, len(profileResponse.Data.Photos), len(payload.Photos))
+		assert.Equal(t, profileResponse.Data.BodyTypeID, payload.BodyTypeID)
+		assert.Equal(t, profileResponse.Data.EthnosID, payload.EthnosID)
+		assert.Equal(t, profileResponse.Data.HairColorID, payload.HairColorID)
+		assert.Equal(t, profileResponse.Data.IntimateHairCutID, payload.IntimateHairCutID)
+		assert.Equal(t, profileResponse.Data.CityID, payload.CityID)
+		assert.Equal(t, profileResponse.Data.Age, payload.Age)
+		assert.Equal(t, profileResponse.Data.Height, payload.Height)
+		assert.Equal(t, profileResponse.Data.Weight, payload.Weight)
+		assert.Equal(t, profileResponse.Data.Bust, payload.Bust)
+		assert.Equal(t, profileResponse.Data.Bio, payload.Bio)
+		assert.Equal(t, profileResponse.Data.AddressLatitude, payload.AddressLatitude)
+		assert.Equal(t, profileResponse.Data.AddressLongitude, payload.AddressLongitude)
+
+		assert.Equal(t, profileResponse.Data.PriceInHouseNightRatio, 1.0)
+		assert.Equal(t, profileResponse.Data.PriceInHouseContact, payload.PriceInHouseContact)
+		assert.Equal(t, profileResponse.Data.PriceInHouseHour, payload.PriceInHouseHour)
+
+		assert.Equal(t, profileResponse.Data.PriceVisitNightRatio, 1.0)
+		assert.Equal(t, profileResponse.Data.PriceVisitContact, payload.PriceVisitContact)
+		assert.Equal(t, profileResponse.Data.PriceVisitHour, payload.PriceVisitHour)
+
+		assert.Equal(t, profileResponse.Data.PriceCarNightRatio, 1.0)
+		assert.Equal(t, profileResponse.Data.PriceCarContact, payload.PriceCarContact)
+		assert.Equal(t, profileResponse.Data.PriceCarHour, payload.PriceCarHour)
+
+		assert.Equal(t, profileResponse.Data.PrinceSaunaNightRatio, 1.0)
+		assert.Equal(t, profileResponse.Data.PriceSaunaContact, payload.PriceSaunaContact)
+		assert.Equal(t, profileResponse.Data.PriceSaunaHour, payload.PriceSaunaHour)
+
+		assert.Equal(t, profileResponse.Data.DeletedAt.Valid, false)
+		assert.Nil(t, profileResponse.Data.Services)
+
 		assert.Equal(t, http.StatusCreated, w.Code)
 	})
 
