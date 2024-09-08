@@ -631,49 +631,13 @@ func TestProfileRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
-	t.Run("POST /api/profiles/: fail with access_token but bad json (only name) ", func(t *testing.T) {
+	t.Run("POST /api/profiles/: success with access_token", func(t *testing.T) {
 		user := generateUser(random, authRouter, t)
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		w := httptest.NewRecorder()
 
-		bio := "Hey :wave: My name is Lola and I'm 18 years old. I read a lot and like cooking."
-
-		photosPayload := []models.CreatePhotoRequest{
-			{URL: "https://w0.peakpx.com/wallpaper/268/995/HD-wallpaper-nice-girl-beauty-brown-hair-cute-denim-girl-jeans-pretty.jpg"},
-		}
-
-		optionsPayload := []models.CreateProfileOption{
-			{ProfileTagID: profileTags[0].ID, Price: 5000, Comment: "This is my favourite!"},
-			{ProfileTagID: profileTags[1].ID, Price: 50000, Comment: "I hate this!"},
-		}
-
-		bodyArtsPayload := []models.CreateBodyArtRequest{
-			{ID: bodyArts[0].ID},
-			{ID: bodyArts[1].ID},
-		}
-
-		payload := &models.CreateProfileRequest{
-			Phone:               "77073778123",
-			Name:                "Alice",
-			Age:                 29,
-			Height:              170,
-			Weight:              57,
-			CityID:              cities[random.IntN(len(cities))].ID,
-			Bust:                2.5,
-			BodyTypeId:          bodyTypes[random.IntN(len(bodyTypes))].ID,
-			EthnosId:            ethnos[random.IntN(len(ethnos))].ID,
-			HairColorId:         hairColors[random.IntN(len(hairColors))].ID,
-			IntimateHairCutId:   intimateHairCuts[random.IntN(len(intimateHairCuts))].ID,
-			Bio:                 bio,
-			PriceInHouseContact: 10000,
-			PriceInHouseHour:    20000,
-			ContactPhone:        "77073778123",
-			ContactTG:           "@lovely_mika",
-			Photos:              photosPayload,
-			Options:             optionsPayload,
-			BodyArts:            bodyArtsPayload,
-		}
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
 
 		jsonPayload, err := json.Marshal(payload)
 		if err != nil {
