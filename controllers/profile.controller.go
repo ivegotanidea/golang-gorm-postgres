@@ -182,13 +182,33 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 	phone := ctx.Param("phone")
 
 	var profile models.Profile
+
 	result := pc.DB.First(&profile, "phone = ?", phone)
+
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No profile with that title exists"})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": profile})
+}
+
+func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
+	var page = ctx.DefaultQuery("page", "1")
+	var limit = ctx.DefaultQuery("limit", "10")
+
+	intPage, _ := strconv.Atoi(page)
+	intLimit, _ := strconv.Atoi(limit)
+	offset := (intPage - 1) * intLimit
+
+	var profiles []models.Profile
+	results := pc.DB.Limit(intLimit).Offset(offset).Find(&profiles)
+	if results.Error != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
 }
 
 func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
@@ -199,8 +219,104 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
+	// Bind query parameters to the struct
+	var query models.FindProfilesQuery
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
 	var profiles []models.Profile
-	results := pc.DB.Limit(intLimit).Offset(offset).Find(&profiles)
+	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
+
+	// Apply filtering based on query parameters
+	if query.BodyTypeId != 0 {
+		dbQuery = dbQuery.Where("body_type_id = ?", query.BodyTypeId)
+	}
+	if query.EthnosId != 0 {
+		dbQuery = dbQuery.Where("ethnos_id = ?", query.EthnosId)
+	}
+	if query.HairColorId != 0 {
+		dbQuery = dbQuery.Where("hair_color_id = ?", query.HairColorId)
+	}
+	if query.IntimateHairCutId != 0 {
+		dbQuery = dbQuery.Where("intimate_hair_cut_id = ?", query.IntimateHairCutId)
+	}
+	if query.CityID != 0 {
+		dbQuery = dbQuery.Where("city_id = ?", query.CityID)
+	}
+	if query.Active {
+		dbQuery = dbQuery.Where("active = ?", query.Active)
+	}
+	if query.Phone != "" {
+		dbQuery = dbQuery.Where("phone = ?", query.Phone)
+	}
+	if query.Age != 0 {
+		dbQuery = dbQuery.Where("age = ?", query.Age)
+	}
+	if query.Name != "" {
+		dbQuery = dbQuery.Where("name LIKE ?", "%"+query.Name+"%")
+	}
+	if query.Height != 0 {
+		dbQuery = dbQuery.Where("height = ?", query.Height)
+	}
+	if query.Weight != 0 {
+		dbQuery = dbQuery.Where("weight = ?", query.Weight)
+	}
+	if query.Bust != 0 {
+		dbQuery = dbQuery.Where("bust = ?", query.Bust)
+	}
+	if query.AddressLatitude != "" {
+		dbQuery = dbQuery.Where("address_latitude = ?", query.AddressLatitude)
+	}
+	if query.AddressLongitude != "" {
+		dbQuery = dbQuery.Where("address_longitude = ?", query.AddressLongitude)
+	}
+	if query.Moderated {
+		dbQuery = dbQuery.Where("moderated = ?", query.Moderated)
+	}
+	if query.Verified {
+		dbQuery = dbQuery.Where("verified = ?", query.Verified)
+	}
+
+	// Handle body arts and profile options if needed (complex relationships)
+	if len(query.BodyArtIds) > 0 {
+		dbQuery = dbQuery.Joins("JOIN profile_body_arts ON profiles.id = profile_body_arts.profile_id").
+			Where("profile_body_arts.body_art_id IN ?", query.BodyArtIds)
+	}
+	if len(query.ProfileTagIds) > 0 {
+		dbQuery = dbQuery.Joins("JOIN profile_options ON profiles.id = profile_options.profile_id").
+			Where("profile_options.profile_tag_id IN ?", query.ProfileTagIds)
+	}
+
+	// Apply price range filters
+	if query.PriceInHouseContactMin != 0 || query.PriceInHouseContactMax != 0 {
+		dbQuery = dbQuery.Where("price_in_house_contact BETWEEN ? AND ?", query.PriceInHouseContactMin, query.PriceInHouseContactMax)
+	}
+	if query.PriceInHouseHourMin != 0 || query.PriceInHouseHourMax != 0 {
+		dbQuery = dbQuery.Where("price_in_house_hour BETWEEN ? AND ?", query.PriceInHouseHourMin, query.PriceInHouseHourMax)
+	}
+	if query.PriceSaunaContactMin != 0 || query.PriceSaunaContactMax != 0 {
+		dbQuery = dbQuery.Where("price_sauna_contact BETWEEN ? AND ?", query.PriceSaunaContactMin, query.PriceSaunaContactMax)
+	}
+	if query.PriceSaunaHourMin != 0 || query.PriceSaunaHourMax != 0 {
+		dbQuery = dbQuery.Where("price_sauna_hour BETWEEN ? AND ?", query.PriceSaunaHourMin, query.PriceSaunaHourMax)
+	}
+	if query.PriceVisitContactMin != 0 || query.PriceVisitContactMax != 0 {
+		dbQuery = dbQuery.Where("price_visit_contact BETWEEN ? AND ?", query.PriceVisitContactMin, query.PriceVisitContactMax)
+	}
+	if query.PriceVisitHourMin != 0 || query.PriceVisitHourMax != 0 {
+		dbQuery = dbQuery.Where("price_visit_hour BETWEEN ? AND ?", query.PriceVisitHourMin, query.PriceVisitHourMax)
+	}
+	if query.PriceCarContactMin != 0 || query.PriceCarContactMax != 0 {
+		dbQuery = dbQuery.Where("price_car_contact BETWEEN ? AND ?", query.PriceCarContactMin, query.PriceCarContactMax)
+	}
+	if query.PriceCarHourMin != 0 || query.PriceCarHourMax != 0 {
+		dbQuery = dbQuery.Where("price_car_hour BETWEEN ? AND ?", query.PriceCarHourMin, query.PriceCarHourMax)
+	}
+
+	// Execute the query
+	results := dbQuery.Find(&profiles)
 	if results.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return

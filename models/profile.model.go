@@ -138,3 +138,40 @@ type UpdateProfileRequest struct {
 	Photos  []CreatePhotoRequest  `json:"photos" binding:"required,dive"`
 	Options []CreateProfileOption `json:"profileOptions" binding:"required,dive"`
 }
+
+type FindProfilesQuery struct {
+	BodyTypeId             uint    `json:"bodyTypeId,omitempty"`
+	EthnosId               uint    `json:"ethnosId,omitempty"`
+	HairColorId            uint    `json:"hairColorId,omitempty"`
+	IntimateHairCutId      uint    `json:"intimateHairCutId,omitempty"`
+	CityID                 uint    `json:"cityId,omitempty"`
+	Active                 bool    `json:"active,omitempty"`
+	Phone                  string  `json:"phone,omitempty"`
+	Age                    int     `json:"age,omitempty"`
+	Name                   string  `json:"name,omitempty"`
+	Height                 int     `json:"height,omitempty"`
+	Weight                 int     `json:"weight,omitempty"`
+	Bust                   float64 `json:"bust,omitempty"`
+	AddressLatitude        string  `json:"latitude,omitempty"`
+	AddressLongitude       string  `json:"longitude,omitempty"`
+	Moderated              bool    `json:"moderated,omitempty"`
+	Verified               bool    `json:"verified,omitempty"`
+	BodyArtIds             []uint  `json:"bodyArtIds,omitempty"`
+	ProfileTagIds          []uint  `json:"profileTagIds,omitempty"`
+	PriceInHouseContactMin int     `json:"priceInHouseContactMin,omitempty"`
+	PriceInHouseContactMax int     `json:"priceInHouseContactMax,omitempty"`
+	PriceInHouseHourMin    int     `json:"priceInHouseHourMin,omitempty"`
+	PriceInHouseHourMax    int     `json:"priceInHouseHourMax,omitempty"`
+	PriceSaunaContactMin   int     `json:"priceSaunaContactMin,omitempty"`
+	PriceSaunaContactMax   int     `json:"priceSaunaContactMax,omitempty"`
+	PriceSaunaHourMin      int     `json:"priceSaunaHourMin,omitempty"`
+	PriceSaunaHourMax      int     `json:"priceSaunaHourMax,omitempty"`
+	PriceVisitContactMin   int     `json:"priceVisitContactMin,omitempty"`
+	PriceVisitContactMax   int     `json:"priceVisitContactMax,omitempty"`
+	PriceVisitHourMin      int     `json:"priceVisitHourMin,omitempty"`
+	PriceVisitHourMax      int     `json:"priceVisitHourMax,omitempty"`
+	PriceCarContactMin     int     `json:"priceCarContactMin,omitempty"`
+	PriceCarContactMax     int     `json:"priceCarContactMax,omitempty"`
+	PriceCarHourMin        int     `json:"priceCarHourMin,omitempty"`
+	PriceCarHourMax        int     `json:"priceCarHourMax,omitempty"`
+}
