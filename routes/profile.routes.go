@@ -21,6 +21,7 @@ func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 
 	router.POST("/", pc.profileController.CreateProfile)
 	router.GET("/", pc.profileController.FindProfiles)
+	router.GET("/all", pc.profileController.ListProfiles)
 	router.PUT("/:id", pc.profileController.UpdateProfile)
 	router.GET("/:phone", pc.profileController.FindProfileByPhone)
 	router.DELETE("/:id", pc.profileController.DeleteProfile)
