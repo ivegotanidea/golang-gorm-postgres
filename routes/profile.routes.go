@@ -20,9 +20,15 @@ func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 	router.Use(middleware.DeserializeUser())
 
 	router.POST("/", pc.profileController.CreateProfile)
-	router.GET("/", pc.profileController.FindProfiles)
-	router.GET("/all", pc.profileController.ListProfiles)
-	router.PUT("/:id", pc.profileController.UpdateProfile)
+
+	router.GET("/", middleware.AbacMiddleware("profiles", "query"), pc.profileController.FindProfiles)
+
+	router.GET("/all", middleware.AbacMiddleware("profiles", "list"), pc.profileController.ListProfiles)
+
+	router.PUT("/profile/:id", pc.profileController.UpdateOwnProfile)
+	router.PUT("/update/:id", middleware.AbacMiddleware("profiles", "update"), pc.profileController.UpdateProfile)
+
 	router.GET("/:phone", pc.profileController.FindProfileByPhone)
+
 	router.DELETE("/:id", pc.profileController.DeleteProfile)
 }

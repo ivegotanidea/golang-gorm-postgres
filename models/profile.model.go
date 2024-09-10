@@ -101,22 +101,30 @@ type CreateProfileRequest struct {
 	ContactTG    string `json:"contactTG" binding:"required"`
 	ContactWA    string `json:"contactWA,omitempty"`
 
-	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty"`
+	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty,dive"`
 	Photos   []CreatePhotoRequest   `json:"photos" binding:"required,dive"`
 	Options  []CreateProfileOption  `json:"profileOptions" binding:"required,dive"`
 }
 
 type UpdateProfileRequest struct {
-	CityID     int     `json:"cityId"  binding:"required"`
-	Phone      string  `json:"phone"  binding:"required"`
-	Name       string  `json:"name"  binding:"required"`
-	Age        int     `json:"age"  binding:"required"`
-	Height     int     `json:"height"  binding:"required"`
-	Weight     int     `json:"weight"  binding:"required"`
-	Bust       float64 `json:"bust"  binding:"required"`
-	BodyTypeId int     `json:"bodyTypeId"  binding:"omitempty"`
-	Ethnos     string  `json:"ethnos"  binding:"required"`
-	Bio        string  `json:"bio"  binding:"required"`
+	Active bool    `json:"active" binding:"omitempty"`
+	CityID int     `json:"cityId"  binding:"omitempty"`
+	Phone  string  `json:"phone"  binding:"omitempty"`
+	Name   string  `json:"name"  binding:"omitempty"`
+	Age    int     `json:"age"  binding:"omitempty"`
+	Height int     `json:"height"  binding:"omitempty"`
+	Weight int     `json:"weight"  binding:"omitempty"`
+	Bust   float64 `json:"bust"  binding:"omitempty"`
+
+	BodyTypeID        int  `json:"bodyTypeId"  binding:"omitempty"`
+	EthnosID          uint `json:"ethnosId"  binding:"omitempty"`
+	HairColorID       uint `json:"hairColorId,omitempty"`
+	IntimateHairCutID uint `json:"intimateHairCutId,omitempty"`
+
+	Bio string `json:"bio"  binding:"omitempty"`
+
+	AddressLatitude  string `json:"latitude,omitempty"`
+	AddressLongitude string `json:"longitude,omitempty"`
 
 	PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
 	PriceInHouseContact    int     `json:"priceInHouseContact,omitempty"`
@@ -135,8 +143,9 @@ type UpdateProfileRequest struct {
 	ContactTG    string `json:"contactTG" binding:"required"`
 	ContactWA    string `json:"contactWA,omitempty"`
 
-	Photos  []CreatePhotoRequest  `json:"photos" binding:"required,dive"`
-	Options []CreateProfileOption `json:"profileOptions" binding:"required,dive"`
+	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty,dive"`
+	Photos   []CreatePhotoRequest   `json:"photos" binding:"omitempty,dive"`
+	Options  []CreateProfileOption  `json:"profileOptions" binding:"omitempty,dive"`
 }
 
 type FindProfilesQuery struct {

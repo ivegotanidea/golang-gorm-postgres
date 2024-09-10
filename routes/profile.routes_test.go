@@ -733,4 +733,28 @@ func TestProfileRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, w.Code)
 	})
 
+	t.Run("PUT /api/profiles/: success with access_token", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+	})
 }

@@ -154,29 +154,289 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newProfile})
 }
 
-func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
-	postId := ctx.Param("id")
-	_ = ctx.MustGet("currentUser").(models.User)
+func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
+	profileId := ctx.Param("id")
+	currentUser := ctx.MustGet("currentUser").(models.User)
 
-	var payload *models.UpdatePost
+	var payload models.UpdateProfileRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
-	var updatedProfile models.Profile
-	result := pc.DB.First(&updatedProfile, "id = ?", postId)
+
+	// Find the existing profile
+	var existingProfile models.Profile
+	result := pc.DB.First(&existingProfile, "id = ?", profileId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No profile with that ID exists"})
 		return
 	}
+
 	now := time.Now()
-	profileToUpdate := models.Profile{
-		CreatedAt: updatedProfile.CreatedAt,
-		UpdatedAt: now,
+
+	// Update the profile fields
+	updatedProfile := models.Profile{
+		Active:              payload.Active,
+		CityID:              uint(payload.CityID),
+		Phone:               payload.Phone,
+		Name:                payload.Name,
+		Age:                 payload.Age,
+		Height:              payload.Height,
+		Weight:              payload.Weight,
+		Bust:                payload.Bust,
+		BodyTypeID:          uint(payload.BodyTypeID),
+		EthnosID:            payload.EthnosID,
+		HairColorID:         payload.HairColorID,
+		IntimateHairCutID:   payload.IntimateHairCutID,
+		Bio:                 payload.Bio,
+		AddressLatitude:     payload.AddressLatitude,
+		AddressLongitude:    payload.AddressLongitude,
+		PriceInHouseContact: payload.PriceInHouseContact,
+		PriceInHouseHour:    payload.PriceInHouseHour,
+		PriceSaunaContact:   payload.PriceSaunaContact,
+		PriceSaunaHour:      payload.PriceSaunaHour,
+		PriceVisitContact:   payload.PriceVisitContact,
+		PriceVisitHour:      payload.PriceVisitHour,
+		PriceCarContact:     payload.PriceCarContact,
+		PriceCarHour:        payload.PriceCarHour,
+		ContactPhone:        payload.ContactPhone,
+		ContactWA:           payload.ContactWA,
+		ContactTG:           payload.ContactTG,
+		UpdatedAt:           now,
+		UpdatedBy:           currentUser.ID,
 	}
 
-	pc.DB.Model(&updatedProfile).Updates(profileToUpdate)
+	tx := pc.DB.Begin()
 
+	// Update profile in the database
+	if err := tx.Model(&existingProfile).Updates(&updatedProfile).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile"})
+		return
+	}
+
+	// Update associated body arts
+	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileBodyArt{}).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old body arts"})
+		return
+	}
+
+	var bodyArts []models.ProfileBodyArt
+	for _, bodyArtReq := range payload.BodyArts {
+		profileBodyArt := models.ProfileBodyArt{
+			BodyArtID: bodyArtReq.ID,
+			ProfileID: existingProfile.ID,
+		}
+		bodyArts = append(bodyArts, profileBodyArt)
+	}
+
+	// Batch insert body arts
+	if err := tx.Create(&bodyArts).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update body arts"})
+		return
+	}
+
+	// Update associated photos
+	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old photos"})
+		return
+	}
+
+	var photos []models.Photo
+	for _, photoReq := range payload.Photos {
+		photo := models.Photo{
+			ProfileID: existingProfile.ID,
+			URL:       photoReq.URL,
+			CreatedAt: time.Now(),
+		}
+		photos = append(photos, photo)
+	}
+
+	// Batch insert photos
+	if err := tx.Create(&photos).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update photos"})
+		return
+	}
+
+	// Update associated profile options
+	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileOption{}).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old profile options"})
+		return
+	}
+
+	var options []models.ProfileOption
+	for _, optionReq := range payload.Options {
+		option := models.ProfileOption{
+			ProfileID:    existingProfile.ID,
+			ProfileTagID: int(optionReq.ProfileTagID),
+			Price:        optionReq.Price,
+			Comment:      optionReq.Comment,
+		}
+		options = append(options, option)
+	}
+
+	// Batch insert profile options
+	if err := tx.Create(&options).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile options"})
+		return
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to commit transaction"})
+		return
+	}
+
+	// Return the updated profile
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedProfile})
+}
+
+func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
+	profileId := ctx.Param("id")
+	currentUser := ctx.MustGet("currentUser").(models.User)
+
+	var payload models.UpdateProfileRequest
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	// Find the existing profile
+	var existingProfile models.Profile
+	result := pc.DB.First(&existingProfile, "id = ?", profileId)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No profile with that ID exists"})
+		return
+	}
+
+	now := time.Now()
+
+	// Update the profile fields
+	updatedProfile := models.Profile{
+		Active:              payload.Active,
+		CityID:              uint(payload.CityID),
+		Phone:               payload.Phone,
+		Name:                payload.Name,
+		Age:                 payload.Age,
+		Height:              payload.Height,
+		Weight:              payload.Weight,
+		Bust:                payload.Bust,
+		BodyTypeID:          uint(payload.BodyTypeID),
+		EthnosID:            payload.EthnosID,
+		HairColorID:         payload.HairColorID,
+		IntimateHairCutID:   payload.IntimateHairCutID,
+		Bio:                 payload.Bio,
+		AddressLatitude:     payload.AddressLatitude,
+		AddressLongitude:    payload.AddressLongitude,
+		PriceInHouseContact: payload.PriceInHouseContact,
+		PriceInHouseHour:    payload.PriceInHouseHour,
+		PriceSaunaContact:   payload.PriceSaunaContact,
+		PriceSaunaHour:      payload.PriceSaunaHour,
+		PriceVisitContact:   payload.PriceVisitContact,
+		PriceVisitHour:      payload.PriceVisitHour,
+		PriceCarContact:     payload.PriceCarContact,
+		PriceCarHour:        payload.PriceCarHour,
+		ContactPhone:        payload.ContactPhone,
+		ContactWA:           payload.ContactWA,
+		ContactTG:           payload.ContactTG,
+		UpdatedAt:           now,
+		UpdatedBy:           currentUser.ID,
+	}
+
+	tx := pc.DB.Begin()
+
+	// Update profile in the database
+	if err := tx.Model(&existingProfile).Updates(&updatedProfile).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile"})
+		return
+	}
+
+	// Update associated body arts
+	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileBodyArt{}).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old body arts"})
+		return
+	}
+
+	var bodyArts []models.ProfileBodyArt
+	for _, bodyArtReq := range payload.BodyArts {
+		profileBodyArt := models.ProfileBodyArt{
+			BodyArtID: bodyArtReq.ID,
+			ProfileID: existingProfile.ID,
+		}
+		bodyArts = append(bodyArts, profileBodyArt)
+	}
+
+	// Batch insert body arts
+	if err := tx.Create(&bodyArts).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update body arts"})
+		return
+	}
+
+	// Update associated photos
+	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old photos"})
+		return
+	}
+
+	var photos []models.Photo
+	for _, photoReq := range payload.Photos {
+		photo := models.Photo{
+			ProfileID: existingProfile.ID,
+			URL:       photoReq.URL,
+			CreatedAt: time.Now(),
+		}
+		photos = append(photos, photo)
+	}
+
+	// Batch insert photos
+	if err := tx.Create(&photos).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update photos"})
+		return
+	}
+
+	// Update associated profile options
+	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileOption{}).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old profile options"})
+		return
+	}
+
+	var options []models.ProfileOption
+	for _, optionReq := range payload.Options {
+		option := models.ProfileOption{
+			ProfileID:    existingProfile.ID,
+			ProfileTagID: int(optionReq.ProfileTagID),
+			Price:        optionReq.Price,
+			Comment:      optionReq.Comment,
+		}
+		options = append(options, option)
+	}
+
+	// Batch insert profile options
+	if err := tx.Create(&options).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile options"})
+		return
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to commit transaction"})
+		return
+	}
+
+	// Return the updated profile
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedProfile})
 }
 
