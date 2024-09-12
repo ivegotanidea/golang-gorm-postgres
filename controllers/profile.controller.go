@@ -35,39 +35,68 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Create the profile
 	now := time.Now()
 	newProfile := models.Profile{
-		UserID:              currentUser.ID,
-		CreatedAt:           now,
-		UpdatedAt:           now,
-		UpdatedBy:           currentUser.ID,
-		CityID:              payload.CityID,
-		Active:              true,
-		Phone:               payload.Phone,
-		Name:                payload.Name,
-		Age:                 payload.Age,
-		Height:              payload.Height,
-		Weight:              payload.Weight,
-		Bust:                payload.Bust,
-		BodyTypeID:          payload.BodyTypeID,
-		EthnosID:            payload.EthnosID,
-		HairColorID:         payload.HairColorID,
-		IntimateHairCutID:   payload.IntimateHairCutID,
-		Ethnos:              payload.Ethnos,
-		Bio:                 payload.Bio,
-		AddressLatitude:     payload.AddressLatitude,
-		AddressLongitude:    payload.AddressLongitude,
-		PriceInHouseContact: payload.PriceInHouseContact,
-		PriceInHouseHour:    payload.PriceInHouseHour,
-		PriceSaunaContact:   payload.PriceSaunaContact,
-		PriceSaunaHour:      payload.PriceSaunaHour,
-		PriceVisitContact:   payload.PriceVisitContact,
-		PriceVisitHour:      payload.PriceVisitHour,
-		PriceCarContact:     payload.PriceCarContact,
-		PriceCarHour:        payload.PriceCarHour,
-		ContactPhone:        payload.ContactPhone,
-		ContactWA:           payload.ContactWA,
-		ContactTG:           payload.ContactTG,
-		Moderated:           false,
-		Verified:            false,
+		UserID:       currentUser.ID,
+		CreatedAt:    now,
+		UpdatedAt:    now,
+		UpdatedBy:    currentUser.ID,
+		CityID:       payload.CityID, // required, no need to check
+		Active:       true,
+		Phone:        payload.Phone,        // required, no need to check
+		Name:         payload.Name,         // required, no need to check
+		Age:          payload.Age,          // required, no need to check
+		Height:       payload.Height,       // required, no need to check
+		Weight:       payload.Weight,       // required, no need to check
+		Bust:         payload.Bust,         // required, no need to check
+		Bio:          payload.Bio,          // required, no need to check
+		ContactPhone: payload.ContactPhone, // required, no need to check
+		ContactTG:    payload.ContactTG,    // required, no need to check
+	}
+
+	// Process optional fields (omitempty)
+	if payload.EthnosID != 0 {
+		newProfile.EthnosID = payload.EthnosID
+	}
+	if payload.HairColorID != 0 {
+		newProfile.HairColorID = payload.HairColorID
+	}
+	if payload.BodyTypeID != 0 {
+		newProfile.BodyTypeID = payload.BodyTypeID
+	}
+	if payload.IntimateHairCutID != 0 {
+		newProfile.IntimateHairCutID = payload.IntimateHairCutID
+	}
+	if payload.AddressLatitude != "" {
+		newProfile.AddressLatitude = payload.AddressLatitude
+	}
+	if payload.AddressLongitude != "" {
+		newProfile.AddressLongitude = payload.AddressLongitude
+	}
+	if payload.PriceInHouseContact != 0 {
+		newProfile.PriceInHouseContact = payload.PriceInHouseContact
+	}
+	if payload.PriceInHouseHour != 0 {
+		newProfile.PriceInHouseHour = payload.PriceInHouseHour
+	}
+	if payload.PriceSaunaContact != 0 {
+		newProfile.PriceSaunaContact = payload.PriceSaunaContact
+	}
+	if payload.PriceSaunaHour != 0 {
+		newProfile.PriceSaunaHour = payload.PriceSaunaHour
+	}
+	if payload.PriceVisitContact != 0 {
+		newProfile.PriceVisitContact = payload.PriceVisitContact
+	}
+	if payload.PriceVisitHour != 0 {
+		newProfile.PriceVisitHour = payload.PriceVisitHour
+	}
+	if payload.PriceCarContact != 0 {
+		newProfile.PriceCarContact = payload.PriceCarContact
+	}
+	if payload.PriceCarHour != 0 {
+		newProfile.PriceCarHour = payload.PriceCarHour
+	}
+	if payload.ContactWA != "" {
+		newProfile.ContactWA = payload.ContactWA
 	}
 
 	// Insert profile into the database
@@ -77,69 +106,65 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		return
 	}
 
-	// Insert associated photos
 	var bodyArts []models.ProfileBodyArt
-	for _, bodyArtReq := range payload.BodyArts {
-		profileBodyArt := models.ProfileBodyArt{
-			BodyArtID: bodyArtReq.ID,
-			ProfileID: newProfile.ID,
-		}
 
-		bodyArts = append(bodyArts, profileBodyArt)
+	// Insert associated body arts
+	if len(payload.BodyArts) > 0 {
+		for _, bodyArtReq := range payload.BodyArts {
+			profileBodyArt := models.ProfileBodyArt{
+				BodyArtID: bodyArtReq.ID,
+				ProfileID: newProfile.ID,
+			}
+			bodyArts = append(bodyArts, profileBodyArt)
+		}
+		if err := tx.Create(&bodyArts).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create body arts connection" + err.Error()})
+			return
+		}
 	}
 
 	newProfile.BodyArts = bodyArts
 
-	// Batch insert options
-	if err := tx.Create(&bodyArts).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create body arts connection" + err.Error()})
-		return
-	}
+	var photos []models.Photo
 
 	// Insert associated photos
-	var photos []models.Photo
-	for _, photoReq := range payload.Photos {
-		photo := models.Photo{
-			ProfileID: newProfile.ID,
-			URL:       photoReq.URL,
-			CreatedAt: time.Now(),
+	if len(payload.Photos) > 0 {
+		for _, photoReq := range payload.Photos {
+			photo := models.Photo{
+				ProfileID: newProfile.ID,
+				URL:       photoReq.URL,
+				CreatedAt: time.Now(),
+			}
+			photos = append(photos, photo)
 		}
-		photos = append(photos, photo)
-	}
-
-	// Batch insert photos
-	if err := tx.Create(&photos).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create photos"})
-		return
+		if err := tx.Create(&photos).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create photos"})
+			return
+		}
 	}
 
 	newProfile.Photos = photos
 
-	// Insert associated profile options
 	var options []models.ProfileOption
-	for _, optionReq := range payload.Options {
-		option := models.ProfileOption{
-			ProfileID:    newProfile.ID,
-			ProfileTagID: int(optionReq.ProfileTagID),
-			Price:        optionReq.Price,
-			Comment:      optionReq.Comment,
+
+	// Insert associated profile options
+	if len(payload.Options) > 0 {
+		for _, optionReq := range payload.Options {
+			option := models.ProfileOption{
+				ProfileID:    newProfile.ID,
+				ProfileTagID: int(optionReq.ProfileTagID),
+				Price:        optionReq.Price,
+				Comment:      optionReq.Comment,
+			}
+			options = append(options, option)
 		}
-		options = append(options, option)
-	}
-
-	// Batch insert options
-	if err := tx.Create(&options).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile options" + err.Error()})
-		return
-	}
-
-	if err := tx.Preload("ProfileTag").Find(&options).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to load profile tag data: " + err.Error()})
-		return
+		if err := tx.Create(&options).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile options" + err.Error()})
+			return
+		}
 	}
 
 	newProfile.ProfileOptions = options
@@ -158,7 +183,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	profileId := ctx.Param("id")
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
-	var payload models.UpdateProfileRequest
+	var payload models.UpdateOwnProfileRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
@@ -319,34 +344,13 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 
 	// Update the profile fields
 	updatedProfile := models.Profile{
-		Active:              payload.Active,
-		CityID:              uint(payload.CityID),
-		Phone:               payload.Phone,
-		Name:                payload.Name,
-		Age:                 payload.Age,
-		Height:              payload.Height,
-		Weight:              payload.Weight,
-		Bust:                payload.Bust,
-		BodyTypeID:          uint(payload.BodyTypeID),
-		EthnosID:            payload.EthnosID,
-		HairColorID:         payload.HairColorID,
-		IntimateHairCutID:   payload.IntimateHairCutID,
-		Bio:                 payload.Bio,
-		AddressLatitude:     payload.AddressLatitude,
-		AddressLongitude:    payload.AddressLongitude,
-		PriceInHouseContact: payload.PriceInHouseContact,
-		PriceInHouseHour:    payload.PriceInHouseHour,
-		PriceSaunaContact:   payload.PriceSaunaContact,
-		PriceSaunaHour:      payload.PriceSaunaHour,
-		PriceVisitContact:   payload.PriceVisitContact,
-		PriceVisitHour:      payload.PriceVisitHour,
-		PriceCarContact:     payload.PriceCarContact,
-		PriceCarHour:        payload.PriceCarHour,
-		ContactPhone:        payload.ContactPhone,
-		ContactWA:           payload.ContactWA,
-		ContactTG:           payload.ContactTG,
-		UpdatedAt:           now,
-		UpdatedBy:           currentUser.ID,
+		Active:    payload.Active,
+		Name:      payload.Name,
+		Bio:       payload.Bio,
+		Verified:  payload.Verified,
+		Moderated: payload.Moderated,
+		UpdatedAt: now,
+		UpdatedBy: currentUser.ID,
 	}
 
 	tx := pc.DB.Begin()
@@ -362,22 +366,6 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileBodyArt{}).Error; err != nil {
 		tx.Rollback()
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old body arts"})
-		return
-	}
-
-	var bodyArts []models.ProfileBodyArt
-	for _, bodyArtReq := range payload.BodyArts {
-		profileBodyArt := models.ProfileBodyArt{
-			BodyArtID: bodyArtReq.ID,
-			ProfileID: existingProfile.ID,
-		}
-		bodyArts = append(bodyArts, profileBodyArt)
-	}
-
-	// Batch insert body arts
-	if err := tx.Create(&bodyArts).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update body arts"})
 		return
 	}
 
@@ -409,24 +397,6 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileOption{}).Error; err != nil {
 		tx.Rollback()
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old profile options"})
-		return
-	}
-
-	var options []models.ProfileOption
-	for _, optionReq := range payload.Options {
-		option := models.ProfileOption{
-			ProfileID:    existingProfile.ID,
-			ProfileTagID: int(optionReq.ProfileTagID),
-			Price:        optionReq.Price,
-			Comment:      optionReq.Comment,
-		}
-		options = append(options, option)
-	}
-
-	// Batch insert profile options
-	if err := tx.Create(&options).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile options"})
 		return
 	}
 

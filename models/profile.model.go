@@ -72,7 +72,6 @@ type CreateProfileRequest struct {
 	Height int     `json:"height"  binding:"required"`
 	Weight int     `json:"weight"  binding:"required"`
 	Bust   float64 `json:"bust"  binding:"required"`
-	Ethnos string  `json:"ethnos"  binding:"omitempty"`
 
 	EthnosID          uint `json:"ethnosId"  binding:"required"`
 	HairColorID       uint `json:"hairColorId"  binding:"omitempty"`
@@ -106,7 +105,7 @@ type CreateProfileRequest struct {
 	Options  []CreateProfileOption  `json:"profileOptions" binding:"required,dive"`
 }
 
-type UpdateProfileRequest struct {
+type UpdateOwnProfileRequest struct {
 	Active bool    `json:"active" binding:"omitempty"`
 	CityID int     `json:"cityId"  binding:"omitempty"`
 	Phone  string  `json:"phone"  binding:"omitempty"`
@@ -146,6 +145,16 @@ type UpdateProfileRequest struct {
 	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty,dive"`
 	Photos   []CreatePhotoRequest   `json:"photos" binding:"omitempty,dive"`
 	Options  []CreateProfileOption  `json:"profileOptions" binding:"omitempty,dive"`
+}
+
+type UpdateProfileRequest struct {
+	Active    bool   `json:"active" binding:"omitempty"`
+	Name      string `json:"name"  binding:"omitempty"`
+	Bio       string `json:"bio"  binding:"omitempty"`
+	Moderated bool   `json:"moderated" binding:"omitempty"`
+	Verified  bool   `json:"verified" binding:"omitempty"`
+
+	Photos []CreatePhotoRequest `json:"photos" binding:"required,dive"`
 }
 
 type FindProfilesQuery struct {
