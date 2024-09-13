@@ -7,15 +7,12 @@ import (
 )
 
 type Profile struct {
-	BodyTypeID        uint `gorm:"type:integer;default:null"`
-	EthnosID          uint `gorm:"type:integer;default:null"` // todo: not null by default
-	HairColorID       uint `gorm:"type:integer;default:null"`
-	IntimateHairCutID uint `gorm:"type:integer;default:null"`
+	BodyTypeID        *int `gorm:"type:integer;default:null"`
+	EthnosID          *int `gorm:"type:integer;default:null"`
+	HairColorID       *int `gorm:"type:integer;default:null"`
+	IntimateHairCutID *int `gorm:"type:integer;default:null"`
 
-	// deprecate
-	Ethnos string `gorm:"type:varchar(30);not null"`
-
-	CityID           uint      `gorm:"type:integer; not null"`
+	CityID           int       `gorm:"type:integer;not null;default:0"`
 	ParsedUrl        string    `gorm:"type:varchar(255);not null;default:''"`
 	ID               uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	UserID           uuid.UUID `gorm:"type:uuid;not null"`
@@ -31,20 +28,20 @@ type Profile struct {
 	AddressLongitude string    `gorm:"type:varchar(10)"`
 
 	PriceInHouseNightRatio float64 `gorm:"type:float;not null;default:1"`
-	PriceInHouseContact    int     `gorm:"type:int"`
-	PriceInHouseHour       int     `gorm:"type:int"`
+	PriceInHouseContact    *int    `gorm:"type:int;default:null"`
+	PriceInHouseHour       *int    `gorm:"type:int;default:null"`
 
 	PrinceSaunaNightRatio float64 `gorm:"type:float;not null;default:1"`
-	PriceSaunaContact     int     `gorm:"type:int"`
-	PriceSaunaHour        int     `gorm:"type:int"`
+	PriceSaunaContact     *int    `gorm:"type:int;default:null"`
+	PriceSaunaHour        *int    `gorm:"type:int;default:null"`
 
 	PriceVisitNightRatio float64 `gorm:"type:float;not null;default:1"`
-	PriceVisitContact    int     `gorm:"type:int"`
-	PriceVisitHour       int     `gorm:"type:int"`
+	PriceVisitContact    *int    `gorm:"type:int;default:null"`
+	PriceVisitHour       *int    `gorm:"type:int;default:null"`
 
 	PriceCarNightRatio float64 `gorm:"type:float;not null;default:1"`
-	PriceCarContact    int     `gorm:"type:int"`
-	PriceCarHour       int     `gorm:"type:int"`
+	PriceCarContact    *int    `gorm:"type:int;default:null"`
+	PriceCarHour       *int    `gorm:"type:int;default:null"`
 
 	ContactPhone string `gorm:"type:varchar(30)"`
 	ContactWA    string `gorm:"type:varchar(30)"`
@@ -68,15 +65,15 @@ type CreateProfileRequest struct {
 	Phone  string  `json:"phone"  binding:"required"`
 	Name   string  `json:"name"  binding:"required"`
 	Age    int     `json:"age"  binding:"required"`
-	CityID uint    `json:"cityId"  binding:"required"`
+	CityID int     `json:"cityId"  binding:"required"`
 	Height int     `json:"height"  binding:"required"`
 	Weight int     `json:"weight"  binding:"required"`
 	Bust   float64 `json:"bust"  binding:"required"`
 
-	EthnosID          uint `json:"ethnosId"  binding:"required"`
-	HairColorID       uint `json:"hairColorId"  binding:"omitempty"`
-	BodyTypeID        uint `json:"bodyTypeId"  binding:"omitempty"`
-	IntimateHairCutID uint `json:"intimateHairCutId"  binding:"omitempty"`
+	EthnosID          *int `json:"ethnosId"  binding:"required"`
+	HairColorID       *int `json:"hairColorId"  binding:"omitempty"`
+	BodyTypeID        *int `json:"bodyTypeId"  binding:"omitempty"`
+	IntimateHairCutID *int `json:"intimateHairCutId"  binding:"omitempty"`
 
 	Bio string `json:"bio"  binding:"required"`
 
@@ -84,17 +81,17 @@ type CreateProfileRequest struct {
 	AddressLongitude string `json:"longitude,omitempty"`
 
 	//PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
-	PriceInHouseContact int `json:"priceInHouseContact,omitempty"`
-	PriceInHouseHour    int `json:"priceInHouseHour,omitempty"`
+	PriceInHouseContact *int `json:"priceInHouseContact,omitempty"`
+	PriceInHouseHour    *int `json:"priceInHouseHour,omitempty"`
 	//PrinceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
-	PriceSaunaContact int `json:"priceSaunaContact,omitempty"`
-	PriceSaunaHour    int `json:"priceSaunaHour,omitempty"`
+	PriceSaunaContact *int `json:"priceSaunaContact,omitempty"`
+	PriceSaunaHour    *int `json:"priceSaunaHour,omitempty"`
 	//PriceVisitNightRatio   float64 `json:"priceVisitNightRatio,omitempty"`
-	PriceVisitContact int `json:"priceVisitContact,omitempty"`
-	PriceVisitHour    int `json:"priceVisitHour,omitempty"`
+	PriceVisitContact *int `json:"priceVisitContact,omitempty"`
+	PriceVisitHour    *int `json:"priceVisitHour,omitempty"`
 	//PriceCarNightRatio     float64 `json:"priceCarNightRatio,omitempty"`
-	PriceCarContact int `json:"priceCarContact,omitempty"`
-	PriceCarHour    int `json:"priceCarHour,omitempty"`
+	PriceCarContact *int `json:"priceCarContact,omitempty"`
+	PriceCarHour    *int `json:"priceCarHour,omitempty"`
 
 	ContactPhone string `json:"contactPhone" binding:"required"`
 	ContactTG    string `json:"contactTG" binding:"required"`
@@ -106,40 +103,40 @@ type CreateProfileRequest struct {
 }
 
 type UpdateOwnProfileRequest struct {
-	Active bool    `json:"active" binding:"omitempty"`
-	CityID int     `json:"cityId"  binding:"omitempty"`
-	Phone  string  `json:"phone"  binding:"omitempty"`
-	Name   string  `json:"name"  binding:"omitempty"`
-	Age    int     `json:"age"  binding:"omitempty"`
-	Height int     `json:"height"  binding:"omitempty"`
-	Weight int     `json:"weight"  binding:"omitempty"`
-	Bust   float64 `json:"bust"  binding:"omitempty"`
+	Active *bool    `json:"active" binding:"omitempty"`
+	CityID *int     `json:"cityId"  binding:"omitempty"`
+	Phone  string   `json:"phone"  binding:"omitempty"`
+	Name   string   `json:"name"  binding:"omitempty"`
+	Age    *int     `json:"age"  binding:"omitempty"`
+	Height *int     `json:"height"  binding:"omitempty"`
+	Weight *int     `json:"weight"  binding:"omitempty"`
+	Bust   *float64 `json:"bust"  binding:"omitempty"`
 
-	BodyTypeID        int  `json:"bodyTypeId"  binding:"omitempty"`
-	EthnosID          uint `json:"ethnosId"  binding:"omitempty"`
-	HairColorID       uint `json:"hairColorId,omitempty"`
-	IntimateHairCutID uint `json:"intimateHairCutId,omitempty"`
+	BodyTypeID        *int `json:"bodyTypeId"  binding:"omitempty"`
+	EthnosID          *int `json:"ethnosId"  binding:"omitempty"`
+	HairColorID       *int `json:"hairColorId,omitempty"`
+	IntimateHairCutID *int `json:"intimateHairCutId,omitempty"`
 
 	Bio string `json:"bio"  binding:"omitempty"`
 
 	AddressLatitude  string `json:"latitude,omitempty"`
 	AddressLongitude string `json:"longitude,omitempty"`
 
-	PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
-	PriceInHouseContact    int     `json:"priceInHouseContact,omitempty"`
-	PriceInHouseHour       int     `json:"priceInHouseHour,omitempty"`
-	PrinceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
-	PriceSaunaContact      int     `json:"priceSaunaContact,omitempty"`
-	PriceSaunaHour         int     `json:"priceSaunaHour,omitempty"`
-	PriceVisitNightRatio   float64 `json:"priceVisitNightRatio,omitempty"`
-	PriceVisitContact      int     `json:"priceVisitContact,omitempty"`
-	PriceVisitHour         int     `json:"priceVisitHour,omitempty"`
-	PriceCarNightRatio     float64 `json:"priceCarNightRatio,omitempty"`
-	PriceCarContact        int     `json:"priceCarContact,omitempty"`
-	PriceCarHour           int     `json:"priceCarHour,omitempty"`
+	PriceInHouseNightRatio *float64 `json:"priceInHouseNightRatio,omitempty"`
+	PriceInHouseContact    *int     `json:"priceInHouseContact,omitempty"`
+	PriceInHouseHour       *int     `json:"priceInHouseHour,omitempty"`
+	PrinceSaunaNightRatio  *float64 `json:"princeSaunaNightRatio,omitempty"`
+	PriceSaunaContact      *int     `json:"priceSaunaContact,omitempty"`
+	PriceSaunaHour         *int     `json:"priceSaunaHour,omitempty"`
+	PriceVisitNightRatio   *float64 `json:"priceVisitNightRatio,omitempty"`
+	PriceVisitContact      *int     `json:"priceVisitContact,omitempty"`
+	PriceVisitHour         *int     `json:"priceVisitHour,omitempty"`
+	PriceCarNightRatio     *float64 `json:"priceCarNightRatio,omitempty"`
+	PriceCarContact        *int     `json:"priceCarContact,omitempty"`
+	PriceCarHour           *int     `json:"priceCarHour,omitempty"`
 
-	ContactPhone string `json:"contactPhone" binding:"required"`
-	ContactTG    string `json:"contactTG" binding:"required"`
+	ContactPhone string `json:"contactPhone" binding:"omitempty"`
+	ContactTG    string `json:"contactTG" binding:"omitempty"`
 	ContactWA    string `json:"contactWA,omitempty"`
 
 	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty,dive"`

@@ -53,16 +53,16 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	}
 
 	// Process optional fields (omitempty)
-	if payload.EthnosID != 0 {
+	if payload.EthnosID != nil {
 		newProfile.EthnosID = payload.EthnosID
 	}
-	if payload.HairColorID != 0 {
+	if payload.HairColorID != nil {
 		newProfile.HairColorID = payload.HairColorID
 	}
-	if payload.BodyTypeID != 0 {
+	if payload.BodyTypeID != nil {
 		newProfile.BodyTypeID = payload.BodyTypeID
 	}
-	if payload.IntimateHairCutID != 0 {
+	if payload.IntimateHairCutID != nil {
 		newProfile.IntimateHairCutID = payload.IntimateHairCutID
 	}
 	if payload.AddressLatitude != "" {
@@ -71,28 +71,28 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	if payload.AddressLongitude != "" {
 		newProfile.AddressLongitude = payload.AddressLongitude
 	}
-	if payload.PriceInHouseContact != 0 {
+	if payload.PriceInHouseContact != nil {
 		newProfile.PriceInHouseContact = payload.PriceInHouseContact
 	}
-	if payload.PriceInHouseHour != 0 {
+	if payload.PriceInHouseHour != nil {
 		newProfile.PriceInHouseHour = payload.PriceInHouseHour
 	}
-	if payload.PriceSaunaContact != 0 {
+	if payload.PriceSaunaContact != nil {
 		newProfile.PriceSaunaContact = payload.PriceSaunaContact
 	}
-	if payload.PriceSaunaHour != 0 {
+	if payload.PriceSaunaHour != nil {
 		newProfile.PriceSaunaHour = payload.PriceSaunaHour
 	}
-	if payload.PriceVisitContact != 0 {
+	if payload.PriceVisitContact != nil {
 		newProfile.PriceVisitContact = payload.PriceVisitContact
 	}
-	if payload.PriceVisitHour != 0 {
+	if payload.PriceVisitHour != nil {
 		newProfile.PriceVisitHour = payload.PriceVisitHour
 	}
-	if payload.PriceCarContact != 0 {
+	if payload.PriceCarContact != nil {
 		newProfile.PriceCarContact = payload.PriceCarContact
 	}
-	if payload.PriceCarHour != 0 {
+	if payload.PriceCarHour != nil {
 		newProfile.PriceCarHour = payload.PriceCarHour
 	}
 	if payload.ContactWA != "" {
@@ -199,39 +199,150 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 	now := time.Now()
 
-	// Update the profile fields
+	// Start a transaction
+	tx := pc.DB.Begin()
+
+	// Only update fields that are not nil (omitempty)
 	updatedProfile := models.Profile{
-		Active:              payload.Active,
-		CityID:              uint(payload.CityID),
-		Phone:               payload.Phone,
-		Name:                payload.Name,
-		Age:                 payload.Age,
-		Height:              payload.Height,
-		Weight:              payload.Weight,
-		Bust:                payload.Bust,
-		BodyTypeID:          uint(payload.BodyTypeID),
-		EthnosID:            payload.EthnosID,
-		HairColorID:         payload.HairColorID,
-		IntimateHairCutID:   payload.IntimateHairCutID,
-		Bio:                 payload.Bio,
-		AddressLatitude:     payload.AddressLatitude,
-		AddressLongitude:    payload.AddressLongitude,
-		PriceInHouseContact: payload.PriceInHouseContact,
-		PriceInHouseHour:    payload.PriceInHouseHour,
-		PriceSaunaContact:   payload.PriceSaunaContact,
-		PriceSaunaHour:      payload.PriceSaunaHour,
-		PriceVisitContact:   payload.PriceVisitContact,
-		PriceVisitHour:      payload.PriceVisitHour,
-		PriceCarContact:     payload.PriceCarContact,
-		PriceCarHour:        payload.PriceCarHour,
-		ContactPhone:        payload.ContactPhone,
-		ContactWA:           payload.ContactWA,
-		ContactTG:           payload.ContactTG,
-		UpdatedAt:           now,
-		UpdatedBy:           currentUser.ID,
+		UpdatedAt: now,
+		UpdatedBy: currentUser.ID,
 	}
 
-	tx := pc.DB.Begin()
+	if payload.Active != nil &&
+		existingProfile.Active != *payload.Active {
+
+		updatedProfile.Active = *payload.Active
+	}
+
+	// Update profile in the database
+	if err := tx.Model(&existingProfile).Select("Active").Updates(&updatedProfile).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile"})
+		return
+	}
+
+	if payload.CityID != nil &&
+		existingProfile.CityID != *payload.CityID {
+		updatedProfile.CityID = *payload.CityID
+	}
+
+	if payload.Phone != "" && existingProfile.Phone != payload.Phone {
+		updatedProfile.Phone = payload.Phone
+	}
+
+	if payload.Name != "" && existingProfile.Name != payload.Name {
+		updatedProfile.Name = payload.Name
+	}
+	if payload.Age != nil &&
+		existingProfile.Age != *payload.Age {
+		updatedProfile.Age = *payload.Age
+	}
+
+	if payload.Height != nil &&
+		existingProfile.Height != *payload.Height {
+		updatedProfile.Height = *payload.Height
+	}
+
+	if payload.Weight != nil &&
+		existingProfile.Weight != *payload.Weight {
+		updatedProfile.Weight = *payload.Weight
+	}
+
+	if payload.Bust != nil &&
+		existingProfile.Bust != *payload.Bust {
+		updatedProfile.Bust = *payload.Bust
+	}
+
+	if payload.BodyTypeID != nil &&
+		existingProfile.BodyTypeID != payload.BodyTypeID {
+		updatedProfile.BodyTypeID = payload.BodyTypeID
+	}
+
+	if payload.EthnosID != nil &&
+		existingProfile.EthnosID != payload.EthnosID {
+		updatedProfile.EthnosID = payload.EthnosID
+	}
+
+	if payload.HairColorID != nil &&
+		existingProfile.HairColorID != payload.HairColorID {
+		updatedProfile.HairColorID = payload.HairColorID
+	}
+
+	if payload.IntimateHairCutID != nil &&
+		existingProfile.IntimateHairCutID != payload.IntimateHairCutID {
+		updatedProfile.IntimateHairCutID = payload.IntimateHairCutID
+	}
+
+	if payload.Bio != "" && existingProfile.Bio != payload.Bio {
+		updatedProfile.Bio = payload.Bio
+	}
+
+	if payload.AddressLatitude != "" &&
+		existingProfile.AddressLatitude != payload.AddressLatitude {
+		updatedProfile.AddressLatitude = payload.AddressLatitude
+	}
+	if payload.AddressLongitude != "" &&
+		existingProfile.AddressLongitude != payload.AddressLongitude {
+		updatedProfile.AddressLongitude = payload.AddressLongitude
+	}
+
+	if payload.PriceInHouseNightRatio != nil &&
+		existingProfile.PriceInHouseNightRatio != *payload.PriceInHouseNightRatio {
+
+		updatedProfile.PriceInHouseNightRatio = *payload.PriceInHouseNightRatio
+	}
+	if payload.PriceInHouseContact != nil &&
+		existingProfile.PriceInHouseContact != payload.PriceInHouseContact {
+
+		updatedProfile.PriceInHouseContact = payload.PriceInHouseContact
+	}
+	if payload.PriceInHouseHour != nil &&
+		existingProfile.PriceInHouseHour != payload.PriceInHouseHour {
+
+		updatedProfile.PriceInHouseHour = payload.PriceInHouseHour
+	}
+	if payload.PrinceSaunaNightRatio != nil &&
+		existingProfile.PrinceSaunaNightRatio != *payload.PrinceSaunaNightRatio {
+
+		updatedProfile.PrinceSaunaNightRatio = *payload.PrinceSaunaNightRatio
+	}
+	if payload.PriceSaunaContact != nil &&
+		existingProfile.PriceSaunaContact != payload.PriceSaunaContact {
+
+		updatedProfile.PriceSaunaContact = payload.PriceSaunaContact
+	}
+
+	if payload.PriceSaunaHour != nil &&
+		existingProfile.PriceSaunaHour != payload.PriceSaunaHour {
+		updatedProfile.PriceSaunaHour = payload.PriceSaunaHour
+	}
+
+	if payload.PriceVisitNightRatio != nil &&
+		existingProfile.PriceVisitNightRatio != *payload.PriceVisitNightRatio {
+
+		updatedProfile.PriceVisitNightRatio = *payload.PriceVisitNightRatio
+	}
+	if payload.PriceVisitContact != nil &&
+		existingProfile.PriceVisitContact != payload.PriceVisitContact {
+
+		updatedProfile.PriceVisitContact = payload.PriceVisitContact
+	}
+	if payload.PriceVisitHour != nil &&
+		existingProfile.PriceVisitHour != payload.PriceVisitHour {
+		updatedProfile.PriceVisitHour = payload.PriceVisitHour
+	}
+	if payload.PriceCarNightRatio != nil &&
+		existingProfile.PriceCarNightRatio != *payload.PriceCarNightRatio {
+		updatedProfile.PriceCarNightRatio = *payload.PriceCarNightRatio
+	}
+	if payload.PriceCarContact != nil &&
+		existingProfile.PriceCarContact != payload.PriceCarContact {
+		updatedProfile.PriceCarContact = payload.PriceCarContact
+	}
+	if payload.PriceCarHour != nil &&
+		existingProfile.PriceCarHour != payload.PriceCarHour {
+		updatedProfile.PriceCarHour = payload.PriceCarHour
+	}
 
 	// Update profile in the database
 	if err := tx.Model(&existingProfile).Updates(&updatedProfile).Error; err != nil {
@@ -240,76 +351,85 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 		return
 	}
 
-	// Update associated body arts
-	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileBodyArt{}).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old body arts"})
-		return
-	}
-
-	var bodyArts []models.ProfileBodyArt
-	for _, bodyArtReq := range payload.BodyArts {
-		profileBodyArt := models.ProfileBodyArt{
-			BodyArtID: bodyArtReq.ID,
-			ProfileID: existingProfile.ID,
+	// Handle the update of BodyArts
+	if payload.BodyArts != nil {
+		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileBodyArt{}).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old body arts"})
+			return
 		}
-		bodyArts = append(bodyArts, profileBodyArt)
-	}
 
-	// Batch insert body arts
-	if err := tx.Create(&bodyArts).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update body arts"})
-		return
-	}
+		if len(payload.BodyArts) > 0 {
+			var bodyArts []models.ProfileBodyArt
+			for _, bodyArtReq := range payload.BodyArts {
+				profileBodyArt := models.ProfileBodyArt{
+					BodyArtID: bodyArtReq.ID,
+					ProfileID: existingProfile.ID,
+				}
+				bodyArts = append(bodyArts, profileBodyArt)
+			}
 
-	// Update associated photos
-	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old photos"})
-		return
-	}
-
-	var photos []models.Photo
-	for _, photoReq := range payload.Photos {
-		photo := models.Photo{
-			ProfileID: existingProfile.ID,
-			URL:       photoReq.URL,
-			CreatedAt: time.Now(),
+			if err := tx.Create(&bodyArts).Error; err != nil {
+				tx.Rollback()
+				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update body arts"})
+				return
+			}
 		}
-		photos = append(photos, photo)
 	}
 
-	// Batch insert photos
-	if err := tx.Create(&photos).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update photos"})
-		return
-	}
-
-	// Update associated profile options
-	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileOption{}).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old profile options"})
-		return
-	}
-
-	var options []models.ProfileOption
-	for _, optionReq := range payload.Options {
-		option := models.ProfileOption{
-			ProfileID:    existingProfile.ID,
-			ProfileTagID: int(optionReq.ProfileTagID),
-			Price:        optionReq.Price,
-			Comment:      optionReq.Comment,
+	// Handle the update of Photos
+	if payload.Photos != nil {
+		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old photos"})
+			return
 		}
-		options = append(options, option)
+
+		if len(payload.Photos) > 0 {
+			var photos []models.Photo
+			for _, photoReq := range payload.Photos {
+				photo := models.Photo{
+					ProfileID: existingProfile.ID,
+					URL:       photoReq.URL,
+					CreatedAt: time.Now(),
+				}
+				photos = append(photos, photo)
+			}
+
+			if err := tx.Create(&photos).Error; err != nil {
+				tx.Rollback()
+				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update photos"})
+				return
+			}
+		}
 	}
 
-	// Batch insert profile options
-	if err := tx.Create(&options).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile options"})
-		return
+	// Handle the update of ProfileOptions
+	if payload.Options != nil {
+		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileOption{}).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old profile options"})
+			return
+		}
+
+		if len(payload.Options) > 0 {
+			var options []models.ProfileOption
+			for _, optionReq := range payload.Options {
+				option := models.ProfileOption{
+					ProfileID:    existingProfile.ID,
+					ProfileTagID: int(optionReq.ProfileTagID),
+					Price:        optionReq.Price,
+					Comment:      optionReq.Comment,
+				}
+				options = append(options, option)
+			}
+
+			if err := tx.Create(&options).Error; err != nil {
+				tx.Rollback()
+				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile options"})
+				return
+			}
+		}
 	}
 
 	// Commit the transaction
@@ -319,7 +439,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	}
 
 	// Return the updated profile
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedProfile})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": existingProfile})
 }
 
 func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
@@ -435,6 +555,29 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 
 	var profiles []models.Profile
 	results := pc.DB.Limit(intLimit).Offset(offset).Find(&profiles)
+	if results.Error != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
+}
+
+func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
+	var page = ctx.DefaultQuery("page", "1")
+	var limit = ctx.DefaultQuery("limit", "10")
+
+	currentUser := ctx.MustGet("currentUser").(models.User)
+
+	intPage, _ := strconv.Atoi(page)
+	intLimit, _ := strconv.Atoi(limit)
+	offset := (intPage - 1) * intLimit
+
+	var profiles []models.Profile
+	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
+
+	results := dbQuery.Find(&profiles, "user_id = ?", currentUser.ID.String())
+
 	if results.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return

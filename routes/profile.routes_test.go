@@ -639,6 +639,8 @@ func TestProfileRoutes(t *testing.T) {
 
 		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
 
+		payload.BodyTypeID = nil
+
 		jsonPayload, err := json.Marshal(payload)
 		if err != nil {
 			fmt.Println("Error marshaling payload:", err)
@@ -733,30 +735,81 @@ func TestProfileRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, w.Code)
 	})
 
-	//t.Run("PUT /api/profiles/: success profile update", func(t *testing.T) {
-	//	user := generateUser(random, authRouter, t)
-	//
-	//	accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
-	//	w := httptest.NewRecorder()
-	//
-	//	payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
-	//
-	//	jsonPayload, err := json.Marshal(payload)
-	//	if err != nil {
-	//		fmt.Println("Error marshaling payload:", err)
-	//		return
-	//	}
-	//
-	//	createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
-	//	createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
-	//	createProfileReq.Header.Set("Content-Type", "application/json")
-	//
-	//	profileRouter.ServeHTTP(w, createProfileReq)
-	//
-	//	var profileResponse CreateProfileResponse
-	//	err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
-	//
-	//	updatePayload := &models.UpdateOwnProfileRequest{}
-	//
-	//})
+	t.Run("PUT /api/profiles/profile/id: success profile update", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		updatePayload := &models.UpdateOwnProfileRequest{
+			Active: boolPtr(false),
+			Name:   fmt.Sprintf("%s-new", payload.Name),
+		}
+
+		jsonPayload, err = json.Marshal(updatePayload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		updateProfileReq, _ := http.NewRequest(
+			"PUT",
+			fmt.Sprintf("/api/profiles/profile/%s",
+				profileResponse.Data.ID.String()),
+			bytes.NewBuffer(jsonPayload))
+
+		updateProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		updateProfileReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, updateProfileReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var updatedProfileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &updatedProfileResponse)
+
+		if err != nil {
+			fmt.Println("Error un marshaling response:", err)
+			return
+		}
+
+		assert.Equal(t, updatedProfileResponse.Status, "success")
+
+		getMyProfilesReq, _ := http.NewRequest("GET", "/api/profiles/my", nil)
+		getMyProfilesReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		getMyProfilesReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, getMyProfilesReq)
+
+		var profilesResponse ProfilesResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profilesResponse)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		assert.Equal(t, 1, profilesResponse.Length)
+		assert.Len(t, profilesResponse.Data, profilesResponse.Length)
+
+		assert.Equal(t, updatePayload.Name, profilesResponse.Data[0].Name)
+		assert.Equal(t, *updatePayload.Active, profilesResponse.Data[0].Active)
+
+	})
 }
