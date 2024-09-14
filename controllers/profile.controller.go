@@ -199,153 +199,126 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 	now := time.Now()
 
+	// Initialize the map to keep track of fields that need to be updated
+	updateFields := map[string]interface{}{
+		"UpdatedAt": now,
+		"UpdatedBy": currentUser.ID,
+	}
+
+	// Check each field to see if it has changed and should be updated
+	if payload.Active != nil && *payload.Active != existingProfile.Active {
+		updateFields["Active"] = *payload.Active
+	}
+
+	if payload.CityID != nil && *payload.CityID != existingProfile.CityID {
+		updateFields["CityID"] = *payload.CityID
+	}
+
+	if payload.Phone != "" && payload.Phone != existingProfile.Phone {
+		updateFields["Phone"] = payload.Phone
+	}
+
+	if payload.Name != "" && payload.Name != existingProfile.Name {
+		updateFields["Name"] = payload.Name
+	}
+
+	if payload.Age != nil && *payload.Age != existingProfile.Age {
+		updateFields["Age"] = *payload.Age
+	}
+
+	if payload.Height != nil && *payload.Height != existingProfile.Height {
+		updateFields["Height"] = *payload.Height
+	}
+
+	if payload.Weight != nil && *payload.Weight != existingProfile.Weight {
+		updateFields["Weight"] = *payload.Weight
+	}
+
+	if payload.Bust != nil && *payload.Bust != existingProfile.Bust {
+		updateFields["Bust"] = *payload.Bust
+	}
+
+	if payload.BodyTypeID != nil && payload.BodyTypeID != existingProfile.BodyTypeID {
+		updateFields["BodyTypeID"] = payload.BodyTypeID
+	}
+
+	if payload.EthnosID != nil && payload.EthnosID != existingProfile.EthnosID {
+		updateFields["EthnosID"] = payload.EthnosID
+	}
+
+	if payload.HairColorID != nil && payload.HairColorID != existingProfile.HairColorID {
+		updateFields["HairColorID"] = payload.HairColorID
+	}
+
+	if payload.IntimateHairCutID != nil && payload.IntimateHairCutID != existingProfile.IntimateHairCutID {
+		updateFields["IntimateHairCutID"] = payload.IntimateHairCutID
+	}
+
+	if payload.Bio != "" && payload.Bio != existingProfile.Bio {
+		updateFields["Bio"] = payload.Bio
+	}
+
+	if payload.AddressLatitude != "" && payload.AddressLatitude != existingProfile.AddressLatitude {
+		updateFields["AddressLatitude"] = payload.AddressLatitude
+	}
+
+	if payload.AddressLongitude != "" && payload.AddressLongitude != existingProfile.AddressLongitude {
+		updateFields["AddressLongitude"] = payload.AddressLongitude
+	}
+
+	if payload.PriceInHouseNightRatio != nil && *payload.PriceInHouseNightRatio != existingProfile.PriceInHouseNightRatio {
+		updateFields["PriceInHouseNightRatio"] = *payload.PriceInHouseNightRatio
+	}
+
+	if payload.PriceInHouseContact != nil && payload.PriceInHouseContact != existingProfile.PriceInHouseContact {
+		updateFields["PriceInHouseContact"] = payload.PriceInHouseContact
+	}
+
+	if payload.PriceInHouseHour != nil && payload.PriceInHouseHour != existingProfile.PriceInHouseHour {
+		updateFields["PriceInHouseHour"] = payload.PriceInHouseHour
+	}
+
+	if payload.PrinceSaunaNightRatio != nil && *payload.PrinceSaunaNightRatio != existingProfile.PrinceSaunaNightRatio {
+		updateFields["PrinceSaunaNightRatio"] = *payload.PrinceSaunaNightRatio
+	}
+
+	if payload.PriceSaunaContact != nil && payload.PriceSaunaContact != existingProfile.PriceSaunaContact {
+		updateFields["PriceSaunaContact"] = payload.PriceSaunaContact
+	}
+
+	if payload.PriceSaunaHour != nil && payload.PriceSaunaHour != existingProfile.PriceSaunaHour {
+		updateFields["PriceSaunaHour"] = payload.PriceSaunaHour
+	}
+
+	if payload.PriceVisitNightRatio != nil && *payload.PriceVisitNightRatio != existingProfile.PriceVisitNightRatio {
+		updateFields["PriceVisitNightRatio"] = *payload.PriceVisitNightRatio
+	}
+
+	if payload.PriceVisitContact != nil && payload.PriceVisitContact != existingProfile.PriceVisitContact {
+		updateFields["PriceVisitContact"] = payload.PriceVisitContact
+	}
+
+	if payload.PriceVisitHour != nil && payload.PriceVisitHour != existingProfile.PriceVisitHour {
+		updateFields["PriceVisitHour"] = payload.PriceVisitHour
+	}
+
+	if payload.PriceCarNightRatio != nil && *payload.PriceCarNightRatio != existingProfile.PriceCarNightRatio {
+		updateFields["PriceCarNightRatio"] = *payload.PriceCarNightRatio
+	}
+
+	if payload.PriceCarContact != nil && payload.PriceCarContact != existingProfile.PriceCarContact {
+		updateFields["PriceCarContact"] = payload.PriceCarContact
+	}
+
+	if payload.PriceCarHour != nil && payload.PriceCarHour != existingProfile.PriceCarHour {
+		updateFields["PriceCarHour"] = payload.PriceCarHour
+	}
+
 	// Start a transaction
 	tx := pc.DB.Begin()
 
-	// Only update fields that are not nil (omitempty)
-	updatedProfile := models.Profile{
-		UpdatedAt: now,
-		UpdatedBy: currentUser.ID,
-	}
-
-	if payload.Active != nil &&
-		existingProfile.Active != *payload.Active {
-
-		updatedProfile.Active = *payload.Active
-	}
-
-	// Update profile in the database
-	if err := tx.Model(&existingProfile).Select("Active").Updates(&updatedProfile).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile"})
-		return
-	}
-
-	if payload.CityID != nil &&
-		existingProfile.CityID != *payload.CityID {
-		updatedProfile.CityID = *payload.CityID
-	}
-
-	if payload.Phone != "" && existingProfile.Phone != payload.Phone {
-		updatedProfile.Phone = payload.Phone
-	}
-
-	if payload.Name != "" && existingProfile.Name != payload.Name {
-		updatedProfile.Name = payload.Name
-	}
-	if payload.Age != nil &&
-		existingProfile.Age != *payload.Age {
-		updatedProfile.Age = *payload.Age
-	}
-
-	if payload.Height != nil &&
-		existingProfile.Height != *payload.Height {
-		updatedProfile.Height = *payload.Height
-	}
-
-	if payload.Weight != nil &&
-		existingProfile.Weight != *payload.Weight {
-		updatedProfile.Weight = *payload.Weight
-	}
-
-	if payload.Bust != nil &&
-		existingProfile.Bust != *payload.Bust {
-		updatedProfile.Bust = *payload.Bust
-	}
-
-	if payload.BodyTypeID != nil &&
-		existingProfile.BodyTypeID != payload.BodyTypeID {
-		updatedProfile.BodyTypeID = payload.BodyTypeID
-	}
-
-	if payload.EthnosID != nil &&
-		existingProfile.EthnosID != payload.EthnosID {
-		updatedProfile.EthnosID = payload.EthnosID
-	}
-
-	if payload.HairColorID != nil &&
-		existingProfile.HairColorID != payload.HairColorID {
-		updatedProfile.HairColorID = payload.HairColorID
-	}
-
-	if payload.IntimateHairCutID != nil &&
-		existingProfile.IntimateHairCutID != payload.IntimateHairCutID {
-		updatedProfile.IntimateHairCutID = payload.IntimateHairCutID
-	}
-
-	if payload.Bio != "" && existingProfile.Bio != payload.Bio {
-		updatedProfile.Bio = payload.Bio
-	}
-
-	if payload.AddressLatitude != "" &&
-		existingProfile.AddressLatitude != payload.AddressLatitude {
-		updatedProfile.AddressLatitude = payload.AddressLatitude
-	}
-	if payload.AddressLongitude != "" &&
-		existingProfile.AddressLongitude != payload.AddressLongitude {
-		updatedProfile.AddressLongitude = payload.AddressLongitude
-	}
-
-	if payload.PriceInHouseNightRatio != nil &&
-		existingProfile.PriceInHouseNightRatio != *payload.PriceInHouseNightRatio {
-
-		updatedProfile.PriceInHouseNightRatio = *payload.PriceInHouseNightRatio
-	}
-	if payload.PriceInHouseContact != nil &&
-		existingProfile.PriceInHouseContact != payload.PriceInHouseContact {
-
-		updatedProfile.PriceInHouseContact = payload.PriceInHouseContact
-	}
-	if payload.PriceInHouseHour != nil &&
-		existingProfile.PriceInHouseHour != payload.PriceInHouseHour {
-
-		updatedProfile.PriceInHouseHour = payload.PriceInHouseHour
-	}
-	if payload.PrinceSaunaNightRatio != nil &&
-		existingProfile.PrinceSaunaNightRatio != *payload.PrinceSaunaNightRatio {
-
-		updatedProfile.PrinceSaunaNightRatio = *payload.PrinceSaunaNightRatio
-	}
-	if payload.PriceSaunaContact != nil &&
-		existingProfile.PriceSaunaContact != payload.PriceSaunaContact {
-
-		updatedProfile.PriceSaunaContact = payload.PriceSaunaContact
-	}
-
-	if payload.PriceSaunaHour != nil &&
-		existingProfile.PriceSaunaHour != payload.PriceSaunaHour {
-		updatedProfile.PriceSaunaHour = payload.PriceSaunaHour
-	}
-
-	if payload.PriceVisitNightRatio != nil &&
-		existingProfile.PriceVisitNightRatio != *payload.PriceVisitNightRatio {
-
-		updatedProfile.PriceVisitNightRatio = *payload.PriceVisitNightRatio
-	}
-	if payload.PriceVisitContact != nil &&
-		existingProfile.PriceVisitContact != payload.PriceVisitContact {
-
-		updatedProfile.PriceVisitContact = payload.PriceVisitContact
-	}
-	if payload.PriceVisitHour != nil &&
-		existingProfile.PriceVisitHour != payload.PriceVisitHour {
-		updatedProfile.PriceVisitHour = payload.PriceVisitHour
-	}
-	if payload.PriceCarNightRatio != nil &&
-		existingProfile.PriceCarNightRatio != *payload.PriceCarNightRatio {
-		updatedProfile.PriceCarNightRatio = *payload.PriceCarNightRatio
-	}
-	if payload.PriceCarContact != nil &&
-		existingProfile.PriceCarContact != payload.PriceCarContact {
-		updatedProfile.PriceCarContact = payload.PriceCarContact
-	}
-	if payload.PriceCarHour != nil &&
-		existingProfile.PriceCarHour != payload.PriceCarHour {
-		updatedProfile.PriceCarHour = payload.PriceCarHour
-	}
-
-	// Update profile in the database
-	if err := tx.Model(&existingProfile).Updates(&updatedProfile).Error; err != nil {
+	// Update only the fields that have changed
+	if err := tx.Model(&existingProfile).Updates(updateFields).Error; err != nil {
 		tx.Rollback()
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile"})
 		return
