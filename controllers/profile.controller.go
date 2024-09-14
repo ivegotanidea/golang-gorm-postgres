@@ -446,13 +446,13 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 		updateFields["Active"] = *payload.Active
 	}
 
-	if payload.Verified != nil && *payload.Verified != existingProfile.Verified {
+	if payload.Verified != nil {
 		updateFields["Verified"] = *payload.Verified
 		updateFields["VerifiedAt"] = now
 		updateFields["VerifiedBy"] = currentUser.ID
 	}
 
-	if payload.Moderated != nil && *payload.Moderated != existingProfile.Moderated {
+	if payload.Moderated != nil {
 		updateFields["Moderated"] = *payload.Moderated
 		updateFields["ModeratedAt"] = now
 		updateFields["ModeratedBy"] = currentUser.ID

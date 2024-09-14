@@ -156,7 +156,7 @@ type UpdateProfileRequest struct {
 	Moderated *bool  `json:"moderated" binding:"omitempty"`
 	Verified  *bool  `json:"verified" binding:"omitempty"`
 
-	Photos []CreatePhotoRequest `json:"photos" binding:"required,dive"`
+	Photos []CreatePhotoRequest `json:"photos" binding:"omitempty,dive"`
 }
 
 type FindProfilesQuery struct {
