@@ -735,7 +735,59 @@ func TestProfileRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, w.Code)
 	})
 
-	t.Run("PUT /api/profiles/profile/id: success profile update", func(t *testing.T) {
+	t.Run("POST /api/profiles/: fail with access_token / admin", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		_ = assignRole(initializers.DB, t, authRouter, userRouter, user.ID.String(), "admin")
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		payload.BodyTypeID = nil
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		assert.Equal(t, http.StatusForbidden, w.Code)
+	})
+
+	t.Run("POST /api/profiles/: fail with access_token / moderator", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		_ = assignRole(initializers.DB, t, authRouter, userRouter, user.ID.String(), "moderator")
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		payload.BodyTypeID = nil
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		assert.Equal(t, http.StatusForbidden, w.Code)
+	})
+
+	t.Run("PUT /api/profiles/my/id: success self profile update", func(t *testing.T) {
 		user := generateUser(random, authRouter, t)
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
@@ -771,7 +823,7 @@ func TestProfileRoutes(t *testing.T) {
 
 		updateProfileReq, _ := http.NewRequest(
 			"PUT",
-			fmt.Sprintf("/api/profiles/profile/%s",
+			fmt.Sprintf("/api/profiles/my/%s",
 				profileResponse.Data.ID.String()),
 			bytes.NewBuffer(jsonPayload))
 
@@ -813,7 +865,97 @@ func TestProfileRoutes(t *testing.T) {
 
 	})
 
-	t.Run("PUT /api/profiles/profile/id: success profile update", func(t *testing.T) {
+	t.Run("PUT /api/profiles/update/id: success other user's profile update / admin", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		moderator := generateUser(random, authRouter, t)
+		assignModeratorRoleResponse := assignRole(initializers.DB, t, authRouter, userRouter, moderator.ID.String(), "admin")
+
+		assert.Equal(t, "admin", assignModeratorRoleResponse.Role)
+
+		moderatorAccessTokenCookie, _ := loginUserGetAccessToken(t, moderator.Password, moderator.TelegramUserID, authRouter)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		updatePayload := &models.UpdateProfileRequest{
+			Active:    boolPtr(false),
+			Name:      fmt.Sprintf("%s-new", payload.Name),
+			Moderated: boolPtr(true),
+			Verified:  boolPtr(false),
+		}
+
+		jsonPayload, err = json.Marshal(updatePayload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		updateProfileReq, _ := http.NewRequest(
+			"PUT",
+			fmt.Sprintf("/api/profiles/update/%s",
+				profileResponse.Data.ID.String()),
+			bytes.NewBuffer(jsonPayload))
+
+		updateProfileReq.AddCookie(&http.Cookie{Name: moderatorAccessTokenCookie.Name, Value: moderatorAccessTokenCookie.Value})
+		updateProfileReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, updateProfileReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var updatedProfileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &updatedProfileResponse)
+
+		if err != nil {
+			fmt.Println("Error un marshaling response:", err)
+			return
+		}
+
+		assert.Equal(t, updatedProfileResponse.Status, "success")
+
+		getMyProfilesReq, _ := http.NewRequest("GET", "/api/profiles/my", nil)
+		getMyProfilesReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		getMyProfilesReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, getMyProfilesReq)
+
+		var profilesResponse ProfilesResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profilesResponse)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		assert.Equal(t, 1, profilesResponse.Length)
+		assert.Len(t, profilesResponse.Data, profilesResponse.Length)
+
+		assert.Equal(t, updatePayload.Name, profilesResponse.Data[0].Name)
+		assert.Equal(t, *updatePayload.Active, profilesResponse.Data[0].Active)
+		assert.Equal(t, *updatePayload.Verified, profilesResponse.Data[0].Verified)
+		assert.Equal(t, *updatePayload.Moderated, profilesResponse.Data[0].Moderated)
+		assert.Equal(t, moderator.ID.String(), profilesResponse.Data[0].VerifiedBy.String())
+		assert.Equal(t, moderator.ID.String(), profilesResponse.Data[0].ModeratedBy.String())
+
+	})
+
+	t.Run("PUT /api/profiles/update/id: success other user's profile update / moderator", func(t *testing.T) {
 		user := generateUser(random, authRouter, t)
 		moderator := generateUser(random, authRouter, t)
 		assignModeratorRoleResponse := assignRole(initializers.DB, t, authRouter, userRouter, moderator.ID.String(), "moderator")
@@ -901,5 +1043,59 @@ func TestProfileRoutes(t *testing.T) {
 		assert.Equal(t, moderator.ID.String(), profilesResponse.Data[0].VerifiedBy.String())
 		assert.Equal(t, moderator.ID.String(), profilesResponse.Data[0].ModeratedBy.String())
 
+	})
+
+	t.Run("PUT /api/profiles/update/id: fail updating other user's profile / user", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		moderator := generateUser(random, authRouter, t)
+
+		moderatorAccessTokenCookie, _ := loginUserGetAccessToken(t, moderator.Password, moderator.TelegramUserID, authRouter)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		updatePayload := &models.UpdateProfileRequest{
+			Active:    boolPtr(false),
+			Name:      fmt.Sprintf("%s-new", payload.Name),
+			Moderated: boolPtr(true),
+			Verified:  boolPtr(false),
+		}
+
+		jsonPayload, err = json.Marshal(updatePayload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		updateProfileReq, _ := http.NewRequest(
+			"PUT",
+			fmt.Sprintf("/api/profiles/update/%s",
+				profileResponse.Data.ID.String()),
+			bytes.NewBuffer(jsonPayload))
+
+		updateProfileReq.AddCookie(&http.Cookie{Name: moderatorAccessTokenCookie.Name, Value: moderatorAccessTokenCookie.Value})
+		updateProfileReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, updateProfileReq)
+
+		assert.Equal(t, http.StatusForbidden, w.Code)
 	})
 }

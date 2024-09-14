@@ -27,7 +27,7 @@ func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 
 	router.GET("/all", middleware.AbacMiddleware("profiles", "list"), pc.profileController.ListProfiles)
 
-	router.PUT("/profile/:id", pc.profileController.UpdateOwnProfile)
+	router.PUT("/my/:id", pc.profileController.UpdateOwnProfile)
 	router.PUT("/update/:id", middleware.AbacMiddleware("profiles", "update"), pc.profileController.UpdateProfile)
 
 	router.GET("/:phone", pc.profileController.FindProfileByPhone)

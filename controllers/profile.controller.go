@@ -21,6 +21,12 @@ func NewProfileController(DB *gorm.DB) ProfileController {
 func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Get the current user
 	currentUser := ctx.MustGet("currentUser").(models.User)
+
+	if currentUser.Role != "user" {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "unauthorized"})
+		return
+	}
+
 	var payload *models.CreateProfileRequest
 
 	// Bind and validate the input payload
