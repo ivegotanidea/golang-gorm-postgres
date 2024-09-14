@@ -435,62 +435,72 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 
 	now := time.Now()
 
-	// Update the profile fields
-	updatedProfile := models.Profile{
-		Active:    payload.Active,
-		Name:      payload.Name,
-		Bio:       payload.Bio,
-		Verified:  payload.Verified,
-		Moderated: payload.Moderated,
-		UpdatedAt: now,
-		UpdatedBy: currentUser.ID,
+	// Initialize the map to keep track of fields that need to be updated
+	updateFields := map[string]interface{}{
+		"UpdatedAt": now,
+		"UpdatedBy": currentUser.ID,
 	}
 
+	// Check each field to see if it has changed and should be updated
+	if payload.Active != nil && *payload.Active != existingProfile.Active {
+		updateFields["Active"] = *payload.Active
+	}
+
+	if payload.Verified != nil && *payload.Verified != existingProfile.Verified {
+		updateFields["Verified"] = *payload.Verified
+		updateFields["VerifiedAt"] = now
+		updateFields["VerifiedBy"] = currentUser.ID
+	}
+
+	if payload.Moderated != nil && *payload.Moderated != existingProfile.Moderated {
+		updateFields["Moderated"] = *payload.Moderated
+		updateFields["ModeratedAt"] = now
+		updateFields["ModeratedBy"] = currentUser.ID
+	}
+
+	if payload.Name != "" && payload.Name != existingProfile.Name {
+		updateFields["Name"] = payload.Name
+	}
+
+	if payload.Bio != "" && payload.Bio != existingProfile.Bio {
+		updateFields["Bio"] = payload.Bio
+	}
+
+	// Start a transaction
 	tx := pc.DB.Begin()
 
-	// Update profile in the database
-	if err := tx.Model(&existingProfile).Updates(&updatedProfile).Error; err != nil {
+	// Update only the fields that have changed
+	if err := tx.Model(&existingProfile).Updates(updateFields).Error; err != nil {
 		tx.Rollback()
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile"})
 		return
 	}
 
-	// Update associated body arts
-	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileBodyArt{}).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old body arts"})
-		return
-	}
-
-	// Update associated photos
-	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old photos"})
-		return
-	}
-
-	var photos []models.Photo
-	for _, photoReq := range payload.Photos {
-		photo := models.Photo{
-			ProfileID: existingProfile.ID,
-			URL:       photoReq.URL,
-			CreatedAt: time.Now(),
+	// Handle the update of Photos
+	if payload.Photos != nil {
+		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old photos"})
+			return
 		}
-		photos = append(photos, photo)
-	}
 
-	// Batch insert photos
-	if err := tx.Create(&photos).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update photos"})
-		return
-	}
+		if len(payload.Photos) > 0 {
+			var photos []models.Photo
+			for _, photoReq := range payload.Photos {
+				photo := models.Photo{
+					ProfileID: existingProfile.ID,
+					URL:       photoReq.URL,
+					CreatedAt: time.Now(),
+				}
+				photos = append(photos, photo)
+			}
 
-	// Update associated profile options
-	if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileOption{}).Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old profile options"})
-		return
+			if err := tx.Create(&photos).Error; err != nil {
+				tx.Rollback()
+				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update photos"})
+				return
+			}
+		}
 	}
 
 	// Commit the transaction
@@ -500,7 +510,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	}
 
 	// Return the updated profile
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedProfile})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": existingProfile})
 }
 
 func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
