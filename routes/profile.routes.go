@@ -23,7 +23,7 @@ func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 
 	router.GET("/my", pc.profileController.GetMyProfiles)
 
-	router.GET("/", middleware.AbacMiddleware("profiles", "query"), pc.profileController.FindProfiles)
+	router.GET("", middleware.AbacMiddleware("profiles", "query"), pc.profileController.FindProfiles)
 
 	router.GET("/all", middleware.AbacMiddleware("profiles", "list"), pc.profileController.ListProfiles)
 

@@ -1098,4 +1098,187 @@ func TestProfileRoutes(t *testing.T) {
 
 		assert.Equal(t, http.StatusForbidden, w.Code)
 	})
+
+	t.Run("GET /api/profiles: success query other user's profile / user:expert", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		secondUser := generateUser(random, authRouter, t)
+
+		tx := initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "expert")
+		assert.NoError(t, tx.Error)
+		assert.Equal(t, int64(1), tx.RowsAffected)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		query := models.FindProfilesQuery{
+			CityID: &payload.CityID,
+		}
+
+		queryPayload, queryErr := json.Marshal(query)
+		if queryErr != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		queryProfilesReq, _ := http.NewRequest(
+			"GET",
+			"/api/profiles?page=1&limit=10",
+			bytes.NewBuffer(queryPayload))
+
+		queryProfilesReq.AddCookie(&http.Cookie{
+			Name:  secondUserAccessTokenCookie.Name,
+			Value: secondUserAccessTokenCookie.Value})
+
+		queryProfilesReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, queryProfilesReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var profilesResponse ProfilesResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profilesResponse)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		assert.Equal(t, 1, profilesResponse.Length)
+		assert.Len(t, profilesResponse.Data, profilesResponse.Length)
+	})
+
+	t.Run("GET /api/profiles: success query other user's profile / user:guru", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		secondUser := generateUser(random, authRouter, t)
+
+		tx := initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "guru")
+		assert.NoError(t, tx.Error)
+		assert.Equal(t, int64(1), tx.RowsAffected)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		query := models.FindProfilesQuery{
+			CityID: &payload.CityID,
+		}
+
+		queryPayload, queryErr := json.Marshal(query)
+		if queryErr != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		queryProfilesReq, _ := http.NewRequest(
+			"GET",
+			"/api/profiles?page=1&limit=10",
+			bytes.NewBuffer(queryPayload))
+
+		queryProfilesReq.AddCookie(&http.Cookie{
+			Name:  secondUserAccessTokenCookie.Name,
+			Value: secondUserAccessTokenCookie.Value})
+
+		queryProfilesReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, queryProfilesReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var profilesResponse ProfilesResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profilesResponse)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		assert.Equal(t, 1, profilesResponse.Length)
+		assert.Len(t, profilesResponse.Data, profilesResponse.Length)
+	})
+
+	t.Run("GET /api/profiles: fail query other user's profile / user:basic", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		secondUser := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		query := models.FindProfilesQuery{
+			CityID: &payload.CityID,
+		}
+
+		queryPayload, queryErr := json.Marshal(query)
+		if queryErr != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		queryProfilesReq, _ := http.NewRequest(
+			"GET",
+			"/api/profiles?page=1&limit=10",
+			bytes.NewBuffer(queryPayload))
+
+		queryProfilesReq.AddCookie(&http.Cookie{
+			Name:  secondUserAccessTokenCookie.Name,
+			Value: secondUserAccessTokenCookie.Value})
+
+		queryProfilesReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, queryProfilesReq)
+
+		assert.Equal(t, http.StatusForbidden, w.Code)
+	})
 }

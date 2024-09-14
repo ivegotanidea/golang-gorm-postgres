@@ -583,9 +583,9 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	// Bind query parameters to the struct
+	// Bind the JSON payload to the struct
 	var query models.FindProfilesQuery
-	if err := ctx.ShouldBindQuery(&query); err != nil {
+	if err := ctx.ShouldBindJSON(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
@@ -594,40 +594,40 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
 
 	// Apply filtering based on query parameters
-	if query.BodyTypeId != 0 {
+	if query.BodyTypeId != nil {
 		dbQuery = dbQuery.Where("body_type_id = ?", query.BodyTypeId)
 	}
-	if query.EthnosId != 0 {
+	if query.EthnosId != nil {
 		dbQuery = dbQuery.Where("ethnos_id = ?", query.EthnosId)
 	}
-	if query.HairColorId != 0 {
+	if query.HairColorId != nil {
 		dbQuery = dbQuery.Where("hair_color_id = ?", query.HairColorId)
 	}
-	if query.IntimateHairCutId != 0 {
+	if query.IntimateHairCutId != nil {
 		dbQuery = dbQuery.Where("intimate_hair_cut_id = ?", query.IntimateHairCutId)
 	}
-	if query.CityID != 0 {
+	if query.CityID != nil {
 		dbQuery = dbQuery.Where("city_id = ?", query.CityID)
 	}
-	if query.Active {
+	if query.Active != nil {
 		dbQuery = dbQuery.Where("active = ?", query.Active)
 	}
 	if query.Phone != "" {
 		dbQuery = dbQuery.Where("phone = ?", query.Phone)
 	}
-	if query.Age != 0 {
+	if query.Age != nil {
 		dbQuery = dbQuery.Where("age = ?", query.Age)
 	}
 	if query.Name != "" {
 		dbQuery = dbQuery.Where("name LIKE ?", "%"+query.Name+"%")
 	}
-	if query.Height != 0 {
+	if query.Height != nil {
 		dbQuery = dbQuery.Where("height = ?", query.Height)
 	}
-	if query.Weight != 0 {
+	if query.Weight != nil {
 		dbQuery = dbQuery.Where("weight = ?", query.Weight)
 	}
-	if query.Bust != 0 {
+	if query.Bust != nil {
 		dbQuery = dbQuery.Where("bust = ?", query.Bust)
 	}
 	if query.AddressLatitude != "" {
@@ -636,10 +636,10 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	if query.AddressLongitude != "" {
 		dbQuery = dbQuery.Where("address_longitude = ?", query.AddressLongitude)
 	}
-	if query.Moderated {
+	if query.Moderated != nil {
 		dbQuery = dbQuery.Where("moderated = ?", query.Moderated)
 	}
-	if query.Verified {
+	if query.Verified != nil {
 		dbQuery = dbQuery.Where("verified = ?", query.Verified)
 	}
 
@@ -653,30 +653,69 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 			Where("profile_options.profile_tag_id IN ?", query.ProfileTagIds)
 	}
 
-	// Apply price range filters
-	if query.PriceInHouseContactMin != 0 || query.PriceInHouseContactMax != 0 {
+	// Apply price range filters with cases for nil min/max values
+	if query.PriceInHouseContactMin != nil && query.PriceInHouseContactMax != nil {
 		dbQuery = dbQuery.Where("price_in_house_contact BETWEEN ? AND ?", query.PriceInHouseContactMin, query.PriceInHouseContactMax)
+	} else if query.PriceInHouseContactMin != nil {
+		dbQuery = dbQuery.Where("price_in_house_contact >= ?", query.PriceInHouseContactMin)
+	} else if query.PriceInHouseContactMax != nil {
+		dbQuery = dbQuery.Where("price_in_house_contact <= ?", query.PriceInHouseContactMax)
 	}
-	if query.PriceInHouseHourMin != 0 || query.PriceInHouseHourMax != 0 {
+
+	if query.PriceInHouseHourMin != nil && query.PriceInHouseHourMax != nil {
 		dbQuery = dbQuery.Where("price_in_house_hour BETWEEN ? AND ?", query.PriceInHouseHourMin, query.PriceInHouseHourMax)
+	} else if query.PriceInHouseHourMin != nil {
+		dbQuery = dbQuery.Where("price_in_house_hour >= ?", query.PriceInHouseHourMin)
+	} else if query.PriceInHouseHourMax != nil {
+		dbQuery = dbQuery.Where("price_in_house_hour <= ?", query.PriceInHouseHourMax)
 	}
-	if query.PriceSaunaContactMin != 0 || query.PriceSaunaContactMax != 0 {
+
+	if query.PriceSaunaContactMin != nil && query.PriceSaunaContactMax != nil {
 		dbQuery = dbQuery.Where("price_sauna_contact BETWEEN ? AND ?", query.PriceSaunaContactMin, query.PriceSaunaContactMax)
+	} else if query.PriceSaunaContactMin != nil {
+		dbQuery = dbQuery.Where("price_sauna_contact >= ?", query.PriceSaunaContactMin)
+	} else if query.PriceSaunaContactMax != nil {
+		dbQuery = dbQuery.Where("price_sauna_contact <= ?", query.PriceSaunaContactMax)
 	}
-	if query.PriceSaunaHourMin != 0 || query.PriceSaunaHourMax != 0 {
+
+	if query.PriceSaunaHourMin != nil && query.PriceSaunaHourMax != nil {
 		dbQuery = dbQuery.Where("price_sauna_hour BETWEEN ? AND ?", query.PriceSaunaHourMin, query.PriceSaunaHourMax)
+	} else if query.PriceSaunaHourMin != nil {
+		dbQuery = dbQuery.Where("price_sauna_hour >= ?", query.PriceSaunaHourMin)
+	} else if query.PriceSaunaHourMax != nil {
+		dbQuery = dbQuery.Where("price_sauna_hour <= ?", query.PriceSaunaHourMax)
 	}
-	if query.PriceVisitContactMin != 0 || query.PriceVisitContactMax != 0 {
+
+	if query.PriceVisitContactMin != nil && query.PriceVisitContactMax != nil {
 		dbQuery = dbQuery.Where("price_visit_contact BETWEEN ? AND ?", query.PriceVisitContactMin, query.PriceVisitContactMax)
+	} else if query.PriceVisitContactMin != nil {
+		dbQuery = dbQuery.Where("price_visit_contact >= ?", query.PriceVisitContactMin)
+	} else if query.PriceVisitContactMax != nil {
+		dbQuery = dbQuery.Where("price_visit_contact <= ?", query.PriceVisitContactMax)
 	}
-	if query.PriceVisitHourMin != 0 || query.PriceVisitHourMax != 0 {
+
+	if query.PriceVisitHourMin != nil && query.PriceVisitHourMax != nil {
 		dbQuery = dbQuery.Where("price_visit_hour BETWEEN ? AND ?", query.PriceVisitHourMin, query.PriceVisitHourMax)
+	} else if query.PriceVisitHourMin != nil {
+		dbQuery = dbQuery.Where("price_visit_hour >= ?", query.PriceVisitHourMin)
+	} else if query.PriceVisitHourMax != nil {
+		dbQuery = dbQuery.Where("price_visit_hour <= ?", query.PriceVisitHourMax)
 	}
-	if query.PriceCarContactMin != 0 || query.PriceCarContactMax != 0 {
+
+	if query.PriceCarContactMin != nil && query.PriceCarContactMax != nil {
 		dbQuery = dbQuery.Where("price_car_contact BETWEEN ? AND ?", query.PriceCarContactMin, query.PriceCarContactMax)
+	} else if query.PriceCarContactMin != nil {
+		dbQuery = dbQuery.Where("price_car_contact >= ?", query.PriceCarContactMin)
+	} else if query.PriceCarContactMax != nil {
+		dbQuery = dbQuery.Where("price_car_contact <= ?", query.PriceCarContactMax)
 	}
-	if query.PriceCarHourMin != 0 || query.PriceCarHourMax != 0 {
+
+	if query.PriceCarHourMin != nil && query.PriceCarHourMax != nil {
 		dbQuery = dbQuery.Where("price_car_hour BETWEEN ? AND ?", query.PriceCarHourMin, query.PriceCarHourMax)
+	} else if query.PriceCarHourMin != nil {
+		dbQuery = dbQuery.Where("price_car_hour >= ?", query.PriceCarHourMin)
+	} else if query.PriceCarHourMax != nil {
+		dbQuery = dbQuery.Where("price_car_hour <= ?", query.PriceCarHourMax)
 	}
 
 	// Execute the query

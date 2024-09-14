@@ -17,3 +17,6 @@ p, owner, *, *, *, *
 
 p, user, users, list, expert, false
 p, user, users, list, guru, false
+
+p, user, profiles, query, expert, false
+p, user, profiles, query, guru, false
