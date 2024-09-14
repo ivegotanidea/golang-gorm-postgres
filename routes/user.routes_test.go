@@ -430,7 +430,7 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "moderator")
+		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("role", "moderator")
 		assert.NoError(t, tx.Error)
 		assert.Equal(t, int64(1), tx.RowsAffected)
 
@@ -525,11 +525,11 @@ func TestUserRoutes(t *testing.T) {
 		firstUser := generateUser(random, authRouter, t)
 		secondUser := generateUser(random, authRouter, t)
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "moderator")
+		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("role", "moderator")
 		assert.NoError(t, tx.Error)
 		assert.Equal(t, int64(1), tx.RowsAffected)
 
-		tx = initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "admin")
+		tx = initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("role", "admin")
 		assert.NoError(t, tx.Error)
 		assert.Equal(t, int64(1), tx.RowsAffected)
 
