@@ -47,8 +47,13 @@ type Profile struct {
 	ContactWA    string `gorm:"type:varchar(30)"`
 	ContactTG    string `gorm:"type:varchar(50)"`
 
-	Moderated bool `gorm:"type:boolean;default:false"`
-	Verified  bool `gorm:"type:boolean;default:false"`
+	Moderated   bool      `gorm:"type:boolean;default:false"`
+	ModeratedAt time.Time `gorm:"type:timestamp;default:null"`
+	ModeratedBy uuid.UUID `gorm:"type:uuid;default:null"`
+
+	Verified   bool      `gorm:"type:boolean;default:false"`
+	VerifiedAt time.Time `gorm:"type:timestamp;default:null"`
+	VerifiedBy uuid.UUID `gorm:"type:uuid;default:null"`
 
 	CreatedAt time.Time      `gorm:"type:timestamp;not null"`
 	UpdatedAt time.Time      `gorm:"type:timestamp;not null"`
@@ -145,11 +150,11 @@ type UpdateOwnProfileRequest struct {
 }
 
 type UpdateProfileRequest struct {
-	Active    bool   `json:"active" binding:"omitempty"`
+	Active    *bool  `json:"active" binding:"omitempty"`
 	Name      string `json:"name"  binding:"omitempty"`
 	Bio       string `json:"bio"  binding:"omitempty"`
-	Moderated bool   `json:"moderated" binding:"omitempty"`
-	Verified  bool   `json:"verified" binding:"omitempty"`
+	Moderated *bool  `json:"moderated" binding:"omitempty"`
+	Verified  *bool  `json:"verified" binding:"omitempty"`
 
 	Photos []CreatePhotoRequest `json:"photos" binding:"required,dive"`
 }
