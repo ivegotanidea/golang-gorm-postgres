@@ -14,9 +14,16 @@ func NewRouteServiceController(serviceController controllers.ServiceController) 
 	return ServiceRouteController{serviceController}
 }
 
-func (uc *ServiceRouteController) ServiceRoute(rg *gin.RouterGroup) {
+func (sc *ServiceRouteController) ServiceRoute(rg *gin.RouterGroup) {
 	router := rg.Group("services")
 
 	router.Use(middleware.DeserializeUser())
-	
+
+	router.POST("/", sc.serviceController.CreateService)
+
+	router.GET("/:profileID", middleware.AbacMiddleware("services", "get"), sc.serviceController.GetProfileServices)
+
+	router.PUT("/:profileID", sc.serviceController.UpdateService)
+
+	router.GET("/all", middleware.AbacMiddleware("services", "list"), sc.serviceController.ListServices)
 }

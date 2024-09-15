@@ -51,6 +51,10 @@ func (pc *ServiceController) CreateService(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newPost})
 }
 
+func (pc *ServiceController) GetProfileServices(ctx *gin.Context) {
+
+}
+
 func (pc *ServiceController) UpdateService(ctx *gin.Context) {
 	postId := ctx.Param("postId")
 	currentUser := ctx.MustGet("currentUser").(models.User)
@@ -81,7 +85,7 @@ func (pc *ServiceController) UpdateService(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedPost})
 }
 
-func (pc *PostController) GetProfileServices(ctx *gin.Context) {
+func (pc *ServiceController) ListServices(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
 
@@ -89,12 +93,19 @@ func (pc *PostController) GetProfileServices(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var posts []models.Post
-	results := pc.DB.Limit(intLimit).Offset(offset).Find(&posts)
+	var profiles []models.Service
+
+	dbQuery := pc.DB.Preload("Photos").
+		Preload("BodyArts").
+		Preload("ProfileOptions.ProfileTag").
+		Limit(intLimit).Offset(offset)
+
+	results := dbQuery.Find(&profiles)
+
 	if results.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(posts), "data": posts})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
 }
