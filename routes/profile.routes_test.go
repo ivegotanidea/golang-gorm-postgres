@@ -1282,64 +1282,57 @@ func TestProfileRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusForbidden, w.Code)
 	})
 
-	t.Run("GET /api/profiles: success list active profiles / user:basic", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+	t.Run("GET /api/profiles: fail list profiles / user: all tiers", func(t *testing.T) {
 
-		tx := initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "guru")
-		assert.NoError(t, tx.Error)
-		assert.Equal(t, int64(1), tx.RowsAffected)
+		tiers := []string{"basic", "expert", "guru"}
 
-		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
-		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+		for _, tier := range tiers {
 
-		for i := 0; i < 2; i++ {
-			w := httptest.NewRecorder()
+			user := generateUser(random, authRouter, t)
+			secondUser := generateUser(random, authRouter, t)
 
-			payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+			tx := initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", tier)
+			assert.NoError(t, tx.Error)
+			assert.Equal(t, int64(1), tx.RowsAffected)
 
-			jsonPayload, err := json.Marshal(payload)
-			if err != nil {
-				fmt.Println("Error marshaling payload:", err)
-				return
+			accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+			secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+
+			for i := 0; i < 2; i++ {
+				w := httptest.NewRecorder()
+
+				payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+				jsonPayload, err := json.Marshal(payload)
+				if err != nil {
+					fmt.Println("Error marshaling payload:", err)
+					return
+				}
+
+				createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+				createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+				createProfileReq.Header.Set("Content-Type", "application/json")
+
+				profileRouter.ServeHTTP(w, createProfileReq)
+
+				assert.Equal(t, http.StatusCreated, w.Code)
 			}
 
-			createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
-			createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
-			createProfileReq.Header.Set("Content-Type", "application/json")
+			queryProfilesReq, _ := http.NewRequest(
+				"GET",
+				"/api/profiles/all?page=1&limit=10",
+				nil)
 
-			profileRouter.ServeHTTP(w, createProfileReq)
+			queryProfilesReq.AddCookie(&http.Cookie{
+				Name:  secondUserAccessTokenCookie.Name,
+				Value: secondUserAccessTokenCookie.Value})
 
-			assert.Equal(t, http.StatusCreated, w.Code)
-		}
+			queryProfilesReq.Header.Set("Content-Type", "application/json")
 
-		queryProfilesReq, _ := http.NewRequest(
-			"GET",
-			"/api/profiles/all?page=1&limit=10",
-			nil)
+			w := httptest.NewRecorder()
+			profileRouter.ServeHTTP(w, queryProfilesReq)
 
-		queryProfilesReq.AddCookie(&http.Cookie{
-			Name:  secondUserAccessTokenCookie.Name,
-			Value: secondUserAccessTokenCookie.Value})
-
-		queryProfilesReq.Header.Set("Content-Type", "application/json")
-
-		w := httptest.NewRecorder()
-		profileRouter.ServeHTTP(w, queryProfilesReq)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-
-		var profilesResponse ProfilesResponse
-		err := json.Unmarshal(w.Body.Bytes(), &profilesResponse)
-
-		if err != nil {
-			panic(err)
-		}
-
-		assert.True(t, profilesResponse.Length >= 2)
-
-		for _, profile := range profilesResponse.Data {
-			assert.True(t, profile.Active, "Expected profile.Active to be true")
+			assert.Equal(t, http.StatusForbidden, w.Code)
 		}
 	})
 

@@ -539,8 +539,6 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
 
-	currentUser := ctx.MustGet("currentUser").(models.User)
-
 	intPage, _ := strconv.Atoi(page)
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
@@ -548,10 +546,6 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	var profiles []models.Profile
 
 	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
-
-	if currentUser.Role == "user" {
-		dbQuery = dbQuery.Where("active = ?", true)
-	}
 
 	results := dbQuery.Find(&profiles)
 
@@ -727,6 +721,12 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 		dbQuery = dbQuery.Where("price_car_hour >= ?", query.PriceCarHourMin)
 	} else if query.PriceCarHourMax != nil {
 		dbQuery = dbQuery.Where("price_car_hour <= ?", query.PriceCarHourMax)
+	}
+
+	currentUser := ctx.MustGet("currentUser").(models.User)
+
+	if currentUser.Role == "user" {
+		dbQuery = dbQuery.Where("active = ?", true)
 	}
 
 	// Execute the query

@@ -3,6 +3,7 @@
 
 p, moderator, users, list, guru, false
 p, moderator, users, update, guru, false
+
 p, moderator, profiles, list, guru, false
 p, moderator, profiles, update, guru, false
 p, moderator, profiles, query, guru, false
