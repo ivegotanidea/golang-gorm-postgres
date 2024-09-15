@@ -117,8 +117,8 @@ func generateCreateProfileRequest(
 	}
 
 	payload := models.CreateProfileRequest{
-		Phone:               "77073778123",
-		Name:                "Alice",
+		Phone:               utils.GenerateRandomPhoneNumber(random, 10),
+		Name:                utils.GenerateRandomStringWithPrefix(random, 15, "Alice"),
 		Age:                 29,
 		Height:              170,
 		Weight:              57,

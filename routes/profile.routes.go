@@ -30,6 +30,8 @@ func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 	router.PUT("/my/:id", pc.profileController.UpdateOwnProfile)
 	router.PUT("/update/:id", middleware.AbacMiddleware("profiles", "update"), pc.profileController.UpdateProfile)
 
+	// todo: should have captcha set
+	// todo: should have rate limiter set
 	router.GET("/:phone", pc.profileController.FindProfileByPhone)
 
 	router.DELETE("/:id", pc.profileController.DeleteProfile)

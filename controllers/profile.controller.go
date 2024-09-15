@@ -525,7 +525,10 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 
 	var profile models.Profile
 
-	result := pc.DB.First(&profile, "phone = ?", phone)
+	result := pc.DB.Preload("Photos").
+		Preload("BodyArts").
+		Preload("ProfileOptions.ProfileTag").
+		First(&profile, "phone = ?", phone)
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No profile with that title exists"})
@@ -545,7 +548,10 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 
 	var profiles []models.Profile
 
-	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
+	dbQuery := pc.DB.Preload("Photos").
+		Preload("BodyArts").
+		Preload("ProfileOptions.ProfileTag").
+		Limit(intLimit).Offset(offset)
 
 	results := dbQuery.Find(&profiles)
 
@@ -568,7 +574,11 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 	offset := (intPage - 1) * intLimit
 
 	var profiles []models.Profile
-	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
+
+	dbQuery := pc.DB.Preload("Photos").
+		Preload("BodyArts").
+		Preload("ProfileOptions.ProfileTag").
+		Limit(intLimit).Offset(offset)
 
 	results := dbQuery.Find(&profiles, "user_id = ?", currentUser.ID.String())
 
@@ -648,11 +658,11 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 		dbQuery = dbQuery.Where("verified = ?", query.Verified)
 	}
 
-	// Handle body arts and profile options if needed (complex relationships)
 	if len(query.BodyArtIds) > 0 {
 		dbQuery = dbQuery.Joins("JOIN profile_body_arts ON profiles.id = profile_body_arts.profile_id").
 			Where("profile_body_arts.body_art_id IN ?", query.BodyArtIds)
 	}
+
 	if len(query.ProfileTagIds) > 0 {
 		dbQuery = dbQuery.Joins("JOIN profile_options ON profiles.id = profile_options.profile_id").
 			Where("profile_options.profile_tag_id IN ?", query.ProfileTagIds)

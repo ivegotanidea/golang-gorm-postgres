@@ -658,79 +658,8 @@ func TestProfileRoutes(t *testing.T) {
 
 		assert.Equal(t, profileResponse.Status, "success")
 		assert.NotNil(t, profileResponse.Data.ID)
-		assert.Equal(t, profileResponse.Data.UserID, user.ID)
-
-		assert.Equal(t, profileResponse.Data.Active, true)
-		assert.Equal(t, profileResponse.Data.Verified, false)
-		assert.Equal(t, profileResponse.Data.Moderated, false)
-		assert.Equal(t, profileResponse.Data.Name, payload.Name)
-		assert.Equal(t, profileResponse.Data.Phone, payload.Phone)
-		assert.Equal(t, profileResponse.Data.ContactPhone, payload.ContactPhone)
-		assert.Equal(t, profileResponse.Data.ContactTG, payload.ContactTG)
-		assert.Equal(t, profileResponse.Data.ContactWA, payload.ContactWA)
-		assert.NotNil(t, profileResponse.Data.CreatedAt)
-		assert.NotNil(t, profileResponse.Data.UpdatedAt)
-		assert.Equal(t, profileResponse.Data.UpdatedBy, user.ID)
-		assert.Equal(t, len(profileResponse.Data.ProfileOptions), len(payload.Options))
-
-		for i := 0; i < len(payload.Options); i++ {
-			assert.Equal(t, profileResponse.Data.ProfileOptions[i].Comment, payload.Options[i].Comment)
-			assert.NotNil(t, profileResponse.Data.ProfileOptions[i].ProfileTag.ID)
-			assert.NotNil(t, profileResponse.Data.ProfileOptions[i].ProfileTag.Name)
-		}
-
-		assert.Equal(t, len(profileResponse.Data.BodyArts), len(payload.BodyArts))
-
-		for i := 0; i < len(payload.BodyArts); i++ {
-			assert.NotNil(t, profileResponse.Data.BodyArts[i].ProfileID)
-			assert.Equal(t, profileResponse.Data.BodyArts[i].BodyArtID, payload.BodyArts[i].ID)
-		}
-
-		assert.Equal(t, len(profileResponse.Data.Photos), len(payload.Photos))
-
-		for i := 0; i < len(payload.Photos); i++ {
-			assert.NotNil(t, profileResponse.Data.Photos[i].ID)
-			assert.NotNil(t, profileResponse.Data.Photos[i].ProfileID)
-			assert.NotNil(t, profileResponse.Data.Photos[i].CreatedAt)
-
-			assert.False(t, profileResponse.Data.Photos[i].Approved)
-			assert.False(t, profileResponse.Data.Photos[i].Deleted)
-			assert.False(t, profileResponse.Data.Photos[i].Disabled)
-
-			assert.Equal(t, profileResponse.Data.Photos[i].URL, payload.Photos[i].URL)
-		}
-
-		assert.Equal(t, profileResponse.Data.BodyTypeID, payload.BodyTypeID)
-		assert.Equal(t, profileResponse.Data.EthnosID, payload.EthnosID)
-		assert.Equal(t, profileResponse.Data.HairColorID, payload.HairColorID)
-		assert.Equal(t, profileResponse.Data.IntimateHairCutID, payload.IntimateHairCutID)
-		assert.Equal(t, profileResponse.Data.CityID, payload.CityID)
-		assert.Equal(t, profileResponse.Data.Age, payload.Age)
-		assert.Equal(t, profileResponse.Data.Height, payload.Height)
-		assert.Equal(t, profileResponse.Data.Weight, payload.Weight)
-		assert.Equal(t, profileResponse.Data.Bust, payload.Bust)
-		assert.Equal(t, profileResponse.Data.Bio, payload.Bio)
-		assert.Equal(t, profileResponse.Data.AddressLatitude, payload.AddressLatitude)
-		assert.Equal(t, profileResponse.Data.AddressLongitude, payload.AddressLongitude)
-
-		assert.Equal(t, profileResponse.Data.PriceInHouseNightRatio, 1.0)
-		assert.Equal(t, profileResponse.Data.PriceInHouseContact, payload.PriceInHouseContact)
-		assert.Equal(t, profileResponse.Data.PriceInHouseHour, payload.PriceInHouseHour)
-
-		assert.Equal(t, profileResponse.Data.PriceVisitNightRatio, 1.0)
-		assert.Equal(t, profileResponse.Data.PriceVisitContact, payload.PriceVisitContact)
-		assert.Equal(t, profileResponse.Data.PriceVisitHour, payload.PriceVisitHour)
-
-		assert.Equal(t, profileResponse.Data.PriceCarNightRatio, 1.0)
-		assert.Equal(t, profileResponse.Data.PriceCarContact, payload.PriceCarContact)
-		assert.Equal(t, profileResponse.Data.PriceCarHour, payload.PriceCarHour)
-
-		assert.Equal(t, profileResponse.Data.PrinceSaunaNightRatio, 1.0)
-		assert.Equal(t, profileResponse.Data.PriceSaunaContact, payload.PriceSaunaContact)
-		assert.Equal(t, profileResponse.Data.PriceSaunaHour, payload.PriceSaunaHour)
-
-		assert.Equal(t, profileResponse.Data.DeletedAt.Valid, false)
-		assert.Nil(t, profileResponse.Data.Services)
+		checkProfilesMatch(t,
+			user.ID.String(), payload, profileResponse, true, false, false)
 
 		assert.Equal(t, http.StatusCreated, w.Code)
 	})
@@ -1432,4 +1361,172 @@ func TestProfileRoutes(t *testing.T) {
 		assert.True(t, foundInactive)
 
 	})
+
+	t.Run("GET /api/profiles/phoneId: fail for non logged user", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		findProfileByPhoneReq, _ := http.NewRequest(
+			"GET",
+			fmt.Sprintf("/api/profiles/%s", payload.Phone),
+			nil)
+
+		findProfileByPhoneReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, findProfileByPhoneReq)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+		assert.JSONEq(t, "{\"message\":\"You are not logged in\",\"status\":\"fail\"}", w.Body.String())
+	})
+
+	t.Run("GET /api/profiles/phoneId: success for logged user", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		secondUser := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		findProfileByPhoneReq, _ := http.NewRequest(
+			"GET",
+			fmt.Sprintf("/api/profiles/%s", payload.Phone),
+			nil)
+
+		findProfileByPhoneReq.AddCookie(
+			&http.Cookie{
+				Name:  secondUserAccessTokenCookie.Name,
+				Value: secondUserAccessTokenCookie.Value})
+
+		findProfileByPhoneReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, findProfileByPhoneReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var findProfileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &findProfileResponse)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, payload.Phone, findProfileResponse.Data.Phone)
+		checkProfilesMatch(t, user.ID.String(),
+			payload, findProfileResponse, true, false, false)
+
+	})
+}
+
+func checkProfilesMatch(t *testing.T, userID string, payload models.CreateProfileRequest,
+	profileResponse CreateProfileResponse, expectedActive bool, expectedVerified bool, expectedModerated bool) {
+
+	assert.Equal(t, profileResponse.Data.UserID.String(), userID)
+
+	assert.Equal(t, profileResponse.Data.Active, expectedActive)
+	assert.Equal(t, profileResponse.Data.Verified, expectedVerified)
+	assert.Equal(t, profileResponse.Data.Moderated, expectedModerated)
+	assert.Equal(t, profileResponse.Data.Name, payload.Name)
+	assert.Equal(t, profileResponse.Data.Phone, payload.Phone)
+	assert.Equal(t, profileResponse.Data.ContactPhone, payload.ContactPhone)
+	assert.Equal(t, profileResponse.Data.ContactTG, payload.ContactTG)
+	assert.Equal(t, profileResponse.Data.ContactWA, payload.ContactWA)
+	assert.NotNil(t, profileResponse.Data.CreatedAt)
+	assert.NotNil(t, profileResponse.Data.UpdatedAt)
+	assert.Equal(t, profileResponse.Data.UpdatedBy.String(), userID)
+	assert.Equal(t, len(profileResponse.Data.ProfileOptions), len(payload.Options))
+
+	for i := 0; i < len(payload.Options); i++ {
+		assert.Equal(t, profileResponse.Data.ProfileOptions[i].Comment, payload.Options[i].Comment)
+		assert.NotNil(t, profileResponse.Data.ProfileOptions[i].ProfileTag.ID)
+		assert.NotNil(t, profileResponse.Data.ProfileOptions[i].ProfileTag.Name)
+	}
+
+	assert.Equal(t, len(profileResponse.Data.BodyArts), len(payload.BodyArts))
+
+	for i := 0; i < len(payload.BodyArts); i++ {
+		assert.NotNil(t, profileResponse.Data.BodyArts[i].ProfileID)
+		assert.Equal(t, profileResponse.Data.BodyArts[i].BodyArtID, payload.BodyArts[i].ID)
+	}
+
+	assert.Equal(t, len(profileResponse.Data.Photos), len(payload.Photos))
+
+	for i := 0; i < len(payload.Photos); i++ {
+		assert.NotNil(t, profileResponse.Data.Photos[i].ID)
+		assert.NotNil(t, profileResponse.Data.Photos[i].ProfileID)
+		assert.NotNil(t, profileResponse.Data.Photos[i].CreatedAt)
+
+		assert.False(t, profileResponse.Data.Photos[i].Approved)
+		assert.False(t, profileResponse.Data.Photos[i].Deleted)
+		assert.False(t, profileResponse.Data.Photos[i].Disabled)
+
+		assert.Equal(t, profileResponse.Data.Photos[i].URL, payload.Photos[i].URL)
+	}
+
+	assert.Equal(t, profileResponse.Data.BodyTypeID, payload.BodyTypeID)
+	assert.Equal(t, profileResponse.Data.EthnosID, payload.EthnosID)
+	assert.Equal(t, profileResponse.Data.HairColorID, payload.HairColorID)
+	assert.Equal(t, profileResponse.Data.IntimateHairCutID, payload.IntimateHairCutID)
+	assert.Equal(t, profileResponse.Data.CityID, payload.CityID)
+	assert.Equal(t, profileResponse.Data.Age, payload.Age)
+	assert.Equal(t, profileResponse.Data.Height, payload.Height)
+	assert.Equal(t, profileResponse.Data.Weight, payload.Weight)
+	assert.Equal(t, profileResponse.Data.Bust, payload.Bust)
+	assert.Equal(t, profileResponse.Data.Bio, payload.Bio)
+	assert.Equal(t, profileResponse.Data.AddressLatitude, payload.AddressLatitude)
+	assert.Equal(t, profileResponse.Data.AddressLongitude, payload.AddressLongitude)
+
+	assert.Equal(t, profileResponse.Data.PriceInHouseNightRatio, 1.0)
+	assert.Equal(t, profileResponse.Data.PriceInHouseContact, payload.PriceInHouseContact)
+	assert.Equal(t, profileResponse.Data.PriceInHouseHour, payload.PriceInHouseHour)
+
+	assert.Equal(t, profileResponse.Data.PriceVisitNightRatio, 1.0)
+	assert.Equal(t, profileResponse.Data.PriceVisitContact, payload.PriceVisitContact)
+	assert.Equal(t, profileResponse.Data.PriceVisitHour, payload.PriceVisitHour)
+
+	assert.Equal(t, profileResponse.Data.PriceCarNightRatio, 1.0)
+	assert.Equal(t, profileResponse.Data.PriceCarContact, payload.PriceCarContact)
+	assert.Equal(t, profileResponse.Data.PriceCarHour, payload.PriceCarHour)
+
+	assert.Equal(t, profileResponse.Data.PrinceSaunaNightRatio, 1.0)
+	assert.Equal(t, profileResponse.Data.PriceSaunaContact, payload.PriceSaunaContact)
+	assert.Equal(t, profileResponse.Data.PriceSaunaHour, payload.PriceSaunaHour)
+
+	assert.Equal(t, profileResponse.Data.DeletedAt.Valid, false)
+	assert.Nil(t, profileResponse.Data.Services)
 }
