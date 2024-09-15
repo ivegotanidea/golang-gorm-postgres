@@ -1451,6 +1451,148 @@ func TestProfileRoutes(t *testing.T) {
 			payload, findProfileResponse, true, false, false)
 
 	})
+
+	t.Run("DELETE /api/profiles/id: success for logged user", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		findProfileByPhoneReq, _ := http.NewRequest(
+			"GET",
+			fmt.Sprintf("/api/profiles/%s", payload.Phone),
+			nil)
+
+		findProfileByPhoneReq.AddCookie(
+			&http.Cookie{
+				Name:  accessTokenCookie.Name,
+				Value: accessTokenCookie.Value})
+
+		findProfileByPhoneReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, findProfileByPhoneReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var findProfileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &findProfileResponse)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, payload.Phone, findProfileResponse.Data.Phone)
+		checkProfilesMatch(t, user.ID.String(),
+			payload, findProfileResponse, true, false, false)
+
+		deleteProfileReq, _ := http.NewRequest(
+			"DELETE",
+			fmt.Sprintf("/api/profiles/%s", findProfileResponse.Data.ID.String()),
+			bytes.NewBuffer(jsonPayload))
+
+		deleteProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		deleteProfileReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, deleteProfileReq)
+
+		assert.Equal(t, http.StatusNoContent, w.Code)
+		assert.Empty(t, w.Body.String())
+
+		getMyProfilesReq, _ := http.NewRequest("GET", "/api/profiles/my", nil)
+		getMyProfilesReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		getMyProfilesReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, getMyProfilesReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var profilesResponse ProfilesResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profilesResponse)
+
+		assert.Equal(t, 0, profilesResponse.Length)
+
+	})
+
+	t.Run("DELETE /api/profiles/id: success for logged user", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		findProfileByPhoneReq, _ := http.NewRequest(
+			"GET",
+			fmt.Sprintf("/api/profiles/%s", payload.Phone),
+			nil)
+
+		findProfileByPhoneReq.AddCookie(
+			&http.Cookie{
+				Name:  accessTokenCookie.Name,
+				Value: accessTokenCookie.Value})
+
+		findProfileByPhoneReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, findProfileByPhoneReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var findProfileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &findProfileResponse)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, payload.Phone, findProfileResponse.Data.Phone)
+		checkProfilesMatch(t, user.ID.String(),
+			payload, findProfileResponse, true, false, false)
+
+		deleteProfileReq, _ := http.NewRequest(
+			"DELETE",
+			fmt.Sprintf("/api/profiles/%s", findProfileResponse.Data.ID.String()),
+			bytes.NewBuffer(jsonPayload))
+
+		deleteProfileReq.Header.Set("Content-Type", "application/json")
+
+		w = httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, deleteProfileReq)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+		assert.JSONEq(t, "{\"message\":\"You are not logged in\",\"status\":\"fail\"}", w.Body.String())
+	})
 }
 
 func checkProfilesMatch(t *testing.T, userID string, payload models.CreateProfileRequest,
