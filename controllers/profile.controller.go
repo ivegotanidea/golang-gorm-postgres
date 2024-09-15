@@ -520,6 +520,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 }
 
 func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
+
 	phone := ctx.Param("phone")
 
 	var profile models.Profile
@@ -538,12 +539,22 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
 
+	currentUser := ctx.MustGet("currentUser").(models.User)
+
 	intPage, _ := strconv.Atoi(page)
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
 	var profiles []models.Profile
-	results := pc.DB.Limit(intLimit).Offset(offset).Find(&profiles)
+
+	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
+
+	if currentUser.Role == "user" {
+		dbQuery = dbQuery.Where("active = ?", true)
+	}
+
+	results := dbQuery.Find(&profiles)
+
 	if results.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return
