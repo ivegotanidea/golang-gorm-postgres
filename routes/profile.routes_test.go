@@ -1046,7 +1046,7 @@ func TestProfileRoutes(t *testing.T) {
 
 	})
 
-	t.Run("DELETE /api/profiles/id: success for logged user", func(t *testing.T) {
+	t.Run("DELETE /api/profiles/id: fail for non logged user", func(t *testing.T) {
 		user := generateUser(random, authRouter, t)
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
