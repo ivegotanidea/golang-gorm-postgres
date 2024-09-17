@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/wpcodevo/golang-gorm-postgres/controllers"
@@ -9,9 +11,11 @@ import (
 	"github.com/wpcodevo/golang-gorm-postgres/models"
 	"github.com/wpcodevo/golang-gorm-postgres/utils"
 	"log"
+	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func SetupSCRouter(serviceController *controllers.ServiceController) *gin.Engine {
@@ -50,31 +54,71 @@ func SetupSCController() controllers.ServiceController {
 
 func TestServiceRoutes(t *testing.T) {
 
-	//ac := SetupAuthController()
-	uc := SetupUCController()
+	ac := SetupAuthController()
 
-	//authRouter := SetupACRouter(&ac)
-	userRouter := SetupUCRouter(&uc)
+	//uc := SetupUCController()
+	pc := SetupPCController()
 
-	//random := rand.New(rand.NewPCG(1, uint64(time.Now().Nanosecond())))
+	authRouter := SetupACRouter(&ac)
+	//userRouter := SetupUCRouter(&uc)
+	profileRouter := SetupPCRouter(&pc)
+
+	profileTags := populateProfileTags(*pc.DB)
+
+	cities := populateCities(*pc.DB)
+
+	// filters
+
+	bodyTypes := populateBodyTypes(*pc.DB)
+
+	ethnos := populateEthnos(*pc.DB)
+
+	hairColors := populateHairColors(*pc.DB)
+
+	intimateHairCuts := populateIntimateHairCuts(*pc.DB)
+
+	bodyArts := populateBodyArts(*pc.DB)
+
+	//createOwnerUser(profileController.DB)
+
+	random := rand.New(rand.NewPCG(1, uint64(time.Now().Nanosecond())))
 
 	t.Cleanup(func() {
-		utils.CleanupTestUsers(uc.DB)
-		utils.DropAllTables(uc.DB)
+		utils.CleanupTestUsers(pc.DB)
+		utils.DropAllTables(pc.DB)
 	})
 
-	t.Run("GET /api/user/me: fail without access token ", func(t *testing.T) {
+	t.Run("POST /api/profiles/: success with access_token", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
 
+		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		w := httptest.NewRecorder()
-		meReq, _ := http.NewRequest("GET", "/api/users/me", nil)
-		meReq.Header.Set("Content-Type", "application/json")
-		userRouter.ServeHTTP(w, meReq)
 
-		var jsonResponse map[string]interface{}
-		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
-		assert.Nil(t, err)
+		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
 
-		assert.Equal(t, http.StatusUnauthorized, w.Code)
+		payload.BodyTypeID = nil
 
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createProfileReq.Header.Set("Content-Type", "application/json")
+
+		profileRouter.ServeHTTP(w, createProfileReq)
+
+		var profileResponse CreateProfileResponse
+		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+		assert.Equal(t, profileResponse.Status, "success")
+		assert.NotNil(t, profileResponse.Data.ID)
+		checkProfilesMatch(t,
+			user.ID.String(), payload, profileResponse, true, false, false)
+
+		assert.Equal(t, http.StatusCreated, w.Code)
 	})
+
 }
