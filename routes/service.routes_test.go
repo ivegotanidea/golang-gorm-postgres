@@ -3,7 +3,6 @@ package routes
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/wpcodevo/golang-gorm-postgres/controllers"
@@ -52,6 +51,42 @@ func SetupSCController() controllers.ServiceController {
 	return serviceController
 }
 
+func createProfile(t *testing.T, random *rand.Rand, cities []models.City, ethnos []models.Ethnos,
+	profileTags []models.ProfileTag, bodyArts []models.BodyArt, bodyTypes []models.BodyType, hairColors []models.HairColor,
+	intimateHairCuts []models.IntimateHairCut, accessTokenCookie *http.Cookie, profileRouter *gin.Engine,
+	userID string) (CreateProfileResponse, error) {
+
+	w := httptest.NewRecorder()
+
+	payload := generateCreateProfileRequest(
+		random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+	payload.BodyTypeID = nil
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		panic(err)
+	}
+
+	createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+	createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+	createProfileReq.Header.Set("Content-Type", "application/json")
+
+	profileRouter.ServeHTTP(w, createProfileReq)
+
+	var profileResponse CreateProfileResponse
+	err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+	assert.Equal(t, profileResponse.Status, "success")
+	assert.NotNil(t, profileResponse.Data.ID)
+	checkProfilesMatch(t,
+		userID, payload, profileResponse, true, false, false)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	return profileResponse, nil
+}
+
 func TestServiceRoutes(t *testing.T) {
 
 	ac := SetupAuthController()
@@ -91,34 +126,11 @@ func TestServiceRoutes(t *testing.T) {
 	t.Run("POST /api/profiles/: success with access_token", func(t *testing.T) {
 		user := generateUser(random, authRouter, t)
 
-		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
-		w := httptest.NewRecorder()
+		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, user.ID.String())
 
-		payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
-
-		payload.BodyTypeID = nil
-
-		jsonPayload, err := json.Marshal(payload)
-		if err != nil {
-			fmt.Println("Error marshaling payload:", err)
-			return
-		}
-
-		createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
-		createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
-		createProfileReq.Header.Set("Content-Type", "application/json")
-
-		profileRouter.ServeHTTP(w, createProfileReq)
-
-		var profileResponse CreateProfileResponse
-		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
-
-		assert.Equal(t, profileResponse.Status, "success")
-		assert.NotNil(t, profileResponse.Data.ID)
-		checkProfilesMatch(t,
-			user.ID.String(), payload, profileResponse, true, false, false)
-
-		assert.Equal(t, http.StatusCreated, w.Code)
+		log.Printf(profile.Status)
 	})
 
 }
