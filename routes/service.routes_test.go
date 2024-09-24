@@ -266,6 +266,9 @@ func TestServiceRoutes(t *testing.T) {
 		assert.True(t, servicesResponse.Length >= 1)
 		assert.Equal(t, servicesResponse.Data[0].TrustedDistance, true)
 		assert.True(t, servicesResponse.Data[0].DistanceBetweenUsers <= 100)
+
+		assert.NotNil(t, servicesResponse.Data[0].ID)
+
 		assert.Nil(t, servicesResponse.Data[0].ClientUserRating)
 		assert.Nil(t, servicesResponse.Data[0].ClientUserRatingID)
 		assert.Nil(t, servicesResponse.Data[0].ProfileRatingID)
