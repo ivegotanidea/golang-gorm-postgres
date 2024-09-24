@@ -39,6 +39,10 @@ func ptr(v int) *int {
 	return &v
 }
 
+func floatPtr(v float32) *float32 {
+	return &v
+}
+
 func boolPtr(v bool) *bool {
 	return &v
 }

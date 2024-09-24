@@ -13,7 +13,7 @@ type ProfileOption struct {
 }
 
 type CreateProfileOption struct {
-	ProfileTagID uint   `json:"profileTagId" binding:"required" validate:"required,int"`
+	ProfileTagID int    `json:"profileTagId" binding:"required" validate:"required,int"`
 	Price        int64  `json:"price,omitempty" validate:"min=0"`
 	Comment      string `json:"comment,omitempty" validate:"max=50"`
 }

@@ -3,6 +3,7 @@ package routes
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/wpcodevo/golang-gorm-postgres/controllers"
@@ -41,11 +42,23 @@ func SetupSCController() controllers.ServiceController {
 	serviceController := controllers.NewServiceController(initializers.DB)
 	serviceController.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
-	createOwnerUser(serviceController.DB)
-
-	// Migrate the schema
-	if err := serviceController.DB.AutoMigrate(&models.User{}, &models.Profile{}); err != nil {
-		panic("failed to migrate database")
+	if err := serviceController.DB.AutoMigrate(
+		&models.HairColor{},
+		&models.IntimateHairCut{},
+		&models.Ethnos{},
+		&models.BodyType{},
+		&models.ProfileBodyArt{},
+		&models.BodyArt{},
+		&models.City{},
+		&models.User{},
+		&models.Profile{},
+		&models.Service{},
+		&models.Photo{},
+		&models.ProfileOption{},
+		&models.UserRating{},
+		&models.ProfileRating{},
+		&models.ProfileTag{}); err != nil {
+		panic("failed to migrate database: " + err.Error())
 	}
 
 	return serviceController
@@ -93,10 +106,12 @@ func TestServiceRoutes(t *testing.T) {
 
 	//uc := SetupUCController()
 	pc := SetupPCController()
+	sc := SetupSCController()
 
 	authRouter := SetupACRouter(&ac)
 	//userRouter := SetupUCRouter(&uc)
 	profileRouter := SetupPCRouter(&pc)
+	serviceRouter := SetupSCRouter(&sc)
 
 	profileTags := populateProfileTags(*pc.DB)
 
@@ -123,14 +138,125 @@ func TestServiceRoutes(t *testing.T) {
 		utils.DropAllTables(pc.DB)
 	})
 
-	t.Run("POST /api/profiles/: success with access_token", func(t *testing.T) {
+	t.Run("POST /api/services/: fail without access_token", func(t *testing.T) {
 		user := generateUser(random, authRouter, t)
+		client := generateUser(random, authRouter, t)
 
 		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
 			intimateHairCuts, accessTokenCookie, profileRouter, user.ID.String())
 
 		log.Printf(profile.Status)
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        client.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+		}
+
+		w := httptest.NewRecorder()
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createServiceReq, _ := http.NewRequest("POST", "/api/services/", bytes.NewBuffer(jsonPayload))
+		createServiceReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, createServiceReq)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
+
+	t.Run("POST /api/services/: success with client's access_token", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		client := generateUser(random, authRouter, t)
+
+		clientAccessTokenCookie, _ := loginUserGetAccessToken(t, client.Password, client.TelegramUserID, authRouter)
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, user.ID.String())
+
+		log.Printf(profile.Status)
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        client.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+		}
+
+		w := httptest.NewRecorder()
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createServiceReq, _ := http.NewRequest("POST", "/api/services/", bytes.NewBuffer(jsonPayload))
+		createServiceReq.AddCookie(&http.Cookie{Name: clientAccessTokenCookie.Name, Value: clientAccessTokenCookie.Value})
+		createServiceReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, createServiceReq)
+
+		assert.Equal(t, http.StatusCreated, w.Code)
+	})
+
+	t.Run("POST /api/services/: success with profile author's access_token", func(t *testing.T) {
+		user := generateUser(random, authRouter, t)
+		client := generateUser(random, authRouter, t)
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, user.ID.String())
+
+		log.Printf(profile.Status)
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        client.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+		}
+
+		w := httptest.NewRecorder()
+
+		jsonPayload, err := json.Marshal(payload)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+			return
+		}
+
+		createServiceReq, _ := http.NewRequest("POST", "/api/services/", bytes.NewBuffer(jsonPayload))
+		createServiceReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		createServiceReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, createServiceReq)
+
+		assert.Equal(t, http.StatusCreated, w.Code)
+
+		w = httptest.NewRecorder()
+		getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", profile.Data.ID.String()), bytes.NewBuffer(jsonPayload))
+		getServiceReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		getServiceReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, getServiceReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
 }

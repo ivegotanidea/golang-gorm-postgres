@@ -21,7 +21,7 @@ func (sc *ServiceRouteController) ServiceRoute(rg *gin.RouterGroup) {
 
 	router.POST("/", sc.serviceController.CreateService)
 
-	router.GET("/:profileID", middleware.AbacMiddleware("services", "get"), sc.serviceController.GetProfileServices)
+	router.GET("/:profileID", sc.serviceController.GetProfileServices)
 
 	router.PUT("/:profileID", sc.serviceController.UpdateService)
 
