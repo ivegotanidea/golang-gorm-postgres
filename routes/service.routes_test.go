@@ -257,6 +257,23 @@ func TestServiceRoutes(t *testing.T) {
 		serviceRouter.ServeHTTP(w, getServiceReq)
 
 		assert.Equal(t, http.StatusOK, w.Code)
+
+		var servicesResponse ServicesResponse
+		err = json.Unmarshal(w.Body.Bytes(), &servicesResponse)
+
+		assert.NoError(t, err)
+		assert.Equal(t, servicesResponse.Status, "success")
+		assert.True(t, servicesResponse.Length >= 1)
+		assert.Equal(t, servicesResponse.Data[0].TrustedDistance, true)
+		assert.True(t, servicesResponse.Data[0].DistanceBetweenUsers <= 100)
+		assert.Nil(t, servicesResponse.Data[0].ClientUserRating)
+		assert.Nil(t, servicesResponse.Data[0].ClientUserRatingID)
+		assert.Nil(t, servicesResponse.Data[0].ProfileRatingID)
+		assert.Nil(t, servicesResponse.Data[0].ProfileRating)
+
+		assert.Equal(t, client.ID, servicesResponse.Data[0].ClientUserID)
+		assert.Equal(t, profile.Data.ID, servicesResponse.Data[0].ProfileID)
+
 	})
 
 }

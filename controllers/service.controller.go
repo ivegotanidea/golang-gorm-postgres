@@ -70,6 +70,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 		ProfileUserLon: strconv.FormatFloat(float64(*payload.ProfileUserLongitude), 'f', -1, 32),
 
 		DistanceBetweenUsers: distance,
+		TrustedDistance:      distance <= 100,
 
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -123,6 +124,8 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 				return
 			}
 		}
+
+		newService.ProfileRatingID = &reviewOfProfile.ID
 	}
 
 	if payload.UserRating != nil {
@@ -162,6 +165,8 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 				return
 			}
 		}
+
+		newService.ClientUserRatingID = &reviewOfUser.ID
 	}
 
 	if err := tx.Commit().Error; err != nil {
@@ -195,7 +200,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": services})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(services), "data": services})
 }
 
 func (sc *ServiceController) UpdateService(ctx *gin.Context) {

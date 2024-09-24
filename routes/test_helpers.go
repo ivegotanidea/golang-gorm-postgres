@@ -35,6 +35,12 @@ type ProfilesResponse struct {
 	Data   []models.Profile `json:"data"`
 }
 
+type ServicesResponse struct {
+	Status string           `json:"status"`
+	Length int              `json:"results"`
+	Data   []models.Service `json:"data"`
+}
+
 func ptr(v int) *int {
 	return &v
 }
