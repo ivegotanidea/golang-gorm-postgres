@@ -180,6 +180,58 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 func (sc *ServiceController) UpdateUserReview(ctx *gin.Context) {
 
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	profileID := ctx.Param("profileID")
+
+	var service models.Service
+	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
+		Preload("ProfileRating.RatedProfileTags.ProfileTag").
+		Where("profile_id = ?", profileID).
+		First(&service)
+
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for the specified profile"})
+		return
+	}
+
+	if service.ClientUserID != currentUser.ID {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "You are not authorized to update this review"})
+		return
+	}
+
+	// Bind the new review data from the request
+	var updatedReview models.UserRating
+	if err := ctx.ShouldBindJSON(&updatedReview); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	// Update the review fields
+	if updatedReview.Review != "" {
+		service.ClientUserRating.Review = updatedReview.Review
+	}
+	//if updatedReview.Score != nil {
+	//	service.ClientUserRating.Score = *updatedReview.Score
+	//}
+
+	// Start a transaction to update the review
+	tx := sc.DB.Begin()
+
+	// Save the updated review
+	if err := tx.Save(&service.ClientUserRating).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update the review"})
+		return
+	}
+
+	// Commit the transaction if everything was successful
+	if err := tx.Commit().Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to commit transaction"})
+		return
+	}
+
+	// Return the updated review in the response
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": service.ClientUserRating})
 }
 
 func (sc *ServiceController) UpdateProfileOwnerReview(ctx *gin.Context) {
