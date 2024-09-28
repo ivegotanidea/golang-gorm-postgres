@@ -37,6 +37,8 @@ func init() {
 	UserController = controllers.NewUserController(initializers.DB)
 	UserRouteController = routes.NewRouteUserController(UserController)
 
+	// todo: add profile, service controllers
+
 	PostController = controllers.NewPostController(initializers.DB)
 	PostRouteController = routes.NewRoutePostController(PostController)
 

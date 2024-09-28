@@ -45,8 +45,8 @@ type CreateRatedUserTagRequest struct {
 }
 
 type CreateUserRatingRequest struct {
-	Review        string                      `json:"review"`
-	Score         int                         `json:"score"`
+	Review        string                      `json:"review" binding:"omitempty"`
+	Score         *int                        `json:"score" binding:"omitempty"`
 	RatedUserTags []CreateRatedUserTagRequest `json:"ratedUserTags" binding:"omitempty,dive"`
 }
 
@@ -56,7 +56,7 @@ type CreateRatedProfileTagRequest struct {
 }
 
 type CreateProfileRatingRequest struct {
-	Review           string                         `json:"review"`
-	Score            int                            `json:"score"`
+	Review           string                         `json:"review" binding:"omitempty"`
+	Score            *int                           `json:"score" binding:"omitempty"`
 	RatedProfileTags []CreateRatedProfileTagRequest `json:"ratedProfileTags" binding:"omitempty,dive"`
 }

@@ -29,6 +29,7 @@ type Config struct {
 	RefreshTokenMaxAge     int           `mapstructure:"REFRESH_TOKEN_MAXAGE"`
 
 	VerifiedDistanceThreshold int `mapstructure:"VERIFIED_DISTANCE_THRESHOLD"`
+	ReviewUpdateLimitHours    int `mapstructure:"REVIEW_UPDATE_LIMIT_HOURS"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
