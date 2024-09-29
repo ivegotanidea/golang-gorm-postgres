@@ -68,6 +68,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 		ClientUserLon: strconv.FormatFloat(float64(*payload.ClientUserLongitude), 'f', -1, 32),
 
 		ProfileID:      payload.ProfileID,
+		ProfileOwnerID: payload.ProfileOwnerID,
 		ProfileUserLat: strconv.FormatFloat(float64(*payload.ProfileUserLatitude), 'f', -1, 32),
 		ProfileUserLon: strconv.FormatFloat(float64(*payload.ProfileUserLongitude), 'f', -1, 32),
 
@@ -283,13 +284,14 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	}
 
 	// Check if the current user is the owner of the profile in the service
-	if service.ProfileID != currentUser.ID {
+	if service.ProfileOwnerID != currentUser.ID {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "You are not authorized to update this review"})
 		return
 	}
 
 	// Check if the review can still be updated (within the allowed time limit)
 	hoursSinceReview := time.Since(service.ProfileRating.CreatedAt).Hours()
+
 	if hoursSinceReview > float64(sc.reviewUpdateLimitHours) {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": fmt.Sprintf("Review can only be updated within %d hours of creation", sc.reviewUpdateLimitHours)})
 		return
@@ -360,41 +362,11 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 		Find(&services)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for the specified profile"})
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for specified profile"})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(services), "data": services})
-}
-
-func (sc *ServiceController) UpdateService(ctx *gin.Context) {
-	postId := ctx.Param("postId")
-	currentUser := ctx.MustGet("currentUser").(models.User)
-
-	var payload *models.UpdatePost
-	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
-		return
-	}
-	var updatedPost models.Post
-	result := sc.DB.First(&updatedPost, "id = ?", postId)
-	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
-		return
-	}
-	now := time.Now()
-	postToUpdate := models.Post{
-		Title:     payload.Title,
-		Content:   payload.Content,
-		Image:     payload.Image,
-		User:      currentUser.ID,
-		CreatedAt: updatedPost.CreatedAt,
-		UpdatedAt: now,
-	}
-
-	sc.DB.Model(&updatedPost).Updates(postToUpdate)
-
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedPost})
 }
 
 func (sc *ServiceController) ListServices(ctx *gin.Context) {
@@ -407,9 +379,8 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 
 	var profiles []models.Service
 
-	dbQuery := sc.DB.Preload("Photos").
-		Preload("BodyArts").
-		Preload("ProfileOptions.ProfileTag").
+	dbQuery := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
+		Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Limit(intLimit).Offset(offset)
 
 	results := dbQuery.Find(&profiles)

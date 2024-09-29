@@ -13,6 +13,7 @@ type Service struct {
 	ClientUserLat      string         `gorm:"type:varchar(10)"`
 	ClientUserLon      string         `gorm:"type:varchar(10)"`
 	ProfileID          uuid.UUID      `gorm:"type:uuid;not null"`
+	ProfileOwnerID     uuid.UUID      `gorm:"type:uuid;not null"`
 	ProfileRatingID    *uuid.UUID     `gorm:"type:uuid"`
 	ProfileRating      *ProfileRating `gorm:"foreignKey:ProfileRatingID"`
 	ProfileUserLat     string         `gorm:"type:varchar(10)"`
@@ -32,6 +33,7 @@ type CreateServiceRequest struct {
 	ClientUserLongitude *float32  `json:"clientUserLongitude"`
 
 	ProfileID            uuid.UUID `json:"profileId"`
+	ProfileOwnerID       uuid.UUID `json:"profileOwnerId"`
 	ProfileUserLatitude  *float32  `json:"profileUserLatitude"`
 	ProfileUserLongitude *float32  `json:"profileUserLongitude"`
 

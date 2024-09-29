@@ -39,7 +39,7 @@ func SetupSCController() controllers.ServiceController {
 	initializers.ConnectDB(&config)
 	initializers.InitCasbin(&config)
 
-	serviceController := controllers.NewServiceController(initializers.DB)
+	serviceController := controllers.NewServiceController(initializers.DB, config.ReviewUpdateLimitHours)
 	serviceController.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	if err := serviceController.DB.AutoMigrate(
@@ -192,6 +192,7 @@ func TestServiceRoutes(t *testing.T) {
 			ClientUserLongitude: floatPtr(76.935246),
 
 			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profile.Data.UserID,
 			ProfileUserLatitude:  floatPtr(43.259879),
 			ProfileUserLongitude: floatPtr(76.934604),
 		}
@@ -229,6 +230,7 @@ func TestServiceRoutes(t *testing.T) {
 			ClientUserLongitude: floatPtr(76.935246),
 
 			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profile.Data.UserID,
 			ProfileUserLatitude:  floatPtr(43.259879),
 			ProfileUserLongitude: floatPtr(76.934604),
 		}
