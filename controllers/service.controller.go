@@ -266,6 +266,42 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": service})
 }
 
+func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	profileID := ctx.Param("profileID")
+
+	// Find the service with the associated user review
+	var service models.Service
+	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
+		Preload("ProfileRating.RatedProfileTags.ProfileTag").
+		Where("profile_id = ?", profileID).
+		First(&service)
+
+	// Check if the service exists
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for the specified profile"})
+		return
+	}
+
+	// Check if the current user is the one who left the review
+	if service.ClientUserID != currentUser.ID {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "You are not authorized to update this review"})
+		return
+	}
+
+	if !service.ClientUserRating.ReviewTextHidden {
+		service.ClientUserRating.ReviewTextHidden = true
+
+		if err := sc.DB.Save(&service.ClientUserRating).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update the user review"})
+			return
+		}
+	}
+
+	// Return the updated service with the updated review
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": service})
+}
+
 func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	profileID := ctx.Param("profileID")
@@ -346,6 +382,43 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	if err := sc.DB.Save(&service.ProfileRating).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update the profile review"})
 		return
+	}
+
+	// Return the updated service with the updated review
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": service})
+}
+
+func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	profileID := ctx.Param("profileID")
+
+	// Find the service with the associated profile review
+	var service models.Service
+	result := sc.DB.Preload("ProfileRating.RatedProfileTags.ProfileTag").
+		Preload("ClientUserRating.RatedUserTags.UserTag").
+		Where("profile_id = ?", profileID).
+		First(&service)
+
+	// Check if the service exists
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for the specified profile"})
+		return
+	}
+
+	// Check if the current user is the owner of the profile in the service
+	if service.ProfileOwnerID != currentUser.ID {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "You are not authorized to update this review"})
+		return
+	}
+
+	if !service.ProfileRating.ReviewTextHidden {
+		service.ProfileRating.ReviewTextHidden = true
+
+		// Update the profile rating in the database
+		if err := sc.DB.Save(&service.ProfileRating).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update the profile review"})
+			return
+		}
 	}
 
 	// Return the updated service with the updated review

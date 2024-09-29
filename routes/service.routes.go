@@ -23,11 +23,15 @@ func (sc *ServiceRouteController) ServiceRoute(rg *gin.RouterGroup) {
 
 	router.GET("/:profileID", sc.serviceController.GetProfileServices)
 
-	router.PUT("/client/:profileID", sc.serviceController.UpdateClientUserReviewOnProfile)
-
-	router.PUT("/host/:profileID", sc.serviceController.UpdateProfileOwnerReviewOnClientUser)
-
 	router.GET("/all", middleware.AbacMiddleware("services", "list"), sc.serviceController.ListServices)
+
+	reviewsRouter := router.Group("reviews")
+
+	reviewsRouter.PUT("/client/:profileID", sc.serviceController.UpdateClientUserReviewOnProfile)
+	reviewsRouter.PUT("/client/:profileID/:serviceID", sc.serviceController.HideProfileOwnerReview)
+
+	reviewsRouter.PUT("/host/:profileID", sc.serviceController.UpdateProfileOwnerReviewOnClientUser)
+	reviewsRouter.PUT("/host/:profileID/:serviceID", sc.serviceController.HideUserReview)
 
 	// if coordinates not provided or not close enough
 	// then automark as unverified
