@@ -281,4 +281,35 @@ func TestServiceRoutes(t *testing.T) {
 
 	})
 
+	// basic user can only see score,  not review's text or tags
+	t.Run("GET /api/services/:profileID: success getting profile services with access_token", func(t *testing.T) {
+	})
+
+	// expert sees all reviews except hidden reviews
+	t.Run("GET /api/services/:profileID: success getting profile services with access_token", func(t *testing.T) {
+	})
+
+	// guru sees all, can rate reviews: like or dislike
+	t.Run("GET /api/services/:profileID: success getting profile services with access_token", func(t *testing.T) {
+	})
+
+	// only users with policy 'list services' are successful
+	t.Run("GET /api/services/all: success with access_token for <user type>", func(t *testing.T) {
+	})
+
+	// client can update his review at first 48 hours after creation
+	t.Run("PUT /api/services/client/:profileID: success with access_token for <user type>", func(t *testing.T) {
+	})
+
+	// client can hide out profile owner's review
+	t.Run("PUT /api/services/client/:serviceID: success with access_token for <user type>", func(t *testing.T) {
+	})
+
+	// profile owner can update his review at first 48 hours after creation
+	t.Run("PUT /api/services/host/:profileID: success with access_token for <user type>", func(t *testing.T) {
+	})
+
+	// profile owner can hide out client's review
+	t.Run("PUT /api/services/host/:serviceID: success with access_token for <user type>", func(t *testing.T) {
+	})
 }

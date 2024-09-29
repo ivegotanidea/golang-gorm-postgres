@@ -33,6 +33,4 @@ func (sc *ServiceRouteController) ServiceRoute(rg *gin.RouterGroup) {
 	reviewsRouter.PUT("/host/:profileID", sc.serviceController.UpdateProfileOwnerReviewOnClientUser)
 	reviewsRouter.PUT("/host/:profileID/:serviceID", sc.serviceController.HideUserReview)
 
-	// if coordinates not provided or not close enough
-	// then automark as unverified
 }
