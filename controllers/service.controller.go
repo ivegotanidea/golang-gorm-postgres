@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"math"
 	"net/http"
 	"strconv"
@@ -111,7 +110,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 			var ratedProfileTags []models.RatedProfileTag
 
 			for _, profileTag := range payload.ProfileRating.RatedProfileTags {
-				profileTagID, _ := uuid.Parse(profileTag.TagID)
+				profileTagID := profileTag.TagID
 
 				ratedProfileTag := models.RatedProfileTag{
 					RatingID:     reviewOfProfile.ID,
@@ -152,11 +151,10 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 			var ratedUserTags []models.RatedUserTag
 
 			for _, userTag := range payload.UserRating.RatedUserTags {
-				userTagID, _ := uuid.Parse(userTag.TagID)
 
 				ratedUserTag := models.RatedUserTag{
 					RatingID:  reviewOfUser.ID,
-					UserTagID: userTagID,
+					UserTagID: userTag.TagID,
 					Type:      userTag.Type,
 				}
 				ratedUserTags = append(ratedUserTags, ratedUserTag)
@@ -237,10 +235,9 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 		// Iterate over the new tags and add them
 		var ratedUserTags []models.RatedUserTag
 		for _, tagReq := range payload.RatedUserTags {
-			tagID, _ := uuid.Parse(tagReq.TagID)
 			ratedUserTag := models.RatedUserTag{
 				RatingID:  service.ClientUserRating.ID,
-				UserTagID: tagID,
+				UserTagID: tagReq.TagID,
 				Type:      tagReq.Type,
 			}
 			ratedUserTags = append(ratedUserTags, ratedUserTag)
@@ -359,10 +356,9 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 		// Iterate over the new tags and add them
 		var ratedProfileTags []models.RatedProfileTag
 		for _, tagReq := range payload.RatedProfileTags {
-			tagID, _ := uuid.Parse(tagReq.TagID)
 			ratedProfileTag := models.RatedProfileTag{
 				RatingID:     service.ProfileRating.ID,
-				ProfileTagID: tagID,
+				ProfileTagID: tagReq.TagID,
 				Type:         tagReq.Type,
 			}
 			ratedProfileTags = append(ratedProfileTags, ratedProfileTag)

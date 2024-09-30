@@ -307,6 +307,53 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 	return tags
 }
 
+func populateUserTags(db gorm.DB) []models.UserTag {
+	var userTag = []string{
+		"Гигиена",
+		"Опрятность",
+		"Щедрость",
+		"Пунктуальность",
+		"Соблюдение границ",
+		"Общительность",
+	}
+
+	var tags []models.UserTag
+	for _, userTag := range userTag {
+		tag := models.UserTag{
+			Name: userTag,
+		}
+		tags = append(tags, tag)
+	}
+
+	tx := db.Begin()
+	// Batch insert options
+	if err := tx.Create(&tags).Error; err != nil {
+		if strings.Contains(err.Error(), "23505") {
+			log.Printf("Duplicate key error: %v", err)
+			tx.Rollback() // Rollback after detecting duplicate key error
+
+			// Now run the fetch query outside the aborted transaction
+			var existingTags []models.UserTag
+			if err := db.Find(&existingTags).Error; err != nil {
+				log.Fatalf("failed to fetch existing profile tags: %v", err)
+				return nil
+			}
+			return existingTags
+		}
+
+		// Handle other errors
+		tx.Rollback()
+		panic("failed to create profile tags: " + err.Error())
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		log.Fatalf("failed to commit profile_tags transaction: %v", err)
+		return nil
+	}
+
+	return tags
+}
+
 func populateCities(db gorm.DB) []models.City {
 	var cities = []models.City{
 		{Name: "almaty", AliasRu: "Алматы", AliasEn: "Almaty"},

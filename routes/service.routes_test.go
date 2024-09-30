@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/wpcodevo/golang-gorm-postgres/controllers"
 	"github.com/wpcodevo/golang-gorm-postgres/initializers"
@@ -56,8 +57,11 @@ func SetupSCController() controllers.ServiceController {
 		&models.Photo{},
 		&models.ProfileOption{},
 		&models.UserRating{},
+		&models.UserTag{},
+		&models.RatedUserTag{},
 		&models.ProfileRating{},
-		&models.ProfileTag{}); err != nil {
+		&models.ProfileTag{},
+		&models.RatedProfileTag{}); err != nil {
 		panic("failed to migrate database: " + err.Error())
 	}
 
@@ -100,6 +104,95 @@ func createProfile(t *testing.T, random *rand.Rand, cities []models.City, ethnos
 	return profileResponse, nil
 }
 
+func createService(t *testing.T, clientID uuid.UUID, profileID uuid.UUID, profileOwnerID uuid.UUID,
+	serviceRouter *gin.Engine, accessTokenCookie *http.Cookie, userTags []models.UserTag, profileTags []models.ProfileTag) (ServicesResponse, error) {
+
+	payload := &models.CreateServiceRequest{
+		ClientUserID:        clientID,
+		ClientUserLatitude:  floatPtr(43.259769),
+		ClientUserLongitude: floatPtr(76.935246),
+
+		ProfileID:            profileID,
+		ProfileOwnerID:       profileOwnerID,
+		ProfileUserLatitude:  floatPtr(43.259879),
+		ProfileUserLongitude: floatPtr(76.934604),
+		ProfileRating: &models.CreateProfileRatingRequest{
+			Review: "I like the service! It's very good",
+			Score:  ptr(5),
+			RatedProfileTags: []models.CreateRatedProfileTagRequest{
+				{
+					Type:  "like",
+					TagID: profileTags[0].ID,
+				},
+				{
+					Type:  "like",
+					TagID: profileTags[1].ID,
+				},
+			},
+		},
+		UserRating: &models.CreateUserRatingRequest{
+			Review: "I liked the client! He is very kind",
+			Score:  ptr(5),
+			RatedUserTags: []models.CreateRatedUserTagRequest{
+				{
+					Type:  "like",
+					TagID: userTags[0].ID,
+				},
+				{
+					Type:  "dislike",
+					TagID: userTags[1].ID,
+				},
+			},
+		},
+	}
+
+	w := httptest.NewRecorder()
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		fmt.Println("Error marshaling payload:", err)
+		return ServicesResponse{}, err
+	}
+
+	createServiceReq, _ := http.NewRequest("POST", "/api/services/", bytes.NewBuffer(jsonPayload))
+	createServiceReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+	createServiceReq.Header.Set("Content-Type", "application/json")
+
+	serviceRouter.ServeHTTP(w, createServiceReq)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	w = httptest.NewRecorder()
+	getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", profileID.String()), bytes.NewBuffer(jsonPayload))
+	getServiceReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+	getServiceReq.Header.Set("Content-Type", "application/json")
+
+	serviceRouter.ServeHTTP(w, getServiceReq)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var servicesResponse ServicesResponse
+	err = json.Unmarshal(w.Body.Bytes(), &servicesResponse)
+
+	assert.NoError(t, err)
+	assert.Equal(t, servicesResponse.Status, "success")
+	assert.True(t, servicesResponse.Length >= 1)
+	assert.Equal(t, servicesResponse.Data[0].TrustedDistance, true)
+	assert.True(t, servicesResponse.Data[0].DistanceBetweenUsers <= 100)
+
+	assert.NotNil(t, servicesResponse.Data[0].ID)
+
+	assert.Nil(t, servicesResponse.Data[0].ClientUserRating)
+	assert.Nil(t, servicesResponse.Data[0].ClientUserRatingID)
+	assert.Nil(t, servicesResponse.Data[0].ProfileRatingID)
+	assert.Nil(t, servicesResponse.Data[0].ProfileRating)
+
+	assert.Equal(t, clientID, servicesResponse.Data[0].ClientUserID)
+	assert.Equal(t, profileID, servicesResponse.Data[0].ProfileID)
+
+	return servicesResponse, nil
+}
+
 func TestServiceRoutes(t *testing.T) {
 
 	ac := SetupAuthController()
@@ -114,6 +207,7 @@ func TestServiceRoutes(t *testing.T) {
 	serviceRouter := SetupSCRouter(&sc)
 
 	profileTags := populateProfileTags(*pc.DB)
+	userTags := populateUserTags(*pc.DB)
 
 	cities := populateCities(*pc.DB)
 
@@ -222,8 +316,6 @@ func TestServiceRoutes(t *testing.T) {
 		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
 			intimateHairCuts, accessTokenCookie, profileRouter, user.ID.String())
 
-		log.Printf(profile.Status)
-
 		payload := &models.CreateServiceRequest{
 			ClientUserID:        client.ID,
 			ClientUserLatitude:  floatPtr(43.259769),
@@ -283,6 +375,26 @@ func TestServiceRoutes(t *testing.T) {
 
 	// basic user can only see score,  not review's text or tags
 	t.Run("GET /api/services/:profileID: success getting profile services with access_token", func(t *testing.T) {
+
+		//tier := "basic"
+		//profileOwner := generateUser(random, authRouter, t)
+		//
+		//tx := initializers.DB.Model(&models.User{}).Where("id = ?", profileOwner.ID).Update("tier", tier)
+		//assert.NoError(t, tx.Error)
+		//assert.Equal(t, int64(1), tx.RowsAffected)
+
+		profileOwner := generateUser(random, authRouter, t)
+		clientUser := generateUser(random, authRouter, t)
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, profileOwner.ID.String())
+
+		service, _ := createService(t, clientUser.ID, profile.Data.ID,
+			profileOwner.ID, serviceRouter, accessTokenCookie, userTags, profileTags)
+
+		assert.NotNil(t, service)
+
 	})
 
 	// expert sees all reviews except hidden reviews

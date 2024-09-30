@@ -39,13 +39,13 @@ type CreateServiceRequest struct {
 	ProfileUserLatitude  *float32  `json:"profileUserLatitude"`
 	ProfileUserLongitude *float32  `json:"profileUserLongitude"`
 
-	UserRating    *CreateUserRatingRequest    `json:"userRating" binding:"omitempty,dive"`
-	ProfileRating *CreateProfileRatingRequest `json:"profileRating" binding:"omitempty,dive"`
+	UserRating    *CreateUserRatingRequest    `json:"userRating" binding:"omitempty"`
+	ProfileRating *CreateProfileRatingRequest `json:"profileRating" binding:"omitempty"`
 }
 
 type CreateRatedUserTagRequest struct {
 	Type  string `json:"type"`
-	TagID string `json:"tagId"`
+	TagID int    `json:"tagId"`
 }
 
 type CreateUserRatingRequest struct {
@@ -56,7 +56,7 @@ type CreateUserRatingRequest struct {
 
 type CreateRatedProfileTagRequest struct {
 	Type  string `json:"type"`
-	TagID string `json:"tagId"`
+	TagID int    `json:"tagId"`
 }
 
 type CreateProfileRatingRequest struct {
