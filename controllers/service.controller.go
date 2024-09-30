@@ -45,7 +45,6 @@ func getDistanceBetweenCoordinates(latA, lonA, latB, lonB float32) float64 {
 }
 
 func (sc *ServiceController) CreateService(ctx *gin.Context) {
-
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var payload *models.CreateServiceRequest
 
@@ -81,17 +80,19 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 	tx := sc.DB.Begin()
 
+	// Create the service entry first
 	err := tx.Create(&newService).Error
-
 	if err != nil {
 		tx.Rollback()
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create service"})
 		return
 	}
 
+	// If profile rating exists
 	if payload.ProfileRating != nil {
+		// Create the profile rating and capture its ID
 		reviewOfProfile := models.ProfileRating{
-			ServiceID: newService.ID,
+			ServiceID: newService.ID, // link to the service
 			ProfileID: newService.ProfileID,
 			Review:    payload.ProfileRating.Review,
 			Score:     payload.ProfileRating.Score,
@@ -105,6 +106,9 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 			return
 		}
 
+		// Capture the ProfileRating ID and assign it to the service
+		newService.ProfileRatingID = &reviewOfProfile.ID
+
 		// Handle RatedProfileTags creation
 		if len(payload.ProfileRating.RatedProfileTags) > 0 {
 			var ratedProfileTags []models.RatedProfileTag
@@ -113,7 +117,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 				profileTagID := profileTag.TagID
 
 				ratedProfileTag := models.RatedProfileTag{
-					RatingID:     reviewOfProfile.ID,
+					RatingID:     reviewOfProfile.ID, // reference the rating ID
 					ProfileTagID: profileTagID,
 					Type:         profileTag.Type,
 				}
@@ -126,13 +130,13 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 				return
 			}
 		}
-
-		newService.ProfileRatingID = &reviewOfProfile.ID
 	}
 
+	// If user rating exists
 	if payload.UserRating != nil {
+		// Create the user rating and capture its ID
 		reviewOfUser := models.UserRating{
-			ServiceID: newService.ID,
+			ServiceID: newService.ID, // link to the service
 			UserID:    newService.ClientUserID,
 			Review:    payload.UserRating.Review,
 			Score:     payload.UserRating.Score,
@@ -146,14 +150,16 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 			return
 		}
 
+		// Capture the UserRating ID and assign it to the service
+		newService.ClientUserRatingID = &reviewOfUser.ID
+
 		// Handle RatedUserTags creation
 		if len(payload.UserRating.RatedUserTags) > 0 {
 			var ratedUserTags []models.RatedUserTag
 
 			for _, userTag := range payload.UserRating.RatedUserTags {
-
 				ratedUserTag := models.RatedUserTag{
-					RatingID:  reviewOfUser.ID,
+					RatingID:  reviewOfUser.ID, // reference the rating ID
 					UserTagID: userTag.TagID,
 					Type:      userTag.Type,
 				}
@@ -166,11 +172,11 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 				return
 			}
 		}
-
-		newService.ClientUserRatingID = &reviewOfUser.ID
 	}
 
-	if err := tx.Commit().Error; err != nil {
+	// Commit the transaction
+	if err := tx.Save(&newService).Commit().Error; err != nil {
+		tx.Rollback()
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to commit transaction"})
 		return
 	}

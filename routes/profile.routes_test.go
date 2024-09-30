@@ -122,7 +122,7 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/profiles/: fail with access_token but bad json (only name) ", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		w := httptest.NewRecorder()
@@ -147,7 +147,7 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/profiles/: success with access_token", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		w := httptest.NewRecorder()
@@ -180,7 +180,7 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/profiles/: fail with access_token / admin", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 		_ = assignRole(initializers.DB, t, authRouter, userRouter, user.ID.String(), "admin")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
@@ -206,7 +206,7 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/profiles/: fail with access_token / moderator", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 		_ = assignRole(initializers.DB, t, authRouter, userRouter, user.ID.String(), "moderator")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
@@ -232,7 +232,7 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("PUT /api/profiles/my/id: success self profile update", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		w := httptest.NewRecorder()
@@ -310,8 +310,8 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("PUT /api/profiles/update/id: success other user's profile update / admin", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		moderator := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		moderator := generateUser(random, authRouter, t, "")
 		assignModeratorRoleResponse := assignRole(initializers.DB, t, authRouter, userRouter, moderator.ID.String(), "admin")
 
 		assert.Equal(t, "admin", assignModeratorRoleResponse.Role)
@@ -400,8 +400,8 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("PUT /api/profiles/update/id: success other user's profile update / moderator", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		moderator := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		moderator := generateUser(random, authRouter, t, "")
 		assignModeratorRoleResponse := assignRole(initializers.DB, t, authRouter, userRouter, moderator.ID.String(), "moderator")
 
 		assert.Equal(t, "moderator", assignModeratorRoleResponse.Role)
@@ -490,8 +490,8 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("PUT /api/profiles/update/id: fail updating other user's profile / user", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		moderator := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		moderator := generateUser(random, authRouter, t, "")
 
 		moderatorAccessTokenCookie, _ := loginUserGetAccessToken(t, moderator.Password, moderator.TelegramUserID, authRouter)
 
@@ -544,8 +544,8 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/profiles: success query other user's profile / user:expert", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		tx := initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "expert")
 		assert.NoError(t, tx.Error)
@@ -609,8 +609,8 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/profiles: success query other user's profile / user:guru", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		tx := initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", "guru")
 		assert.NoError(t, tx.Error)
@@ -674,8 +674,8 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/profiles: fail query other user's profile / user:basic", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
@@ -732,8 +732,8 @@ func TestProfileRoutes(t *testing.T) {
 
 		for _, tier := range tiers {
 
-			user := generateUser(random, authRouter, t)
-			secondUser := generateUser(random, authRouter, t)
+			user := generateUser(random, authRouter, t, "")
+			secondUser := generateUser(random, authRouter, t, "")
 
 			tx := initializers.DB.Model(&models.User{}).Where("id = ?", secondUser.ID).Update("tier", tier)
 			assert.NoError(t, tx.Error)
@@ -781,8 +781,8 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/profiles: success list profiles / moderator", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		_ = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "moderator")
 
@@ -878,7 +878,7 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/profiles/phoneId: fail for non logged user", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 
 		w := httptest.NewRecorder()
@@ -915,8 +915,8 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/profiles/phoneId: success for logged user", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
@@ -968,7 +968,7 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/profiles/id: success for logged user", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 
@@ -1047,7 +1047,7 @@ func TestProfileRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/profiles/id: fail for non logged user", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 

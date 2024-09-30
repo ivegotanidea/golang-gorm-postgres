@@ -163,7 +163,7 @@ func createService(t *testing.T, clientID uuid.UUID, profileID uuid.UUID, profil
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	w = httptest.NewRecorder()
-	getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", profileID.String()), bytes.NewBuffer(jsonPayload))
+	getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", profileID.String()), nil)
 	getServiceReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 	getServiceReq.Header.Set("Content-Type", "application/json")
 
@@ -182,10 +182,10 @@ func createService(t *testing.T, clientID uuid.UUID, profileID uuid.UUID, profil
 
 	assert.NotNil(t, servicesResponse.Data[0].ID)
 
-	assert.Nil(t, servicesResponse.Data[0].ClientUserRating)
-	assert.Nil(t, servicesResponse.Data[0].ClientUserRatingID)
-	assert.Nil(t, servicesResponse.Data[0].ProfileRatingID)
-	assert.Nil(t, servicesResponse.Data[0].ProfileRating)
+	assert.NotNil(t, servicesResponse.Data[0].ClientUserRating)
+	assert.NotNil(t, servicesResponse.Data[0].ClientUserRatingID)
+	assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
+	assert.NotNil(t, servicesResponse.Data[0].ProfileRating)
 
 	assert.Equal(t, clientID, servicesResponse.Data[0].ClientUserID)
 	assert.Equal(t, profileID, servicesResponse.Data[0].ProfileID)
@@ -233,8 +233,8 @@ func TestServiceRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/services/: fail without access_token", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		client := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		client := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
@@ -269,8 +269,8 @@ func TestServiceRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/services/: success with client's access_token", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		client := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		client := generateUser(random, authRouter, t, "")
 
 		clientAccessTokenCookie, _ := loginUserGetAccessToken(t, client.Password, client.TelegramUserID, authRouter)
 
@@ -309,8 +309,8 @@ func TestServiceRoutes(t *testing.T) {
 	})
 
 	t.Run("POST /api/services/: success with profile author's access_token", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
-		client := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
+		client := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
@@ -376,15 +376,8 @@ func TestServiceRoutes(t *testing.T) {
 	// basic user can only see score,  not review's text or tags
 	t.Run("GET /api/services/:profileID: success getting profile services with access_token", func(t *testing.T) {
 
-		//tier := "basic"
-		//profileOwner := generateUser(random, authRouter, t)
-		//
-		//tx := initializers.DB.Model(&models.User{}).Where("id = ?", profileOwner.ID).Update("tier", tier)
-		//assert.NoError(t, tx.Error)
-		//assert.Equal(t, int64(1), tx.RowsAffected)
-
-		profileOwner := generateUser(random, authRouter, t)
-		clientUser := generateUser(random, authRouter, t)
+		profileOwner := generateUser(random, authRouter, t, "")
+		clientUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
 		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
@@ -394,6 +387,23 @@ func TestServiceRoutes(t *testing.T) {
 			profileOwner.ID, serviceRouter, accessTokenCookie, userTags, profileTags)
 
 		assert.NotNil(t, service)
+
+		basicUser := generateUser(random, authRouter, t, "")
+		basicUserAccessTokenCookie, _ := loginUserGetAccessToken(t, basicUser.Password, basicUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+		getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", profile.Data.ID.String()), nil)
+		getServiceReq.AddCookie(&http.Cookie{Name: basicUserAccessTokenCookie.Name, Value: basicUserAccessTokenCookie.Value})
+		getServiceReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, getServiceReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var servicesResponse ServicesResponse
+		err := json.Unmarshal(w.Body.Bytes(), &servicesResponse)
+
+		assert.NoError(t, err)
 
 	})
 

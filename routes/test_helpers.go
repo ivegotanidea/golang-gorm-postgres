@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/wpcodevo/golang-gorm-postgres/initializers"
 	"github.com/wpcodevo/golang-gorm-postgres/models"
 	"github.com/wpcodevo/golang-gorm-postgres/utils"
 	"gorm.io/gorm"
@@ -79,7 +80,12 @@ func createOwnerUser(db *gorm.DB) models.User {
 	return owner
 }
 
-func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T) models.UserResponse {
+func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T, tier string) models.UserResponse {
+
+	if tier == "" {
+		tier = "basic"
+	}
+
 	name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 	phone := utils.GenerateRandomPhoneNumber(random, 0)
 	telegramUserId := fmt.Sprintf("%d", rand.Int64())
@@ -98,6 +104,12 @@ func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T) model
 	assert.NoError(t, err)
 
 	user := userResponse.Data
+
+	if tier == "guru" || tier == "expert" {
+		tx := initializers.DB.Model(&models.User{}).Where("id = ?", user.ID).Update("tier", tier)
+		assert.NoError(t, tx.Error)
+		assert.Equal(t, int64(1), tx.RowsAffected)
+	}
 
 	return user
 }

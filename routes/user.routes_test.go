@@ -84,7 +84,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/user/me: success with access token", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 
@@ -125,7 +125,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/user: basic user, forbidden to list users", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 
@@ -148,7 +148,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/user: moderator, success list users", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		user = assignRole(initializers.DB, t, authRouter, userRouter, user.ID.String(), "moderator")
 
@@ -173,7 +173,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/user: admin, success list users", func(t *testing.T) {
-		user := generateUser(random, authRouter, t)
+		user := generateUser(random, authRouter, t, "")
 
 		user = assignRole(initializers.DB, t, authRouter, userRouter, user.ID.String(), "admin")
 
@@ -235,8 +235,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/users/user: success by phone with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -261,8 +261,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/users/user: success by id with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -287,8 +287,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/users/user: success by telegramId with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -313,7 +313,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/users/user: 404 non existing phone with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -333,7 +333,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/users/user: 404 non existing id with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -353,7 +353,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/users/user: 404 non existing telegramId with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -373,7 +373,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: success with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -427,8 +427,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: fail moderator deletes user", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("role", "moderator")
 		assert.NoError(t, tx.Error)
@@ -454,8 +454,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: success admin deletes user", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
@@ -494,8 +494,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: fail moderator deletes moderator", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "moderator")
 		secondUser = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "moderator")
@@ -522,8 +522,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: fail moderator deletes admin", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("role", "moderator")
 		assert.NoError(t, tx.Error)
@@ -555,8 +555,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: success admin deletes moderator", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 		secondUser = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "moderator")
@@ -584,8 +584,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: fail admin deletes admin", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 		secondUser = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "admin")
@@ -614,7 +614,7 @@ func TestUserRoutes(t *testing.T) {
 
 	t.Run("DELETE /api/users/user: success owner deletes admin", func(t *testing.T) {
 		owner := getOwnerUser()
-		secondUser := generateUser(random, authRouter, t)
+		secondUser := generateUser(random, authRouter, t, "")
 
 		secondUser = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "admin")
 
@@ -641,7 +641,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: fail moderator deletes owner", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 		secondUser := getOwnerUser()
 
 		tx := initializers.DB.Model(&models.User{}).Where("id = ?", firstUser.ID).Update("tier", "moderator")
@@ -670,7 +670,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("DELETE /api/users/user: fail admin deletes owner", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 		secondUser := getOwnerUser()
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
@@ -698,7 +698,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("UPDATE /api/users/user: fail with access token and empty update", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -731,7 +731,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("UPDATE /api/users/user: success with access token, update name", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -768,7 +768,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("UPDATE /api/users/user: success with access token, update phone", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -805,7 +805,7 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("UPDATE /api/users/user: success with access token, update avatar", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -842,8 +842,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("UPDATE /api/users/user: basic user fails with access token, update avatar", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, firstUser.Password, firstUser.TelegramUserID, authRouter)
 
@@ -873,8 +873,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("UPDATE /api/users/user: moderator success with access token, update avatar", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "moderator")
 
@@ -906,8 +906,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("UPDATE /api/users/user: admin success with access token, deactivate user", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
@@ -953,8 +953,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("UPDATE /api/users/user: admin success with access token, verify user", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
@@ -1000,8 +1000,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/users/users: expert success list users with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
@@ -1067,8 +1067,8 @@ func TestUserRoutes(t *testing.T) {
 	})
 
 	t.Run("GET /api/users/users: guru success list users with access token", func(t *testing.T) {
-		firstUser := generateUser(random, authRouter, t)
-		secondUser := generateUser(random, authRouter, t)
+		firstUser := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
 
 		firstUser = assignRole(initializers.DB, t, authRouter, userRouter, firstUser.ID.String(), "admin")
 
