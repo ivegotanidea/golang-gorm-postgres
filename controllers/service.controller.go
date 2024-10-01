@@ -428,12 +428,20 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 }
 
 func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
+	var page = ctx.DefaultQuery("page", "1")
+	var limit = ctx.DefaultQuery("limit", "10")
+
 	profileID := ctx.Param("profileID")
+
+	intPage, _ := strconv.Atoi(page)
+	intLimit, _ := strconv.Atoi(limit)
+	offset := (intPage - 1) * intLimit
 
 	var services []models.Service
 	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
 		Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Where("profile_id = ?", profileID).
+		Limit(intLimit).Offset(offset).
 		Find(&services)
 
 	if result.Error != nil {
