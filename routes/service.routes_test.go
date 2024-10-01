@@ -198,12 +198,12 @@ func TestServiceRoutes(t *testing.T) {
 
 	ac := SetupAuthController()
 
-	//uc := SetupUCController()
+	uc := SetupUCController()
 	pc := SetupPCController()
 	sc := SetupSCController()
 
 	authRouter := SetupACRouter(&ac)
-	//userRouter := SetupUCRouter(&uc)
+	userRouter := SetupUCRouter(&uc)
 	profileRouter := SetupPCRouter(&pc)
 	serviceRouter := SetupSCRouter(&sc)
 
@@ -623,8 +623,150 @@ func TestServiceRoutes(t *testing.T) {
 
 	})
 
-	// only users with policy 'list services' are successful
-	t.Run("GET /api/services/all: success with access_token for <user type>", func(t *testing.T) {
+	t.Run("GET /api/services/:profileID: guru can list services", func(t *testing.T) {
+
+		profileOwner := generateUser(random, authRouter, t, "")
+		clientUser := generateUser(random, authRouter, t, "")
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, profileOwner.ID.String())
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        clientUser.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profileOwner.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+			ProfileRating: &models.CreateProfileRatingRequest{
+				Review: "I like the service! It's very good",
+				Score:  ptr(5),
+				RatedProfileTags: []models.CreateRatedProfileTagRequest{
+					{
+						Type:  "like",
+						TagID: profileTags[0].ID,
+					},
+					{
+						Type:  "like",
+						TagID: profileTags[1].ID,
+					},
+				},
+			},
+			UserRating: &models.CreateUserRatingRequest{
+				Review: "I liked the client! He is very kind",
+				Score:  ptr(5),
+				RatedUserTags: []models.CreateRatedUserTagRequest{
+					{
+						Type:  "like",
+						TagID: userTags[0].ID,
+					},
+					{
+						Type:  "dislike",
+						TagID: userTags[1].ID,
+					},
+				},
+			},
+		}
+
+		service, _ := createServiceFromPayload(t, *payload, serviceRouter, accessTokenCookie)
+
+		assert.NotNil(t, service)
+
+		basicUser := generateUser(random, authRouter, t, "guru")
+		basicUserAccessTokenCookie, _ := loginUserGetAccessToken(t, basicUser.Password, basicUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+		listServicesReq, _ := http.NewRequest("GET", "/api/services/all", nil)
+		listServicesReq.AddCookie(&http.Cookie{Name: basicUserAccessTokenCookie.Name, Value: basicUserAccessTokenCookie.Value})
+		listServicesReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, listServicesReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var servicesResponse ServicesResponse
+		err := json.Unmarshal(w.Body.Bytes(), &servicesResponse)
+
+		assert.NoError(t, err)
+		assert.True(t, servicesResponse.Length == 1)
+		assert.Equal(t, servicesResponse.Length, len(service.Data))
+	})
+
+	t.Run("GET /api/services/:profileID: moderator can list services", func(t *testing.T) {
+
+		profileOwner := generateUser(random, authRouter, t, "")
+		clientUser := generateUser(random, authRouter, t, "")
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, profileOwner.ID.String())
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        clientUser.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profileOwner.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+			ProfileRating: &models.CreateProfileRatingRequest{
+				Review: "I like the service! It's very good",
+				Score:  ptr(5),
+				RatedProfileTags: []models.CreateRatedProfileTagRequest{
+					{
+						Type:  "like",
+						TagID: profileTags[0].ID,
+					},
+					{
+						Type:  "like",
+						TagID: profileTags[1].ID,
+					},
+				},
+			},
+			UserRating: &models.CreateUserRatingRequest{
+				Review: "I liked the client! He is very kind",
+				Score:  ptr(5),
+				RatedUserTags: []models.CreateRatedUserTagRequest{
+					{
+						Type:  "like",
+						TagID: userTags[0].ID,
+					},
+					{
+						Type:  "dislike",
+						TagID: userTags[1].ID,
+					},
+				},
+			},
+		}
+
+		service, _ := createServiceFromPayload(t, *payload, serviceRouter, accessTokenCookie)
+
+		assert.NotNil(t, service)
+
+		basicUser := generateUser(random, authRouter, t, "guru")
+		basicUser = assignRole(initializers.DB, t, authRouter, userRouter, basicUser.ID.String(), "moderator")
+
+		basicUserAccessTokenCookie, _ := loginUserGetAccessToken(t, basicUser.Password, basicUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+		listServicesReq, _ := http.NewRequest("GET", "/api/services/all", nil)
+		listServicesReq.AddCookie(&http.Cookie{Name: basicUserAccessTokenCookie.Name, Value: basicUserAccessTokenCookie.Value})
+		listServicesReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, listServicesReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var servicesResponse ServicesResponse
+		err := json.Unmarshal(w.Body.Bytes(), &servicesResponse)
+
+		assert.NoError(t, err)
+		assert.True(t, servicesResponse.Length == 1)
+		assert.Equal(t, servicesResponse.Length, len(service.Data))
 	})
 
 	// client can update his review at first 48 hours after creation
