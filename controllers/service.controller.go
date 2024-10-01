@@ -432,6 +432,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	var limit = ctx.DefaultQuery("limit", "10")
 
 	profileID := ctx.Param("profileID")
+	currentUser := ctx.MustGet("currentUser").(models.User)
 
 	intPage, _ := strconv.Atoi(page)
 	intLimit, _ := strconv.Atoi(limit)
@@ -449,7 +450,57 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(services), "data": services})
+	filteredServices := make([]map[string]interface{}, 0, len(services))
+
+	for _, service := range services {
+		filteredService := make(map[string]interface{})
+
+		// Common fields that are visible to all
+		filteredService["ID"] = service.ID
+		filteredService["ClientUserID"] = service.ClientUserID
+		filteredService["ClientUserRatingID"] = service.ClientUserRatingID
+		filteredService["ProfileID"] = service.ProfileID
+		filteredService["ProfileOwnerID"] = service.ProfileOwnerID
+		filteredService["ProfileRatingID"] = service.ProfileRating.ID
+		filteredService["CreatedAt"] = service.CreatedAt
+		filteredService["DistanceBetweenUsers"] = service.DistanceBetweenUsers
+		filteredService["TrustedDistance"] = service.TrustedDistance
+
+		// Access control based on user tier
+		if currentUser.Tier == "basic" {
+			// Only expose ProfileRating.Score for basic users, hide UserRating entirely
+			if service.ProfileRating != nil {
+				filteredService["ProfileRating"] = map[string]interface{}{
+					"Score":            service.ProfileRating.Score,
+					"ReviewTextHidden": true,
+				}
+			}
+		} else if currentUser.Tier == "expert" {
+			// Expert users can see all ProfileRating fields and only Score from UserRating
+			if service.ProfileRating != nil {
+				filteredService["ProfileRating"] = map[string]interface{}{
+					"Review": service.ProfileRating.Review,
+					"Score":  service.ProfileRating.Score,
+				}
+			}
+			if service.ClientUserRating != nil {
+				filteredService["ClientUserRating"] = map[string]interface{}{
+					"Score":            service.ClientUserRating.Score,
+					"ReviewTextHidden": true,
+				}
+			}
+		} else if currentUser.Tier == "guru" {
+			// Guru users can see both ProfileRating and UserRating completely
+			filteredService["ProfileRating"] = service.ProfileRating
+			filteredService["ClientUserRating"] = service.ClientUserRating
+		}
+
+		// Append filtered service to the response
+		filteredServices = append(filteredServices, filteredService)
+	}
+
+	// Return the filtered response
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(filteredServices), "data": filteredServices})
 }
 
 func (sc *ServiceController) ListServices(ctx *gin.Context) {

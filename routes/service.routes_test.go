@@ -182,10 +182,10 @@ func createService(t *testing.T, clientID uuid.UUID, profileID uuid.UUID, profil
 
 	assert.NotNil(t, servicesResponse.Data[0].ID)
 
-	assert.NotNil(t, servicesResponse.Data[0].ClientUserRating)
-	assert.NotNil(t, servicesResponse.Data[0].ClientUserRatingID)
-	assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
-	assert.NotNil(t, servicesResponse.Data[0].ProfileRating)
+	//assert.NotNil(t, servicesResponse.Data[0].ClientUserRating)
+	//assert.NotNil(t, servicesResponse.Data[0].ClientUserRatingID)
+	//assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
+	//assert.NotNil(t, servicesResponse.Data[0].ProfileRating)
 
 	assert.Equal(t, clientID, servicesResponse.Data[0].ClientUserID)
 	assert.Equal(t, profileID, servicesResponse.Data[0].ProfileID)
@@ -373,8 +373,7 @@ func TestServiceRoutes(t *testing.T) {
 
 	})
 
-	// basic user can only see score,  not review's text or tags
-	t.Run("GET /api/services/:profileID: success getting profile services with access_token", func(t *testing.T) {
+	t.Run("GET /api/services/:profileID: basic user can only see score,  not review's text or tags", func(t *testing.T) {
 
 		profileOwner := generateUser(random, authRouter, t, "")
 		clientUser := generateUser(random, authRouter, t, "")
@@ -404,6 +403,26 @@ func TestServiceRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &servicesResponse)
 
 		assert.NoError(t, err)
+
+		assert.Equal(t, servicesResponse.Status, "success")
+		assert.True(t, servicesResponse.Length == 1)
+		assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
+		assert.NotNil(t, servicesResponse.Data[0].ProfileOwnerID)
+		assert.Nil(t, servicesResponse.Data[0].ProfileRating.RatedProfileTags)
+		assert.True(t, servicesResponse.Data[0].ProfileRating.ReviewTextHidden)
+
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserID)
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserRatingID)
+		assert.Nil(t, servicesResponse.Data[0].ClientUserRating)
+
+		assert.Empty(t, servicesResponse.Data[0].ProfileUserLon)
+		assert.Empty(t, servicesResponse.Data[0].ProfileUserLat)
+		assert.Empty(t, servicesResponse.Data[0].ClientUserLon)
+		assert.Empty(t, servicesResponse.Data[0].ClientUserLat)
+
+		assert.NotNil(t, servicesResponse.Data[0].CreatedAt)
+		assert.NotNil(t, servicesResponse.Data[0].UpdatedAt)
+		assert.NotNil(t, servicesResponse.Data[0].UpdatedBy)
 
 	})
 
