@@ -146,6 +146,12 @@ func createService(t *testing.T, clientID uuid.UUID, profileID uuid.UUID, profil
 		},
 	}
 
+	return createServiceFromPayload(t, *payload, serviceRouter, accessTokenCookie)
+}
+
+func createServiceFromPayload(t *testing.T, payload models.CreateServiceRequest,
+	serviceRouter *gin.Engine, accessTokenCookie *http.Cookie) (ServicesResponse, error) {
+
 	w := httptest.NewRecorder()
 
 	jsonPayload, err := json.Marshal(payload)
@@ -163,7 +169,7 @@ func createService(t *testing.T, clientID uuid.UUID, profileID uuid.UUID, profil
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	w = httptest.NewRecorder()
-	getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", profileID.String()), nil)
+	getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", payload.ProfileID), nil)
 	getServiceReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 	getServiceReq.Header.Set("Content-Type", "application/json")
 
@@ -182,13 +188,8 @@ func createService(t *testing.T, clientID uuid.UUID, profileID uuid.UUID, profil
 
 	assert.NotNil(t, servicesResponse.Data[0].ID)
 
-	//assert.NotNil(t, servicesResponse.Data[0].ClientUserRating)
-	//assert.NotNil(t, servicesResponse.Data[0].ClientUserRatingID)
-	//assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
-	//assert.NotNil(t, servicesResponse.Data[0].ProfileRating)
-
-	assert.Equal(t, clientID, servicesResponse.Data[0].ClientUserID)
-	assert.Equal(t, profileID, servicesResponse.Data[0].ProfileID)
+	assert.Equal(t, payload.ClientUserID, servicesResponse.Data[0].ClientUserID)
+	assert.Equal(t, payload.ProfileID, servicesResponse.Data[0].ProfileID)
 
 	return servicesResponse, nil
 }
@@ -410,6 +411,8 @@ func TestServiceRoutes(t *testing.T) {
 		assert.NotNil(t, servicesResponse.Data[0].ProfileOwnerID)
 		assert.Nil(t, servicesResponse.Data[0].ProfileRating.RatedProfileTags)
 		assert.True(t, servicesResponse.Data[0].ProfileRating.ReviewTextHidden)
+		assert.Empty(t, servicesResponse.Data[0].ProfileRating.Review)
+		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Score, service.Data[0].ProfileRating.Score)
 
 		assert.NotNil(t, servicesResponse.Data[0].ClientUserID)
 		assert.NotNil(t, servicesResponse.Data[0].ClientUserRatingID)
@@ -426,12 +429,198 @@ func TestServiceRoutes(t *testing.T) {
 
 	})
 
-	// expert sees all reviews except hidden reviews
-	t.Run("GET /api/services/:profileID: success getting profile services with access_token", func(t *testing.T) {
+	t.Run("GET /api/services/:profileID: expert user can only see score,  not review's text or tags", func(t *testing.T) {
+
+		profileOwner := generateUser(random, authRouter, t, "")
+		clientUser := generateUser(random, authRouter, t, "")
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, profileOwner.ID.String())
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        clientUser.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profileOwner.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+			ProfileRating: &models.CreateProfileRatingRequest{
+				Review: "I like the service! It's very good",
+				Score:  ptr(5),
+				RatedProfileTags: []models.CreateRatedProfileTagRequest{
+					{
+						Type:  "like",
+						TagID: profileTags[0].ID,
+					},
+					{
+						Type:  "like",
+						TagID: profileTags[1].ID,
+					},
+				},
+			},
+			UserRating: &models.CreateUserRatingRequest{
+				Review: "I liked the client! He is very kind",
+				Score:  ptr(5),
+				RatedUserTags: []models.CreateRatedUserTagRequest{
+					{
+						Type:  "like",
+						TagID: userTags[0].ID,
+					},
+					{
+						Type:  "dislike",
+						TagID: userTags[1].ID,
+					},
+				},
+			},
+		}
+
+		service, _ := createServiceFromPayload(t, *payload, serviceRouter, accessTokenCookie)
+
+		assert.NotNil(t, service)
+
+		basicUser := generateUser(random, authRouter, t, "expert")
+		basicUserAccessTokenCookie, _ := loginUserGetAccessToken(t, basicUser.Password, basicUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+		getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", profile.Data.ID.String()), nil)
+		getServiceReq.AddCookie(&http.Cookie{Name: basicUserAccessTokenCookie.Name, Value: basicUserAccessTokenCookie.Value})
+		getServiceReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, getServiceReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var servicesResponse ServicesResponse
+		err := json.Unmarshal(w.Body.Bytes(), &servicesResponse)
+
+		assert.NoError(t, err)
+
+		assert.Equal(t, servicesResponse.Status, "success")
+		assert.True(t, servicesResponse.Length == 1)
+		assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
+		assert.NotNil(t, servicesResponse.Data[0].ProfileOwnerID)
+		assert.Nil(t, servicesResponse.Data[0].ProfileRating.RatedProfileTags)
+		assert.False(t, servicesResponse.Data[0].ProfileRating.ReviewTextHidden)
+		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Review, payload.ProfileRating.Review)
+		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Score, payload.ProfileRating.Score)
+
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserID)
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserRatingID)
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserRating)
+
+		assert.Nil(t, servicesResponse.Data[0].ClientUserRating.RatedUserTags)
+		assert.True(t, servicesResponse.Data[0].ClientUserRating.ReviewTextHidden)
+		assert.Equal(t, servicesResponse.Data[0].ClientUserRating.Score, payload.UserRating.Score)
+
+		assert.Empty(t, servicesResponse.Data[0].ProfileUserLon)
+		assert.Empty(t, servicesResponse.Data[0].ProfileUserLat)
+		assert.Empty(t, servicesResponse.Data[0].ClientUserLon)
+		assert.Empty(t, servicesResponse.Data[0].ClientUserLat)
+
+		assert.NotNil(t, servicesResponse.Data[0].CreatedAt)
+		assert.NotNil(t, servicesResponse.Data[0].UpdatedAt)
+		assert.NotNil(t, servicesResponse.Data[0].UpdatedBy)
+
 	})
 
-	// guru sees all, can rate reviews: like or dislike
-	t.Run("GET /api/services/:profileID: success getting profile services with access_token", func(t *testing.T) {
+	t.Run("GET /api/services/:profileID: guru user can only see score,  not review's text or tags", func(t *testing.T) {
+
+		profileOwner := generateUser(random, authRouter, t, "")
+		clientUser := generateUser(random, authRouter, t, "")
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, profileOwner.ID.String())
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        clientUser.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profileOwner.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+			ProfileRating: &models.CreateProfileRatingRequest{
+				Review: "I like the service! It's very good",
+				Score:  ptr(5),
+				RatedProfileTags: []models.CreateRatedProfileTagRequest{
+					{
+						Type:  "like",
+						TagID: profileTags[0].ID,
+					},
+					{
+						Type:  "like",
+						TagID: profileTags[1].ID,
+					},
+				},
+			},
+			UserRating: &models.CreateUserRatingRequest{
+				Review: "I liked the client! He is very kind",
+				Score:  ptr(5),
+				RatedUserTags: []models.CreateRatedUserTagRequest{
+					{
+						Type:  "like",
+						TagID: userTags[0].ID,
+					},
+					{
+						Type:  "dislike",
+						TagID: userTags[1].ID,
+					},
+				},
+			},
+		}
+
+		service, _ := createServiceFromPayload(t, *payload, serviceRouter, accessTokenCookie)
+
+		assert.NotNil(t, service)
+
+		basicUser := generateUser(random, authRouter, t, "guru")
+		basicUserAccessTokenCookie, _ := loginUserGetAccessToken(t, basicUser.Password, basicUser.TelegramUserID, authRouter)
+
+		w := httptest.NewRecorder()
+		getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s", profile.Data.ID.String()), nil)
+		getServiceReq.AddCookie(&http.Cookie{Name: basicUserAccessTokenCookie.Name, Value: basicUserAccessTokenCookie.Value})
+		getServiceReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, getServiceReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var servicesResponse ServicesResponse
+		err := json.Unmarshal(w.Body.Bytes(), &servicesResponse)
+
+		assert.NoError(t, err)
+
+		assert.Equal(t, servicesResponse.Status, "success")
+		assert.True(t, servicesResponse.Length == 1)
+		assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
+		assert.NotNil(t, servicesResponse.Data[0].ProfileOwnerID)
+		assert.NotNil(t, servicesResponse.Data[0].ProfileRating.RatedProfileTags)
+		assert.False(t, servicesResponse.Data[0].ProfileRating.ReviewTextHidden)
+		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Review, payload.ProfileRating.Review)
+		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Score, payload.ProfileRating.Score)
+
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserID)
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserRatingID)
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserRating)
+
+		assert.NotNil(t, servicesResponse.Data[0].ClientUserRating.RatedUserTags)
+		assert.False(t, servicesResponse.Data[0].ClientUserRating.ReviewTextHidden)
+		assert.Equal(t, servicesResponse.Data[0].ClientUserRating.Score, payload.UserRating.Score)
+
+		assert.Empty(t, servicesResponse.Data[0].ProfileUserLon)
+		assert.Empty(t, servicesResponse.Data[0].ProfileUserLat)
+		assert.Empty(t, servicesResponse.Data[0].ClientUserLon)
+		assert.Empty(t, servicesResponse.Data[0].ClientUserLat)
+
+		assert.NotNil(t, servicesResponse.Data[0].CreatedAt)
+		assert.NotNil(t, servicesResponse.Data[0].UpdatedAt)
+		assert.NotNil(t, servicesResponse.Data[0].UpdatedBy)
+
 	})
 
 	// only users with policy 'list services' are successful
