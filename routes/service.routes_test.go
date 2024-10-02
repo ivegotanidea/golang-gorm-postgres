@@ -26,6 +26,7 @@ func SetupSCRouter(serviceController *controllers.ServiceController) *gin.Engine
 
 	api := r.Group("/api")
 	serviceRouteController.ServiceRoute(api)
+	serviceRouteController.ReviewsRoute(api)
 
 	return r
 }
@@ -901,11 +902,103 @@ func TestServiceRoutes(t *testing.T) {
 		assert.Equal(t, servicesResponse.Length, len(service.Data))
 	})
 
+	// client can't update his review after 48 hours after creation
+	t.Run("PUT /api/services/reviews/client/:profileID/:serviceID: success with access_token for <user type>", func(t *testing.T) {
+
+		profileOwner := generateUser(random, authRouter, t, "")
+		clientUser := generateUser(random, authRouter, t, "")
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, profileOwner.ID.String())
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        clientUser.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profileOwner.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+			ProfileRating: &models.CreateProfileRatingRequest{
+				Review: "I like the service! It's very good",
+				Score:  ptr(5),
+				RatedProfileTags: []models.CreateRatedProfileTagRequest{
+					{
+						Type:  "like",
+						TagID: profileTags[0].ID,
+					},
+					{
+						Type:  "like",
+						TagID: profileTags[1].ID,
+					},
+				},
+			},
+			UserRating: &models.CreateUserRatingRequest{
+				Review: "I liked the client! He is very kind",
+				Score:  ptr(5),
+				RatedUserTags: []models.CreateRatedUserTagRequest{
+					{
+						Type:  "like",
+						TagID: userTags[0].ID,
+					},
+					{
+						Type:  "dislike",
+						TagID: userTags[1].ID,
+					},
+				},
+			},
+		}
+
+		service, _ := createServiceFromPayload(t, *payload, serviceRouter, accessTokenCookie)
+
+		assert.NotNil(t, service)
+
+		newCreatedAt := time.Date(2024, 9, 29, 0, 0, 0, 0, time.UTC)
+
+		result := sc.DB.Model(&models.ProfileRating{}).
+			Where("id = ?", service.Data[0].ProfileRatingID).
+			UpdateColumn("created_at", newCreatedAt)
+
+		if result.Error != nil {
+			panic(result.Error.Error())
+		}
+
+		w := httptest.NewRecorder()
+
+		updateProfileOwnerReviewReqBody := &models.CreateProfileRatingRequest{
+			Review: "I liked the client! He is very kind.\n\n UPD: I've changed my mind: it was worst experience I've had in my life",
+			Score:  ptr(1),
+			RatedProfileTags: []models.CreateRatedProfileTagRequest{
+				{
+					Type:  "dislike",
+					TagID: profileTags[0].ID,
+				},
+			},
+		}
+
+		jsonPayload, err := json.Marshal(updateProfileOwnerReviewReqBody)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+		}
+
+		updateUri := fmt.Sprintf("/api/reviews/host?profile_id=%s&service_id=%s", profile.Data.ID.String(), service.Data[0].ID.String())
+		updateProfileOwnerReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
+		updateProfileOwnerReviewReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+		updateProfileOwnerReviewReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, updateProfileOwnerReviewReq)
+
+		assert.Equal(t, http.StatusForbidden, w.Code)
+
+	})
+
 	// client can update his review at first 48 hours after creation
 	t.Run("PUT /api/services/client/:profileID: success with access_token for <user type>", func(t *testing.T) {
 	})
 
-	// client can hide out profile owner's review
+	// client expert-tier can hide out profile owner's review
 	t.Run("PUT /api/services/client/:serviceID: success with access_token for <user type>", func(t *testing.T) {
 	})
 
@@ -913,7 +1006,7 @@ func TestServiceRoutes(t *testing.T) {
 	t.Run("PUT /api/services/host/:profileID: success with access_token for <user type>", func(t *testing.T) {
 	})
 
-	// profile owner can hide out client's review
+	// profile owner expert-tier can hide out client's review
 	t.Run("PUT /api/services/host/:serviceID: success with access_token for <user type>", func(t *testing.T) {
 	})
 }

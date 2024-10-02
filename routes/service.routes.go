@@ -25,12 +25,23 @@ func (sc *ServiceRouteController) ServiceRoute(rg *gin.RouterGroup) {
 
 	router.GET("/all", middleware.AbacMiddleware("services", "list"), sc.serviceController.ListServices)
 
-	reviewsRouter := router.Group("reviews")
+	router.PUT("/client/update/:profileID/:serviceID", sc.serviceController.UpdateClientUserReviewOnProfile)
+	router.PUT("/client/:profileID/:serviceID", sc.serviceController.HideProfileOwnerReview)
 
-	reviewsRouter.PUT("/client/:profileID", sc.serviceController.UpdateClientUserReviewOnProfile)
-	reviewsRouter.PUT("/client/:profileID/:serviceID", sc.serviceController.HideProfileOwnerReview)
+	router.PUT("/host/update", sc.serviceController.UpdateProfileOwnerReviewOnClientUser)
+	router.PUT("/host/:profileID/:serviceID", sc.serviceController.HideUserReview)
 
-	reviewsRouter.PUT("/host/:profileID", sc.serviceController.UpdateProfileOwnerReviewOnClientUser)
-	reviewsRouter.PUT("/host/:profileID/:serviceID", sc.serviceController.HideUserReview)
+}
+
+func (sc *ServiceRouteController) ReviewsRoute(rg *gin.RouterGroup) {
+	router := rg.Group("reviews")
+
+	router.Use(middleware.DeserializeUser())
+
+	router.PUT("/client", sc.serviceController.UpdateClientUserReviewOnProfile)
+	router.PUT("/client/hide", sc.serviceController.HideProfileOwnerReview)
+
+	router.PUT("/host", sc.serviceController.UpdateProfileOwnerReviewOnClientUser)
+	router.PUT("/host/hide", sc.serviceController.HideUserReview)
 
 }

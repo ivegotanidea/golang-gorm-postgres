@@ -307,13 +307,14 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 
 func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
-	profileID := ctx.Param("profileID")
+	profileID := ctx.Query("profile_id")
+	serviceID := ctx.Query("service_id")
 
 	// Find the service with the associated profile review
 	var service models.Service
 	result := sc.DB.Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Preload("ClientUserRating.RatedUserTags.UserTag").
-		Where("profile_id = ?", profileID).
+		Where("profile_id = ? AND id = ?", profileID, serviceID).
 		First(&service)
 
 	// Check if the service exists
