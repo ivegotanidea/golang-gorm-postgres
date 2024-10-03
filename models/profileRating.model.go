@@ -6,13 +6,15 @@ import (
 )
 
 type ProfileRating struct {
-	ID               uuid.UUID         `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	ServiceID        uuid.UUID         `gorm:"type:uuid;not null"`
-	ProfileID        uuid.UUID         `gorm:"type:uuid;not null"`
-	ReviewTextHidden bool              `gorm:"default:false"`
-	Review           string            `gorm:"type:varchar(2000)"`
-	Score            *int              `gorm:"type:int;not null"`
-	CreatedAt        time.Time         `gorm:"type:timestamp;not null"`
-	UpdatedAt        time.Time         `gorm:"type:timestamp;not null"`
-	RatedProfileTags []RatedProfileTag `gorm:"foreignKey:RatingID"`
+	ID                uuid.UUID         `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	ServiceID         uuid.UUID         `gorm:"type:uuid;not null"`
+	ProfileID         uuid.UUID         `gorm:"type:uuid;not null"`
+	ReviewTextVisible bool              `gorm:"default:true"`
+	Review            string            `gorm:"type:varchar(2000)"`
+	Score             *int              `gorm:"type:int;not null"`
+	CreatedAt         time.Time         `gorm:"type:timestamp;not null"`
+	UpdatedAt         time.Time         `gorm:"type:timestamp;not null"`
+	RatedProfileTags  []RatedProfileTag `gorm:"foreignKey:RatingID"`
+
+	UpdatedBy uuid.UUID `gorm:"type:uuid;not null"`
 }

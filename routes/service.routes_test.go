@@ -410,7 +410,7 @@ func TestServiceRoutes(t *testing.T) {
 		assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
 		assert.NotNil(t, servicesResponse.Data[0].ProfileOwnerID)
 		assert.Nil(t, servicesResponse.Data[0].ProfileRating.RatedProfileTags)
-		assert.True(t, servicesResponse.Data[0].ProfileRating.ReviewTextHidden)
+		assert.True(t, servicesResponse.Data[0].ProfileRating.ReviewTextVisible)
 		assert.Empty(t, servicesResponse.Data[0].ProfileRating.Review)
 		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Score, service.Data[0].ProfileRating.Score)
 
@@ -503,7 +503,7 @@ func TestServiceRoutes(t *testing.T) {
 		assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
 		assert.NotNil(t, servicesResponse.Data[0].ProfileOwnerID)
 		assert.Nil(t, servicesResponse.Data[0].ProfileRating.RatedProfileTags)
-		assert.False(t, servicesResponse.Data[0].ProfileRating.ReviewTextHidden)
+		assert.False(t, servicesResponse.Data[0].ProfileRating.ReviewTextVisible)
 		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Review, payload.ProfileRating.Review)
 		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Score, payload.ProfileRating.Score)
 
@@ -600,7 +600,7 @@ func TestServiceRoutes(t *testing.T) {
 		assert.NotNil(t, servicesResponse.Data[0].ProfileRatingID)
 		assert.NotNil(t, servicesResponse.Data[0].ProfileOwnerID)
 		assert.NotNil(t, servicesResponse.Data[0].ProfileRating.RatedProfileTags)
-		assert.False(t, servicesResponse.Data[0].ProfileRating.ReviewTextHidden)
+		assert.False(t, servicesResponse.Data[0].ProfileRating.ReviewTextVisible)
 		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Review, payload.ProfileRating.Review)
 		assert.Equal(t, servicesResponse.Data[0].ProfileRating.Score, payload.ProfileRating.Score)
 

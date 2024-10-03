@@ -15,4 +15,6 @@ type UserRating struct {
 	CreatedAt        time.Time      `gorm:"type:timestamp;not null"`
 	UpdatedAt        time.Time      `gorm:"type:timestamp;not null"`
 	RatedUserTags    []RatedUserTag `gorm:"foreignKey:RatingID"`
+
+	UpdatedBy uuid.UUID `gorm:"type:uuid;not null"`
 }

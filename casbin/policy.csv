@@ -9,6 +9,7 @@ p, moderator, profiles, update, guru, false
 p, moderator, profiles, query, guru, false
 
 p, moderator, services, list, guru, false
+p, moderator, reviews, set-visibility, guru, false
 
 # admin
 p, admin, *, *, *, *
@@ -25,3 +26,6 @@ p, user, profiles, query, expert, false
 p, user, profiles, query, guru, false
 
 p, user, services, list, guru, false
+
+p, user, reviews, set-visibility, expert, false
+p, user, reviews, set-visibility, guru, false

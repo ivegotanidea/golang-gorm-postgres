@@ -209,8 +209,8 @@ func MutateService(tier string, service models.Service) map[string]interface{} {
 		// Only expose ProfileRating.Score for basic users, hide UserRating entirely
 		if service.ProfileRating != nil {
 			filteredService["ProfileRating"] = map[string]interface{}{
-				"Score":            service.ProfileRating.Score,
-				"ReviewTextHidden": true,
+				"Score":             service.ProfileRating.Score,
+				"ReviewTextVisible": true,
 			}
 		}
 	} else if tier == "expert" {
@@ -223,8 +223,8 @@ func MutateService(tier string, service models.Service) map[string]interface{} {
 		}
 		if service.ClientUserRating != nil {
 			filteredService["ClientUserRating"] = map[string]interface{}{
-				"Score":            service.ClientUserRating.Score,
-				"ReviewTextHidden": true,
+				"Score":             service.ClientUserRating.Score,
+				"ReviewTextVisible": true,
 			}
 		}
 	} else if tier == "guru" {
@@ -526,14 +526,13 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
-	profileID := ctx.Query("profile_id")
 	serviceID := ctx.Query("service_id")
 
 	// Find the service with the associated profile review
 	var service models.Service
 	result := sc.DB.Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Preload("ClientUserRating.RatedUserTags.UserTag").
-		Where("profile_id = ? and id = ?", profileID, serviceID).
+		Where("id = ?", serviceID).
 		First(&service)
 
 	// Check if the service exists
@@ -552,8 +551,16 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "Basic-tier user can't hide out profile reviews"})
 	}
 
-	if !service.ProfileRating.ReviewTextHidden {
-		service.ProfileRating.ReviewTextHidden = true
+	var payload *models.SetReviewVisibilityRequest
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	if service.ProfileRating.ReviewTextVisible != *payload.Visible {
+		service.ProfileRating.ReviewTextVisible = *payload.Visible
+		service.ProfileRating.UpdatedAt = time.Now()
+		service.UpdatedBy = currentUser.ID
 
 		// Update the profile rating in the database
 		if err := sc.DB.Save(&service.ProfileRating).Error; err != nil {

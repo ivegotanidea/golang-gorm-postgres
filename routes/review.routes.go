@@ -20,9 +20,9 @@ func (sc *ReviewsRouteController) ReviewsRoute(rg *gin.RouterGroup) {
 	router.Use(middleware.DeserializeUser())
 
 	router.PUT("/client", sc.serviceController.UpdateClientUserReviewOnProfile)
-	router.PUT("/client/set-visibility", sc.serviceController.HideProfileOwnerReview)
+	router.PUT("/client/set-visibility", middleware.AbacMiddleware("reviews", "set-visibility"), sc.serviceController.HideProfileOwnerReview)
 
 	router.PUT("/host", sc.serviceController.UpdateProfileOwnerReviewOnClientUser)
-	router.PUT("/host/set-visibility", sc.serviceController.HideUserReview)
+	router.PUT("/host/set-visibility", middleware.AbacMiddleware("reviews", "set-visibility"), sc.serviceController.HideUserReview)
 
 }

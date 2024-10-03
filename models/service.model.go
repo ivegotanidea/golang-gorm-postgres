@@ -64,3 +64,7 @@ type CreateProfileRatingRequest struct {
 	Score            *int                           `json:"score" binding:"omitempty"`
 	RatedProfileTags []CreateRatedProfileTagRequest `json:"ratedProfileTags" binding:"omitempty,dive"`
 }
+
+type SetReviewVisibilityRequest struct {
+	Visible *bool `json:"visible"`
+}
