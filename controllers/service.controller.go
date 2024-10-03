@@ -393,13 +393,14 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
-	profileID := ctx.Param("profileID")
+	profileID := ctx.Query("profile_id")
+	serviceID := ctx.Query("service_id")
 
 	// Find the service with the associated profile review
 	var service models.Service
 	result := sc.DB.Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Preload("ClientUserRating.RatedUserTags.UserTag").
-		Where("profile_id = ?", profileID).
+		Where("profile_id = ? and id = ?", profileID, serviceID).
 		First(&service)
 
 	// Check if the service exists
@@ -412,6 +413,10 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	if service.ProfileOwnerID != currentUser.ID {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "You are not authorized to update this review"})
 		return
+	}
+
+	if currentUser.Tier == "basic" {
+		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "Basic-tier user can't hide out profile reviews"})
 	}
 
 	if !service.ProfileRating.ReviewTextHidden {
@@ -438,7 +443,11 @@ func MutateService(tier string, service models.Service) map[string]interface{} {
 	filteredService["ClientUserRatingID"] = service.ClientUserRatingID
 	filteredService["ProfileID"] = service.ProfileID
 	filteredService["ProfileOwnerID"] = service.ProfileOwnerID
-	filteredService["ProfileRatingID"] = service.ProfileRating.ID
+
+	if service.ProfileRating != nil {
+		filteredService["ProfileRatingID"] = service.ProfileRating.ID
+	}
+
 	filteredService["CreatedAt"] = service.CreatedAt
 	filteredService["DistanceBetweenUsers"] = service.DistanceBetweenUsers
 	filteredService["TrustedDistance"] = service.TrustedDistance
@@ -523,48 +532,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	filteredServices := make([]map[string]interface{}, 0, len(services))
 
 	for _, service := range services {
-		filteredService := make(map[string]interface{})
-
-		// Common fields that are visible to all
-		filteredService["ID"] = service.ID
-		filteredService["ClientUserID"] = service.ClientUserID
-		filteredService["ClientUserRatingID"] = service.ClientUserRatingID
-		filteredService["ProfileID"] = service.ProfileID
-		filteredService["ProfileOwnerID"] = service.ProfileOwnerID
-		filteredService["ProfileRatingID"] = service.ProfileRating.ID
-		filteredService["CreatedAt"] = service.CreatedAt
-		filteredService["DistanceBetweenUsers"] = service.DistanceBetweenUsers
-		filteredService["TrustedDistance"] = service.TrustedDistance
-
-		// Access control based on user tier
-		if currentUser.Tier == "basic" {
-			// Only expose ProfileRating.Score for basic users, hide UserRating entirely
-			if service.ProfileRating != nil {
-				filteredService["ProfileRating"] = map[string]interface{}{
-					"Score":            service.ProfileRating.Score,
-					"ReviewTextHidden": true,
-				}
-			}
-		} else if currentUser.Tier == "expert" {
-			// Expert users can see all ProfileRating fields and only Score from UserRating
-			if service.ProfileRating != nil {
-				filteredService["ProfileRating"] = map[string]interface{}{
-					"Review": service.ProfileRating.Review,
-					"Score":  service.ProfileRating.Score,
-				}
-			}
-			if service.ClientUserRating != nil {
-				filteredService["ClientUserRating"] = map[string]interface{}{
-					"Score":            service.ClientUserRating.Score,
-					"ReviewTextHidden": true,
-				}
-			}
-		} else if currentUser.Tier == "guru" {
-			// Guru users can see both ProfileRating and UserRating completely
-			filteredService["ProfileRating"] = service.ProfileRating
-			filteredService["ClientUserRating"] = service.ClientUserRating
-		}
-
+		filteredService := MutateService(currentUser.Tier, service)
 		// Append filtered service to the response
 		filteredServices = append(filteredServices, filteredService)
 	}
