@@ -108,7 +108,7 @@ func TestReviewsRoutes(t *testing.T) {
 		utils.DropAllTables(pc.DB)
 	})
 
-	t.Run("PUT /api/reviews/host?service_id=:serviceID: success with access_token for <user type>", func(t *testing.T) {
+	t.Run("PUT /api/reviews/host?service_id=:serviceID: success with access_token for basic user", func(t *testing.T) {
 
 		profileOwner := generateUser(random, authRouter, t, "")
 		clientUser := generateUser(random, authRouter, t, "")
