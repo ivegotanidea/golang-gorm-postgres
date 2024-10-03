@@ -344,6 +344,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 
 	// Check if the review can still be updated (within the allowed time limit)
 	hoursSinceReview := time.Since(service.ClientUserRating.CreatedAt).Hours()
+
 	if hoursSinceReview > float64(sc.reviewUpdateLimitHours) {
 		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": fmt.Sprintf("Review can only be updated within %d hours of creation", sc.reviewUpdateLimitHours)})
 		return
