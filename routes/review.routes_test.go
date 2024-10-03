@@ -109,7 +109,7 @@ func TestReviewsRoutes(t *testing.T) {
 	})
 
 	// client can't update his review after 48 hours after creation
-	t.Run("PUT /api/reviews/host:profileID/:serviceID: success with access_token for <user type>", func(t *testing.T) {
+	t.Run("PUT /api/reviews/host?service_id=:serviceID: success with access_token for <user type>", func(t *testing.T) {
 
 		profileOwner := generateUser(random, authRouter, t, "")
 		clientUser := generateUser(random, authRouter, t, "")
@@ -161,7 +161,7 @@ func TestReviewsRoutes(t *testing.T) {
 
 		assert.NotNil(t, service)
 
-		newCreatedAt := time.Now().Add(-49 * time.Hour)
+		newCreatedAt := time.Now().UTC().Add(-49 * time.Hour)
 
 		result := sc.DB.Model(&models.ProfileRating{}).
 			Where("id = ?", service.Data[0].ProfileRatingID).
@@ -189,12 +189,12 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/host?profile_id=%s&service_id=%s", profile.Data.ID.String(), service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/host?service_id=%s", service.Data[0].ID.String())
 		updateProfileOwnerReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateProfileOwnerReviewReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		updateProfileOwnerReviewReq.Header.Set("Content-Type", "application/json")
 
-		serviceRouter.ServeHTTP(w, updateProfileOwnerReviewReq)
+		reviewRouter.ServeHTTP(w, updateProfileOwnerReviewReq)
 
 		assert.Equal(t, http.StatusForbidden, w.Code)
 
@@ -253,7 +253,7 @@ func TestReviewsRoutes(t *testing.T) {
 
 		assert.NotNil(t, service)
 
-		newCreatedAt := time.Now().Add(-24 * time.Hour)
+		newCreatedAt := time.Now().UTC().Add(-24 * time.Hour)
 
 		result := sc.DB.Model(&models.ProfileRating{}).
 			Where("id = ?", service.Data[0].ProfileRatingID).
