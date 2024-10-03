@@ -387,7 +387,7 @@ func TestReviewsRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusForbidden, w.Code)
 	})
 
-	t.Run("PUT /api/reviews/host/set-visibility: success profile owner expert-tier can't hide out client's review", func(t *testing.T) {
+	t.Run("PUT /api/reviews/host/set-visibility: success profile owner expert-tier can hide out client's review", func(t *testing.T) {
 
 		profileOwner := generateUser(random, authRouter, t, "expert")
 		clientUser := generateUser(random, authRouter, t, "")
@@ -691,6 +691,178 @@ func TestReviewsRoutes(t *testing.T) {
 
 		assert.Equal(t, updateClientReviewReqBody.Review, servicesResponse.Data.ClientUserRating.Review)
 		assert.Equal(t, updateClientReviewReqBody.Score, servicesResponse.Data.ClientUserRating.Score)
+
+	})
+
+	t.Run("PUT /api/reviews/client/set-visibility: fail client basic-tier can't hide out profile owner's review", func(t *testing.T) {
+
+		profileOwner := generateUser(random, authRouter, t, "")
+		clientUser := generateUser(random, authRouter, t, "")
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
+		clientAccessTokenCookie, _ := loginUserGetAccessToken(t, clientUser.Password, clientUser.TelegramUserID, authRouter)
+
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, profileOwner.ID.String())
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        clientUser.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profileOwner.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+			ProfileRating: &models.CreateProfileRatingRequest{
+				Review: "I like the service! It's very good",
+				Score:  ptr(5),
+				RatedProfileTags: []models.CreateRatedProfileTagRequest{
+					{
+						Type:  "like",
+						TagID: profileTags[0].ID,
+					},
+					{
+						Type:  "like",
+						TagID: profileTags[1].ID,
+					},
+				},
+			},
+			UserRating: &models.CreateUserRatingRequest{
+				Review: "I liked the client! He is very kind",
+				Score:  ptr(5),
+				RatedUserTags: []models.CreateRatedUserTagRequest{
+					{
+						Type:  "like",
+						TagID: userTags[0].ID,
+					},
+					{
+						Type:  "dislike",
+						TagID: userTags[1].ID,
+					},
+				},
+			},
+		}
+
+		service, _ := createServiceFromPayload(t, *payload, serviceRouter, accessTokenCookie)
+
+		assert.NotNil(t, service)
+
+		w := httptest.NewRecorder()
+
+		updateClientReviewReqBody := &models.SetReviewVisibilityRequest{
+			Visible: boolPtr(false),
+		}
+
+		jsonPayload, err := json.Marshal(updateClientReviewReqBody)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+		}
+
+		updateUri := fmt.Sprintf("/api/reviews/client/set-visibility?service_id=%s", service.Data[0].ID.String())
+		updateClientReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
+		updateClientReviewReq.AddCookie(&http.Cookie{Name: clientAccessTokenCookie.Name, Value: clientAccessTokenCookie.Value})
+		updateClientReviewReq.Header.Set("Content-Type", "application/json")
+
+		reviewRouter.ServeHTTP(w, updateClientReviewReq)
+
+		assert.Equal(t, http.StatusForbidden, w.Code)
+	})
+
+	t.Run("PUT /api/reviews/client/set-visibility: success client expert-tier can hide out profile owner's review", func(t *testing.T) {
+
+		profileOwner := generateUser(random, authRouter, t, "")
+		clientUser := generateUser(random, authRouter, t, "expert")
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, profileOwner.Password, profileOwner.TelegramUserID, authRouter)
+		clientAccessTokenCookie, _ := loginUserGetAccessToken(t, clientUser.Password, clientUser.TelegramUserID, authRouter)
+
+		profile, _ := createProfile(t, random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors,
+			intimateHairCuts, accessTokenCookie, profileRouter, profileOwner.ID.String())
+
+		payload := &models.CreateServiceRequest{
+			ClientUserID:        clientUser.ID,
+			ClientUserLatitude:  floatPtr(43.259769),
+			ClientUserLongitude: floatPtr(76.935246),
+
+			ProfileID:            profile.Data.ID,
+			ProfileOwnerID:       profileOwner.ID,
+			ProfileUserLatitude:  floatPtr(43.259879),
+			ProfileUserLongitude: floatPtr(76.934604),
+			ProfileRating: &models.CreateProfileRatingRequest{
+				Review: "I like the service! It's very good",
+				Score:  ptr(5),
+				RatedProfileTags: []models.CreateRatedProfileTagRequest{
+					{
+						Type:  "like",
+						TagID: profileTags[0].ID,
+					},
+					{
+						Type:  "like",
+						TagID: profileTags[1].ID,
+					},
+				},
+			},
+			UserRating: &models.CreateUserRatingRequest{
+				Review: "I liked the client! He is very kind",
+				Score:  ptr(5),
+				RatedUserTags: []models.CreateRatedUserTagRequest{
+					{
+						Type:  "like",
+						TagID: userTags[0].ID,
+					},
+					{
+						Type:  "dislike",
+						TagID: userTags[1].ID,
+					},
+				},
+			},
+		}
+
+		service, _ := createServiceFromPayload(t, *payload, serviceRouter, accessTokenCookie)
+
+		assert.NotNil(t, service)
+
+		w := httptest.NewRecorder()
+
+		updateClientReviewReqBody := models.SetReviewVisibilityRequest{
+			Visible: boolPtr(false),
+		}
+
+		jsonPayload, err := json.Marshal(updateClientReviewReqBody)
+		if err != nil {
+			fmt.Println("Error marshaling payload:", err)
+		}
+
+		updateUri := fmt.Sprintf("/api/reviews/client/set-visibility?service_id=%s", service.Data[0].ID.String())
+		updateClientReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
+		updateClientReviewReq.AddCookie(&http.Cookie{Name: clientAccessTokenCookie.Name, Value: clientAccessTokenCookie.Value})
+		updateClientReviewReq.Header.Set("Content-Type", "application/json")
+
+		reviewRouter.ServeHTTP(w, updateClientReviewReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		basicUser := generateUser(random, authRouter, t, "guru")
+		basicUserAccessTokenCookie, _ := loginUserGetAccessToken(t, basicUser.Password, basicUser.TelegramUserID, authRouter)
+
+		w = httptest.NewRecorder()
+		getServiceReq, _ := http.NewRequest("GET", fmt.Sprintf("/api/services/%s/service/%s", profile.Data.ID.String(), service.Data[0].ID.String()), nil)
+		getServiceReq.AddCookie(&http.Cookie{Name: basicUserAccessTokenCookie.Name, Value: basicUserAccessTokenCookie.Value})
+		getServiceReq.Header.Set("Content-Type", "application/json")
+
+		serviceRouter.ServeHTTP(w, getServiceReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var servicesResponse ServiceResponse
+		err = json.Unmarshal(w.Body.Bytes(), &servicesResponse)
+
+		assert.NoError(t, err)
+
+		assert.Equal(t, servicesResponse.Status, "success")
+
+		assert.Equal(t, *updateClientReviewReqBody.Visible, servicesResponse.Data.ClientUserRating.ReviewTextVisible)
 
 	})
 }

@@ -406,13 +406,13 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 
 func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
-	profileID := ctx.Param("profileID")
+	serviceID := ctx.Query("service_id")
 
 	// Find the service with the associated user review
 	var service models.Service
 	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
 		Preload("ProfileRating.RatedProfileTags.ProfileTag").
-		Where("profile_id = ?", profileID).
+		Where("id = ?", serviceID).
 		First(&service)
 
 	// Check if the service exists
@@ -427,8 +427,14 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 		return
 	}
 
-	if !service.ClientUserRating.ReviewTextHidden {
-		service.ClientUserRating.ReviewTextHidden = true
+	var payload *models.SetReviewVisibilityRequest
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	if service.ClientUserRating.ReviewTextVisible != *payload.Visible {
+		service.ClientUserRating.ReviewTextVisible = *payload.Visible
 
 		if err := sc.DB.Save(&service.ClientUserRating).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update the user review"})

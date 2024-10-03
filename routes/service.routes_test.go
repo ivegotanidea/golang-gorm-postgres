@@ -512,7 +512,7 @@ func TestServiceRoutes(t *testing.T) {
 		assert.NotNil(t, servicesResponse.Data[0].ClientUserRating)
 
 		assert.Nil(t, servicesResponse.Data[0].ClientUserRating.RatedUserTags)
-		assert.True(t, servicesResponse.Data[0].ClientUserRating.ReviewTextHidden)
+		assert.True(t, servicesResponse.Data[0].ClientUserRating.ReviewTextVisible)
 		assert.Equal(t, servicesResponse.Data[0].ClientUserRating.Score, payload.UserRating.Score)
 
 		assert.Empty(t, servicesResponse.Data[0].ProfileUserLon)
@@ -609,7 +609,7 @@ func TestServiceRoutes(t *testing.T) {
 		assert.NotNil(t, servicesResponse.Data[0].ClientUserRating)
 
 		assert.NotNil(t, servicesResponse.Data[0].ClientUserRating.RatedUserTags)
-		assert.False(t, servicesResponse.Data[0].ClientUserRating.ReviewTextHidden)
+		assert.False(t, servicesResponse.Data[0].ClientUserRating.ReviewTextVisible)
 		assert.Equal(t, servicesResponse.Data[0].ClientUserRating.Score, payload.UserRating.Score)
 
 		assert.Empty(t, servicesResponse.Data[0].ProfileUserLon)
