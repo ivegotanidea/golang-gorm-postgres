@@ -428,6 +428,75 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": service})
 }
 
+func MutateService(tier string, service models.Service) map[string]interface{} {
+
+	filteredService := make(map[string]interface{})
+
+	// Common fields that are visible to all
+	filteredService["ID"] = service.ID
+	filteredService["ClientUserID"] = service.ClientUserID
+	filteredService["ClientUserRatingID"] = service.ClientUserRatingID
+	filteredService["ProfileID"] = service.ProfileID
+	filteredService["ProfileOwnerID"] = service.ProfileOwnerID
+	filteredService["ProfileRatingID"] = service.ProfileRating.ID
+	filteredService["CreatedAt"] = service.CreatedAt
+	filteredService["DistanceBetweenUsers"] = service.DistanceBetweenUsers
+	filteredService["TrustedDistance"] = service.TrustedDistance
+
+	// Access control based on user tier
+	if tier == "basic" {
+		// Only expose ProfileRating.Score for basic users, hide UserRating entirely
+		if service.ProfileRating != nil {
+			filteredService["ProfileRating"] = map[string]interface{}{
+				"Score":            service.ProfileRating.Score,
+				"ReviewTextHidden": true,
+			}
+		}
+	} else if tier == "expert" {
+		// Expert users can see all ProfileRating fields and only Score from UserRating
+		if service.ProfileRating != nil {
+			filteredService["ProfileRating"] = map[string]interface{}{
+				"Review": service.ProfileRating.Review,
+				"Score":  service.ProfileRating.Score,
+			}
+		}
+		if service.ClientUserRating != nil {
+			filteredService["ClientUserRating"] = map[string]interface{}{
+				"Score":            service.ClientUserRating.Score,
+				"ReviewTextHidden": true,
+			}
+		}
+	} else if tier == "guru" {
+		// Guru users can see both ProfileRating and UserRating completely
+		filteredService["ProfileRating"] = service.ProfileRating
+		filteredService["ClientUserRating"] = service.ClientUserRating
+	}
+
+	return filteredService
+}
+
+func (sc *ServiceController) GetService(ctx *gin.Context) {
+	profileID := ctx.Param("profileID")
+	serviceID := ctx.Param("serviceID")
+	currentUser := ctx.MustGet("currentUser").(models.User)
+
+	var service models.Service
+	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
+		Preload("ProfileRating.RatedProfileTags.ProfileTag").
+		Where("profile_id = ? and id = ?", profileID, serviceID).
+		First(&service)
+
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for specified profile"})
+		return
+	}
+
+	filteredService := MutateService(currentUser.Tier, service)
+
+	// Return the filtered response
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": filteredService})
+}
+
 func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")

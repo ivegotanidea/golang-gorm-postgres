@@ -23,6 +23,8 @@ func (sc *ServiceRouteController) ServiceRoute(rg *gin.RouterGroup) {
 
 	router.GET("/:profileID", sc.serviceController.GetProfileServices)
 
+	router.GET("/:profileID/service/:serviceID", sc.serviceController.GetService)
+
 	router.GET("/all", middleware.AbacMiddleware("services", "list"), sc.serviceController.ListServices)
 
 	router.PUT("/client/update/:profileID/:serviceID", sc.serviceController.UpdateClientUserReviewOnProfile)

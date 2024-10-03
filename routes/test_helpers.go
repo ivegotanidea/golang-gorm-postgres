@@ -36,6 +36,11 @@ type ProfilesResponse struct {
 	Data   []models.Profile `json:"data"`
 }
 
+type ServiceResponse struct {
+	Status string         `json:"status"`
+	Data   models.Service `json:"data"`
+}
+
 type ServicesResponse struct {
 	Status string           `json:"status"`
 	Length int              `json:"results"`
