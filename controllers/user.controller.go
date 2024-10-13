@@ -492,49 +492,89 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	})
 }
 
+// AssignRole godoc
+// @Summary Assign a role to a user
+// @Description Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param body body models.AssignRole true "Role assignment details"
+// @Success 200 {object} models.SuccessResponse{data=models.User}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/assign-role [post]
 func (uc *UserController) AssignRole(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
+	// Bind the request payload
 	var payload models.AssignRole
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
+	// Validate the payload
 	if err := uc.validator.Struct(payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
+	// Find the target user
 	var targetUser models.User
 	if err := initializers.DB.First(&targetUser, "id = ?", payload.Id).Error; err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "User not found",
+		})
 		return
 	}
 
+	// Role validation for the current admin
 	if currentUser.Role == "admin" && (targetUser.Role == "admin" || targetUser.Role == "owner") {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: "Cannot assign role to admins or owners",
+		})
 		return
 	}
 
+	// Check if the target user already has a profile
 	if targetUser.HasProfile {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "User has profile"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: "User already has a profile",
+		})
 		return
 	}
 
-	// Assign the role to the targetUser
+	// Assign the role to the target user
 	targetUser.Role = payload.Role
 
-	// Automatically assign the "guru" tier if the role is "moderator"
+	// Automatically assign "guru" tier if the role is moderator or admin
 	if payload.Role == "moderator" || payload.Role == "admin" {
 		targetUser.Tier = "guru"
 	}
 
+	// Save the updated user in the database
 	if err := initializers.DB.Save(&targetUser).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to change user's role"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Status:  "error",
+			Message: "Failed to change user's role",
+		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": targetUser})
-
+	// Return the updated user in the response
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   targetUser,
+	})
 }
