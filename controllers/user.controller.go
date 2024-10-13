@@ -400,42 +400,70 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	})
 }
 
+// UpdateUser godoc
+// @Summary Update a user's information (privileged access)
+// @Description Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param body body models.UpdateUserPrivileged true "User Update Payload"
+// @Success 200 {object} models.SuccessResponse{data=models.User}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 502 {object} models.ErrorResponse
+// @Router /users/{id} [put]
 func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 
+	// Parse and bind the payload from the request
 	var payload *models.UpdateUserPrivileged
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
+	// Validate the payload
 	if err := uc.validator.Struct(payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
+	// Find the user to be updated
 	var updatedUser models.User
 	result := uc.DB.First(&updatedUser, "id = ?", userId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "User not found",
+		})
 		return
 	}
 
+	// Parse TelegramUserId if provided
 	var newTelegramId int64
 	var err error
-
 	if payload.TelegramUserId != "" {
-
 		newTelegramId, err = strconv.ParseInt(payload.TelegramUserId, 10, 64)
-
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid telegram id"})
+			ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+				Status:  "fail",
+				Message: "Invalid telegram id",
+			})
 			return
 		}
 	}
 
+	// Set the current time
 	now := time.Now()
 
+	// Prepare the updated user data
 	userToUpdate := models.User{
 		Name:           payload.Name,
 		Phone:          payload.Phone,
@@ -447,13 +475,21 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 		UpdatedAt:      now,
 	}
 
+	// Apply the updates to the database
 	tx := uc.DB.Model(&updatedUser).Updates(userToUpdate)
-
 	if tx.Error != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": tx.Error.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: tx.Error.Error(),
+		})
+		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedUser})
+	// Return the updated user data in the response
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   updatedUser,
+	})
 }
 
 func (uc *UserController) AssignRole(ctx *gin.Context) {
