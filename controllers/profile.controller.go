@@ -545,8 +545,16 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: existingProfile})
 }
 
+// FindProfileByPhone godoc
+// @Summary Find a profile by phone number
+// @Description Retrieves a profile based on the phone number provided
+// @Tags Profiles
+// @Produce json
+// @Param phone path string true "Phone Number"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /profiles/phone/{phone} [get]
 func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
-
 	phone := ctx.Param("phone")
 
 	var profile models.Profile
@@ -557,11 +565,11 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 		First(&profile, "phone = ?", phone)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No profile with that title exists"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "fail", Message: "No profile with that title exists"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": profile})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: profile})
 }
 
 // ListProfiles godoc
