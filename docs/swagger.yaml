@@ -1,0 +1,252 @@
+definitions:
+  models.BotSignInInput:
+    properties:
+      telegramUserId:
+        type: string
+    required:
+    - telegramUserId
+    type: object
+  models.BotSignUpInput:
+    properties:
+      name:
+        minLength: 5
+        type: string
+      phone:
+        maxLength: 11
+        minLength: 11
+        type: string
+      telegramUserId:
+        type: string
+    required:
+    - name
+    - phone
+    - telegramUserId
+    type: object
+  models.ErrorResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  models.SignInInput:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      phone:
+        maxLength: 11
+        minLength: 11
+        type: string
+    required:
+    - password
+    - phone
+    type: object
+  models.SignUpInput:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      passwordConfirm:
+        minLength: 8
+        type: string
+      phone:
+        maxLength: 11
+        minLength: 11
+        type: string
+    required:
+    - password
+    - passwordConfirm
+    - phone
+    type: object
+  models.SuccessResponse:
+    properties:
+      data: {}
+      status:
+        type: string
+    type: object
+  models.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      status:
+        type: string
+    type: object
+  models.UserResponse:
+    properties:
+      active:
+        type: boolean
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      photo:
+        type: string
+      role:
+        type: string
+      telegramUserId:
+        type: integer
+      tier:
+        type: string
+      updated_at:
+        type: string
+      verified:
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/bot/signin:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a bot user by accepting Telegram User ID.
+      parameters:
+      - description: Bot SignIn Input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.BotSignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Logs in a bot user
+      tags:
+      - Auth
+  /auth/bot/signup:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user by accepting Telegram user ID and other basic
+        details. Automatically generates password.
+      parameters:
+      - description: Bot Signup Input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.BotSignUpInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Registers a new user via bot
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      description: Clears the access and refresh tokens and logs out the user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+      summary: Logs out a user
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      description: Refreshes the access token using the refresh token cookie.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Refreshes access token
+      tags:
+      - Auth
+  /auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user by accepting phone and password.
+      parameters:
+      - description: SignIn Input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Logs in a user
+      tags:
+      - Auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user by accepting basic details and password confirmation.
+      parameters:
+      - description: SignUp Input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Registers a new user
+      tags:
+      - Auth
+swagger: "2.0"

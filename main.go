@@ -1,6 +1,9 @@
 package main
 
 import (
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/wpcodevo/golang-gorm-postgres/docs"
 	"log"
 	"net/http"
 
@@ -69,9 +72,11 @@ func main() {
 
 	server.Use(cors.New(corsConfig))
 
-	router := server.Group("/api")
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	router := server.Group("/api/v1")
 	router.HEAD("/healthchecker", healthCheckHandler)
 	router.GET("/healthchecker", healthCheckHandler)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	AuthRouteController.AuthRoute(router)
 	UserRouteController.UserRoute(router)

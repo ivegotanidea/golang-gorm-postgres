@@ -14,6 +14,8 @@ func NewAuthRouteController(authController controllers.AuthController) AuthRoute
 	return AuthRouteController{authController}
 }
 
+// @BasePath /api/v1/auth
+
 func (rc *AuthRouteController) AuthRoute(rg *gin.RouterGroup) {
 	router := rg.Group("auth")
 
