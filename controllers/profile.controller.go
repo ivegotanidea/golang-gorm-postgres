@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -18,12 +19,24 @@ func NewProfileController(DB *gorm.DB) ProfileController {
 	return ProfileController{DB}
 }
 
+// CreateProfile godoc
+// @Summary Creates a new profile
+// @Description Creates a new profile for the current user
+// @Tags Profiles
+// @Accept json
+// @Produce json
+// @Param body body models.CreateProfileRequest true "Create Profile Request"
+// @Success 201 {object} models.SuccessResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /profiles [post]
 func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Get the current user
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
 	if currentUser.Role != "user" {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "unauthorized"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{Status: "fail", Message: "unauthorized"})
 		return
 	}
 
@@ -31,7 +44,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	// Bind and validate the input payload
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
 		return
 	}
 
@@ -108,7 +121,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Insert profile into the database
 	if err := tx.Create(&newProfile).Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Failed to create profile: %s", err.Error())})
 		return
 	}
 
@@ -146,7 +159,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		}
 		if err := tx.Create(&photos).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create photos"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Failed to create photos: %s", err.Error())})
 			return
 		}
 	}
@@ -168,7 +181,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		}
 		if err := tx.Create(&options).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile options" + err.Error()})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Failed to create profile options: %s", err.Error())})
 			return
 		}
 	}
@@ -177,12 +190,12 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	// Commit the transaction if everything was successful
 	if err := tx.Commit().Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to commit transaction"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: err.Error()})
 		return
 	}
 
 	// Return the created profile in the response
-	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newProfile})
+	ctx.JSON(http.StatusCreated, models.SuccessResponse{Status: "success", Data: newProfile})
 }
 
 func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
