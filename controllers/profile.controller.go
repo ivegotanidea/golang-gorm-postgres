@@ -640,7 +640,10 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	// Bind the JSON payload to the struct
 	var query models.FindProfilesQuery
 	if err := ctx.ShouldBindJSON(&query); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
@@ -697,6 +700,7 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 		dbQuery = dbQuery.Where("verified = ?", query.Verified)
 	}
 
+	// Apply filtering for BodyArt and ProfileTags if present
 	if len(query.BodyArtIds) > 0 {
 		dbQuery = dbQuery.Joins("JOIN profile_body_arts ON profiles.id = profile_body_arts.profile_id").
 			Where("profile_body_arts.body_art_id IN ?", query.BodyArtIds)
@@ -773,7 +777,6 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	}
 
 	currentUser := ctx.MustGet("currentUser").(models.User)
-
 	if currentUser.Role == "user" {
 		dbQuery = dbQuery.Where("active = ?", true)
 	}
@@ -781,11 +784,21 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	// Execute the query
 	results := dbQuery.Find(&profiles)
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+			Status:  "error",
+			Message: results.Error.Error(),
+		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
+	intPage, _ = strconv.Atoi(page)
+	// Return the results in the response
+	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+		Status:  "success",
+		Results: len(profiles),
+		Page:    intPage,
+		Data:    profiles,
+	})
 }
 
 // DeleteProfile godoc
