@@ -44,12 +44,26 @@ func getDistanceBetweenCoordinates(latA, lonA, latB, lonB float32) float64 {
 	return distance
 }
 
+// CreateService godoc
+// @Summary Create a new service
+// @Description Creates a new service between a client user and a profile, including optional ratings for both the profile and the user.
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param body body models.CreateServiceRequest true "Create Service Request"
+// @Success 201 {object} models.SuccessResponse{data=models.Service}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /services [post]
 func (sc *ServiceController) CreateService(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var payload *models.CreateServiceRequest
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
@@ -80,19 +94,21 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 	tx := sc.DB.Begin()
 
-	// Create the service entry first
+	// Create the service entry
 	err := tx.Create(&newService).Error
 	if err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create service"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Status:  "error",
+			Message: "Failed to create service",
+		})
 		return
 	}
 
 	// If profile rating exists
 	if payload.ProfileRating != nil {
-		// Create the profile rating and capture its ID
 		reviewOfProfile := models.ProfileRating{
-			ServiceID: newService.ID, // link to the service
+			ServiceID: newService.ID,
 			ProfileID: newService.ProfileID,
 			Review:    payload.ProfileRating.Review,
 			Score:     payload.ProfileRating.Score,
@@ -102,31 +118,31 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 		if err := tx.Create(&reviewOfProfile).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create profile rating"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Status:  "error",
+				Message: "Failed to create profile rating",
+			})
 			return
 		}
 
-		// Capture the ProfileRating ID and assign it to the service
 		newService.ProfileRatingID = &reviewOfProfile.ID
 
-		// Handle RatedProfileTags creation
 		if len(payload.ProfileRating.RatedProfileTags) > 0 {
 			var ratedProfileTags []models.RatedProfileTag
-
 			for _, profileTag := range payload.ProfileRating.RatedProfileTags {
-				profileTagID := profileTag.TagID
-
-				ratedProfileTag := models.RatedProfileTag{
-					RatingID:     reviewOfProfile.ID, // reference the rating ID
-					ProfileTagID: profileTagID,
+				ratedProfileTags = append(ratedProfileTags, models.RatedProfileTag{
+					RatingID:     reviewOfProfile.ID,
+					ProfileTagID: profileTag.TagID,
 					Type:         profileTag.Type,
-				}
-				ratedProfileTags = append(ratedProfileTags, ratedProfileTag)
+				})
 			}
 
 			if err := tx.Create(&ratedProfileTags).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create rated profile tags"})
+				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+					Status:  "error",
+					Message: "Failed to create rated profile tags",
+				})
 				return
 			}
 		}
@@ -134,9 +150,8 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 	// If user rating exists
 	if payload.UserRating != nil {
-		// Create the user rating and capture its ID
 		reviewOfUser := models.UserRating{
-			ServiceID: newService.ID, // link to the service
+			ServiceID: newService.ID,
 			UserID:    newService.ClientUserID,
 			Review:    payload.UserRating.Review,
 			Score:     payload.UserRating.Score,
@@ -146,29 +161,31 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 		if err := tx.Create(&reviewOfUser).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create user rating"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Status:  "error",
+				Message: "Failed to create user rating",
+			})
 			return
 		}
 
-		// Capture the UserRating ID and assign it to the service
 		newService.ClientUserRatingID = &reviewOfUser.ID
 
-		// Handle RatedUserTags creation
 		if len(payload.UserRating.RatedUserTags) > 0 {
 			var ratedUserTags []models.RatedUserTag
-
 			for _, userTag := range payload.UserRating.RatedUserTags {
-				ratedUserTag := models.RatedUserTag{
-					RatingID:  reviewOfUser.ID, // reference the rating ID
+				ratedUserTags = append(ratedUserTags, models.RatedUserTag{
+					RatingID:  reviewOfUser.ID,
 					UserTagID: userTag.TagID,
 					Type:      userTag.Type,
-				}
-				ratedUserTags = append(ratedUserTags, ratedUserTag)
+				})
 			}
 
 			if err := tx.Create(&ratedUserTags).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create rated user tags"})
+				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+					Status:  "error",
+					Message: "Failed to create rated user tags",
+				})
 				return
 			}
 		}
@@ -177,12 +194,18 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 	// Commit the transaction
 	if err := tx.Save(&newService).Commit().Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to commit transaction"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Status:  "error",
+			Message: "Failed to commit transaction",
+		})
 		return
 	}
 
 	// Return the created service in the response
-	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newService})
+	ctx.JSON(http.StatusCreated, models.SuccessResponse{
+		Status: "success",
+		Data:   newService,
+	})
 }
 
 func MutateService(tier string, service models.Service) map[string]interface{} {
