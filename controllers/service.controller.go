@@ -502,6 +502,20 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	})
 }
 
+// HideProfileOwnerReview godoc
+// @Summary Hide or show the profile owner's review visibility
+// @Description Hides or shows the profile owner's review based on the client's request.
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param service_id query string true "Service ID"
+// @Param body body models.SetReviewVisibilityRequest true "Set Review Visibility Request"
+// @Success 200 {object} models.SuccessResponse{data=models.Service}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /services/profile-owner/review/hide [put]
 func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	serviceID := ctx.Query("service_id")
@@ -515,35 +529,65 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 
 	// Check if the service exists
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for the specified profile"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "No services found for the specified profile",
+		})
 		return
 	}
 
 	// Check if the current user is the one who left the review
 	if service.ClientUserID != currentUser.ID {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "You are not authorized to update this review"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: "You are not authorized to update this review",
+		})
 		return
 	}
 
 	var payload *models.SetReviewVisibilityRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
+	// Update review visibility if changed
 	if service.ClientUserRating.ReviewTextVisible != *payload.Visible {
 		service.ClientUserRating.ReviewTextVisible = *payload.Visible
 
 		if err := sc.DB.Save(&service.ClientUserRating).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update the user review"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Status:  "error",
+				Message: "Failed to update the user review",
+			})
 			return
 		}
 	}
 
 	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": service})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   service,
+	})
 }
 
+// UpdateProfileOwnerReviewOnClientUser godoc
+// @Summary Update the profile owner's review on a client user
+// @Description Allows a profile owner to update their review on a client user within the allowed time limit.
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param service_id query string true "Service ID"
+// @Param body body models.CreateProfileRatingRequest true "Create Profile Rating Request"
+// @Success 200 {object} models.SuccessResponse{data=models.Service}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /services/profile-owner/review/update [put]
 func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	serviceID := ctx.Query("service_id")
@@ -557,28 +601,39 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 	// Check if the service exists
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for the specified profile"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "No services found for the specified profile",
+		})
 		return
 	}
 
 	// Check if the current user is the owner of the profile in the service
 	if service.ProfileOwnerID != currentUser.ID {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "You are not authorized to update this review"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: "You are not authorized to update this review",
+		})
 		return
 	}
 
 	// Check if the review can still be updated (within the allowed time limit)
 	hoursSinceReview := time.Since(service.ProfileRating.CreatedAt).Hours()
-
 	if hoursSinceReview > float64(sc.reviewUpdateLimitHours) {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": fmt.Sprintf("Review can only be updated within %d hours of creation", sc.reviewUpdateLimitHours)})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: fmt.Sprintf("Review can only be updated within %d hours of creation", sc.reviewUpdateLimitHours),
+		})
 		return
 	}
 
 	// Parse the request payload
 	var payload *models.CreateProfileRatingRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
@@ -594,7 +649,10 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	if len(payload.RatedProfileTags) > 0 {
 		// First, delete the existing tags for this profile rating
 		if err := sc.DB.Where("rating_id = ?", service.ProfileRating.ID).Delete(&models.RatedProfileTag{}).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old profile tags"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Status:  "error",
+				Message: "Failed to delete old profile tags",
+			})
 			return
 		}
 
@@ -611,7 +669,10 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 		// Save the new tags
 		if err := sc.DB.Create(&ratedProfileTags).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to create new profile tags"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Status:  "error",
+				Message: "Failed to create new profile tags",
+			})
 			return
 		}
 
@@ -621,12 +682,18 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 	// Update the profile rating in the database
 	if err := sc.DB.Save(&service.ProfileRating).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update the profile review"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Status:  "error",
+			Message: "Failed to update the profile review",
+		})
 		return
 	}
 
 	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": service})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   service,
+	})
 }
 
 func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
