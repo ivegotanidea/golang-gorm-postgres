@@ -312,6 +312,18 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, nil)
 }
 
+// UpdateSelf godoc
+// @Summary Update the current user's information
+// @Description Allows the current user to update their own profile, including name, phone, and avatar.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param body body models.UpdateUser true "User Update Payload"
+// @Success 200 {object} models.SuccessResponse{data=models.UserResponse}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 502 {object} models.ErrorResponse
+// @Router /users/me [put]
 func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 
 	currentUser := ctx.MustGet("currentUser").(models.User)
@@ -319,33 +331,45 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 
 	var payload *models.UpdateUser
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
 	if err := uc.validator.Struct(payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
 	var updatedUser models.User
-
 	result := uc.DB.First(&updatedUser, "id = ?", userId)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "User not found",
+		})
 		return
 	}
 
+	// Validate and update avatar if needed
 	avatarUrl, err := checkAvatar(payload.Avatar, updatedUser.Avatar)
-
 	if err != "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err,
+		})
 		return
 	}
 
 	now := time.Now()
 
+	// Prepare the updated user data
 	userToUpdate := models.User{
 		Name:      payload.Name,
 		Phone:     payload.Phone,
@@ -353,8 +377,10 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 		UpdatedAt: now,
 	}
 
+	// Apply the updates to the database
 	uc.DB.Model(&updatedUser).Updates(userToUpdate)
 
+	// Prepare the user response
 	userResponse := &models.UserResponse{
 		ID:             updatedUser.ID,
 		TelegramUserID: updatedUser.TelegramUserId,
@@ -367,7 +393,11 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 		Tier:           updatedUser.Tier,
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": userResponse})
+	// Return the updated user data in the response
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   userResponse,
+	})
 }
 
 func (uc *UserController) UpdateUser(ctx *gin.Context) {
