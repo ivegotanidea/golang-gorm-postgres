@@ -136,6 +136,17 @@ func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 	})
 }
 
+// GetMyPayments godoc
+// @Summary Get current user's payments
+// @Description Retrieves the payments made by the current user, sorted by payment date in descending order with pagination.
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Limit per page" default(10)
+// @Success 200 {object} models.SuccessResponse{data=[]models.Payment}
+// @Failure 500 {object} models.ErrorResponse
+// @Router /payments/me [get]
 func (pc *PaymentController) GetMyPayments(ctx *gin.Context) {
 	// Get the current user from context (assumes middleware has set currentUser)
 	currentUser := ctx.MustGet("currentUser").(models.User)
@@ -146,16 +157,27 @@ func (pc *PaymentController) GetMyPayments(ctx *gin.Context) {
 	offset := (page - 1) * limit
 
 	var payments []models.Payment
-	result := pc.DB.Where("user_id = ?", currentUser.ID). // Filter payments by user_id
-								Order("payment_date DESC"). // Sort by payment_date in descending order
-								Limit(limit).Offset(offset).Find(&payments)
+
+	// Retrieve payments for the current user with sorting and pagination
+	result := pc.DB.Where("user_id = ?", currentUser.ID).
+		Order("payment_date DESC").
+		Limit(limit).Offset(offset).Find(&payments)
 
 	// Check if any error occurred during the query
 	if result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to retrieve user payments"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Status:  "error",
+			Message: "Failed to retrieve user payments",
+		})
 		return
 	}
 
 	// Return the user's payments in the response
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(payments), "data": payments})
+	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+		Status:  "success",
+		Page:    page,
+		Limit:   limit,
+		Results: len(payments),
+		Data:    payments,
+	})
 }
