@@ -58,17 +58,40 @@ func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 	})
 }
 
+// GetPaymentHistory godoc
+// @Summary Get payment history for a user
+// @Description Retrieves the payment history for a specified user between two dates.
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param userID path string true "User ID"
+// @Param start_date query string true "Start Date in RFC3339 format"
+// @Param end_date query string true "End Date in RFC3339 format"
+// @Success 200 {object} models.SuccessResponse{data=[]models.Payment}
+// @Failure 500 {object} models.ErrorResponse
+// @Router /payments/history/{userID} [get]
 func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
+	// Get userID from path and date range from query parameters
 	userID := ctx.Param("userID")
 	startDate, _ := time.Parse(time.RFC3339, ctx.Query("start_date"))
 	endDate, _ := time.Parse(time.RFC3339, ctx.Query("end_date"))
 
 	var payments []models.Payment
+
+	// Fetch payments from the database for the given user and date range
 	if err := pc.DB.Where("user_id = ? AND payment_date BETWEEN ? AND ?", userID, startDate, endDate).Find(&payments).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve payments"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Status:  "error",
+			Message: "Failed to retrieve payments",
+		})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"payments": payments})
+
+	// Return success response with the payment data
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   payments,
+	})
 }
 
 func (pc *PaymentController) ListPayments(ctx *gin.Context) {
