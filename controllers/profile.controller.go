@@ -558,16 +558,8 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: existingProfile})
 }
 
-// FindProfileByPhone godoc
-// @Summary Find a profile by phone number
-// @Description Retrieves a profile based on the phone number provided
-// @Tags Profiles
-// @Produce json
-// @Param phone path string true "Phone Number"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Router /profiles/phone/{phone} [get]
 func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
+
 	phone := ctx.Param("phone")
 
 	var profile models.Profile
@@ -578,23 +570,13 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 		First(&profile, "phone = ?", phone)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "fail", Message: "No profile with that title exists"})
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No profile with that title exists"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: profile})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": profile})
 }
 
-// ListProfiles godoc
-// @Summary Lists all profiles with pagination
-// @Description Retrieves all profiles, supports pagination
-// @Tags Profiles
-// @Produce json
-// @Param page query string false "Page number"
-// @Param limit query string false "Items per page"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 502 {object} models.ErrorResponse
-// @Router /profiles [get]
 func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -613,23 +595,13 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	results := dbQuery.Find(&profiles)
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: results.Error.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: profiles})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
 }
 
-// GetMyProfiles godoc
-// @Summary Get current user's profiles
-// @Description Retrieves the profiles created by the currently authenticated user
-// @Tags Profiles
-// @Produce json
-// @Param page query string false "Page number"
-// @Param limit query string false "Items per page"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 502 {object} models.ErrorResponse
-// @Router /profiles/my [get]
 func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -650,24 +622,13 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 	results := dbQuery.Find(&profiles, "user_id = ?", currentUser.ID.String())
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: results.Error.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: profiles})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
 }
 
-// FindProfiles godoc
-// @Summary Search for profiles
-// @Description Retrieves profiles based on filters provided in the query
-// @Tags Profiles
-// @Accept json
-// @Produce json
-// @Param body body models.FindProfilesQuery true "Search Filters"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 502 {object} models.ErrorResponse
-// @Router /profiles/search [post]
 func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -676,9 +637,10 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
+	// Bind the JSON payload to the struct
 	var query models.FindProfilesQuery
 	if err := ctx.ShouldBindJSON(&query); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
 
@@ -818,13 +780,12 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 
 	// Execute the query
 	results := dbQuery.Find(&profiles)
-
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: results.Error.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: profiles})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
 }
 
 // DeleteProfile godoc
