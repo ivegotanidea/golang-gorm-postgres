@@ -14,6 +14,8 @@ func NewRouteReviewController(serviceController controllers.ServiceController) R
 	return ReviewsRouteController{serviceController}
 }
 
+// @BasePath /api/v1/review
+
 func (sc *ReviewsRouteController) ReviewsRoute(rg *gin.RouterGroup) {
 	router := rg.Group("reviews")
 

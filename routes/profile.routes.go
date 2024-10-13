@@ -14,6 +14,8 @@ func NewRouteProfileController(profileController controllers.ProfileController) 
 	return ProfileRouteController{profileController}
 }
 
+// @BasePath /api/v1/profile
+
 func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("profiles")

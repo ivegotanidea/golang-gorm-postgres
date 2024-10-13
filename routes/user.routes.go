@@ -14,6 +14,8 @@ func NewRouteUserController(userController controllers.UserController) UserRoute
 	return UserRouteController{userController}
 }
 
+// @BasePath /api/v1/user
+
 func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 	router := rg.Group("users")
 

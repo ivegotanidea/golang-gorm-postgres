@@ -14,6 +14,8 @@ func NewRouteServiceController(serviceController controllers.ServiceController) 
 	return ServiceRouteController{serviceController}
 }
 
+// @BasePath /api/v1/service
+
 func (sc *ServiceRouteController) ServiceRoute(rg *gin.RouterGroup) {
 	router := rg.Group("services")
 
