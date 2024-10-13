@@ -29,6 +29,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: go_service
+    command: >
+      sh -c "sleep 10 &&
+             /app/main"
     ports:
       - "8888:8888"  # Change this if your Go service exposes a different port
     env_file:

@@ -58,7 +58,7 @@ type Profile struct {
 	CreatedAt time.Time      `gorm:"type:timestamp;not null"`
 	UpdatedAt time.Time      `gorm:"type:timestamp;not null"`
 	UpdatedBy uuid.UUID      `gorm:"type:uuid;not null"`
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	DeletedAt gorm.DeletedAt `gorm:"index" swaggerignore:"true"`
 
 	BodyArts       []ProfileBodyArt `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
 	Photos         []Photo          `gorm:"foreignKey:ProfileID;constraint:OnDelete:CASCADE;"`
