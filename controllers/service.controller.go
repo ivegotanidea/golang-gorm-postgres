@@ -236,6 +236,18 @@ func MutateService(tier string, service models.Service) map[string]interface{} {
 	return filteredService
 }
 
+// GetService godoc
+// @Summary Get a specific service by profile and service ID
+// @Description Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param profileID path string true "Profile ID"
+// @Param serviceID path string true "Service ID"
+// @Success 200 {object} models.SuccessResponse{data=models.Service}
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /profiles/{profileID}/services/{serviceID} [get]
 func (sc *ServiceController) GetService(ctx *gin.Context) {
 	profileID := ctx.Param("profileID")
 	serviceID := ctx.Param("serviceID")
@@ -248,16 +260,36 @@ func (sc *ServiceController) GetService(ctx *gin.Context) {
 		First(&service)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for specified profile"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "No services found for specified profile",
+		})
 		return
 	}
 
+	// Mutate the service based on the user's tier
 	filteredService := MutateService(currentUser.Tier, service)
 
 	// Return the filtered response
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": filteredService})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   filteredService,
+	})
 }
 
+// GetProfileServices godoc
+// @Summary Get all services for a specific profile
+// @Description Retrieves all services for a specific profile, with filtered data based on the user's tier.
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param profileID path string true "Profile ID"
+// @Param page query string false "Page number" default(1)
+// @Param limit query string false "Number of items per page" default(10)
+// @Success 200 {object} models.SuccessResponse{data=[]map[string]interface{}}
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /profiles/{profileID}/services [get]
 func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -277,20 +309,28 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 		Find(&services)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for specified profile"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "No services found for specified profile",
+		})
 		return
 	}
 
+	// Mutate services based on user tier
 	filteredServices := make([]map[string]interface{}, 0, len(services))
-
 	for _, service := range services {
 		filteredService := MutateService(currentUser.Tier, service)
-		// Append filtered service to the response
 		filteredServices = append(filteredServices, filteredService)
 	}
 
 	// Return the filtered response
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(filteredServices), "data": filteredServices})
+	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+		Status:  "success",
+		Results: len(filteredServices),
+		Page:    intPage,
+		Limit:   intLimit,
+		Data:    filteredServices,
+	})
 }
 
 func (sc *ServiceController) ListServices(ctx *gin.Context) {
