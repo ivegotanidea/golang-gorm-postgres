@@ -128,11 +128,27 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 	})
 }
 
+// GetUser godoc
+// @Summary Get a user by ID, Telegram user ID, or phone
+// @Description Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id query string false "User ID"
+// @Param telegramUserId query int false "Telegram User ID"
+// @Param phone query string false "Phone number"
+// @Success 200 {object} models.SuccessResponse{data=models.UserResponse}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /users [get]
 func (uc *UserController) GetUser(ctx *gin.Context) {
 	var query *models.FindUserQuery
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
@@ -141,12 +157,14 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 	phone := query.Phone
 
 	if userId == "" && telegramUserId == 0 && phone == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: "userId or telegramUserId or phone is required",
+		})
 		return
 	}
 
 	var user models.User
-
 	var result *gorm.DB
 
 	if userId != "" {
@@ -158,13 +176,18 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 	}
 
 	if result.Error != nil {
-
 		if result.Error.Error() == "record not found" && result.RowsAffected == 0 {
-			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that id exists"})
+			ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+				Status:  "fail",
+				Message: "No user with that ID exists",
+			})
 			return
 		}
 
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: result.Error.Error(),
+		})
 		return
 	}
 
@@ -180,7 +203,10 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 		Tier:           user.Tier,
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": userResponse})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   userResponse,
+	})
 }
 
 func (uc *UserController) DeleteSelf(ctx *gin.Context) {
