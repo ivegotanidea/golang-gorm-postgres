@@ -564,6 +564,16 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": profile})
 }
 
+// ListProfiles godoc
+// @Summary Lists all profiles with pagination
+// @Description Retrieves all profiles, supports pagination
+// @Tags Profiles
+// @Produce json
+// @Param page query string false "Page number"
+// @Param limit query string false "Items per page"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 502 {object} models.ErrorResponse
+// @Router /profiles [get]
 func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -582,11 +592,11 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	results := dbQuery.Find(&profiles)
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: results.Error.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: profiles})
 }
 
 // GetMyProfiles godoc
