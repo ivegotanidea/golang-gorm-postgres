@@ -247,39 +247,65 @@ func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, nil)
 }
 
+// DeleteUser godoc
+// @Summary Delete a user by ID
+// @Description Allows an authorized user to delete another user by their ID, with role-based restrictions.
+// @Tags Users
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 204 {object} nil
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /users/{id} [delete]
 func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
-
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
 	var targetUser models.User
 
 	if err := initializers.DB.First(&targetUser, "id = ?", userId).Error; err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "User not found",
+		})
 		return
 	}
 
+	// Role-based restrictions
 	if currentUser.Role == "moderator" && (targetUser.Role == "moderator" || targetUser.Role == "admin" || targetUser.Role == "owner") {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: "You are not authorized to delete this user",
+		})
 		return
 	}
 
 	if currentUser.Role == "admin" && (targetUser.Role == "admin" || targetUser.Role == "owner") {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: "You are not authorized to delete this user",
+		})
 		return
 	}
 
+	// Proceed with deletion
 	var result *gorm.DB
-
 	if userId != "" {
 		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
 	} else {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: "User ID is required",
+		})
 		return
 	}
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "User not found"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "User not found",
+		})
 		return
 	}
 
