@@ -696,6 +696,20 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	})
 }
 
+// HideUserReview godoc
+// @Summary Hide a user's review
+// @Description Allows a profile owner to hide a user's review on a service. Only available for non-basic tier users.
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param service_id query string true "Service ID"
+// @Param body body models.SetReviewVisibilityRequest true "Set Review Visibility Request"
+// @Success 200 {object} models.SuccessResponse{data=models.Service}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /services/user/review/hide [put]
 func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	serviceID := ctx.Query("service_id")
@@ -709,26 +723,42 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 
 	// Check if the service exists
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No services found for the specified profile"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "No services found for the specified profile",
+		})
 		return
 	}
 
 	// Check if the current user is the owner of the profile in the service
 	if service.ProfileOwnerID != currentUser.ID {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "You are not authorized to update this review"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: "You are not authorized to update this review",
+		})
 		return
 	}
 
+	// Check if the user is allowed to hide the review
 	if currentUser.Tier == "basic" {
-		ctx.JSON(http.StatusForbidden, gin.H{"status": "fail", "message": "Basic-tier user can't hide out profile reviews"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+			Status:  "fail",
+			Message: "Basic-tier users can't hide profile reviews",
+		})
+		return
 	}
 
+	// Parse the request payload
 	var payload *models.SetReviewVisibilityRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: err.Error(),
+		})
 		return
 	}
 
+	// Update review visibility if changed
 	if service.ProfileRating.ReviewTextVisible != *payload.Visible {
 		service.ProfileRating.ReviewTextVisible = *payload.Visible
 		service.ProfileRating.UpdatedAt = time.Now()
@@ -736,11 +766,17 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 
 		// Update the profile rating in the database
 		if err := sc.DB.Save(&service.ProfileRating).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update the profile review"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Status:  "error",
+				Message: "Failed to update the profile review",
+			})
 			return
 		}
 	}
 
 	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": service})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   service,
+	})
 }
