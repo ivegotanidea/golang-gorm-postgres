@@ -198,13 +198,26 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, models.SuccessResponse{Status: "success", Data: newProfile})
 }
 
+// UpdateOwnProfile godoc
+// @Summary Updates own profile
+// @Description Updates the user's own profile with the provided fields
+// @Tags Profiles
+// @Accept json
+// @Produce json
+// @Param id path string true "Profile ID"
+// @Param body body models.UpdateOwnProfileRequest true "Profile Update Payload"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /profiles/{id}/own [put]
 func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	profileId := ctx.Param("id")
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
 	var payload models.UpdateOwnProfileRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
 		return
 	}
 
@@ -212,7 +225,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	var existingProfile models.Profile
 	result := pc.DB.First(&existingProfile, "id = ?", profileId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No profile with that ID exists"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "fail", Message: "No profile with that ID exists"})
 		return
 	}
 
@@ -339,7 +352,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	// Update only the fields that have changed
 	if err := tx.Model(&existingProfile).Updates(updateFields).Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to update profile"})
 		return
 	}
 
@@ -347,7 +360,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	if payload.BodyArts != nil {
 		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileBodyArt{}).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old body arts"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to delete old body arts"})
 			return
 		}
 
@@ -363,7 +376,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 			if err := tx.Create(&bodyArts).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update body arts"})
+				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to update body arts"})
 				return
 			}
 		}
@@ -373,7 +386,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	if payload.Photos != nil {
 		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old photos"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to delete old photos"})
 			return
 		}
 
@@ -390,7 +403,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 			if err := tx.Create(&photos).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update photos"})
+				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to update photos"})
 				return
 			}
 		}
@@ -400,7 +413,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	if payload.Options != nil {
 		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileOption{}).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to delete old profile options"})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to delete old profile options"})
 			return
 		}
 
@@ -418,7 +431,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 			if err := tx.Create(&options).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to update profile options"})
+				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to update profile options"})
 				return
 			}
 		}
@@ -426,12 +439,12 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to commit transaction"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to commit transaction"})
 		return
 	}
 
 	// Return the updated profile
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": existingProfile})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: existingProfile})
 }
 
 // UpdateProfile godoc
