@@ -775,13 +775,22 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
 }
 
+// DeleteProfile godoc
+// @Summary Deletes a profile by ID
+// @Description Deletes the profile with the given ID from the database
+// @Tags Profiles
+// @Produce json
+// @Param id path string true "Profile ID"
+// @Success 204 {object} nil
+// @Failure 404 {object} models.ErrorResponse
+// @Router /profiles/{id} [delete]
 func (pc *ProfileController) DeleteProfile(ctx *gin.Context) {
 	profileId := ctx.Param("id")
 
 	result := pc.DB.Delete(&models.Profile{}, "id = ?", profileId)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No profile with that title exists"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "fail", Message: "No profile with that title exists"})
 		return
 	}
 
