@@ -333,6 +333,17 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	})
 }
 
+// ListServices godoc
+// @Summary Get a list of services
+// @Description Retrieves a paginated list of services with all related information.
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param page query string false "Page number" default(1)
+// @Param limit query string false "Number of items per page" default(10)
+// @Success 200 {object} models.SuccessResponse{data=[]models.Service}
+// @Failure 502 {object} models.ErrorResponse
+// @Router /services [get]
 func (sc *ServiceController) ListServices(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -341,20 +352,29 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var profiles []models.Service
+	var services []models.Service
 
 	dbQuery := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
 		Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Limit(intLimit).Offset(offset)
 
-	results := dbQuery.Find(&profiles)
+	results := dbQuery.Find(&services)
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+			Status:  "error",
+			Message: results.Error.Error(),
+		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(profiles), "data": profiles})
+	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+		Status:  "success",
+		Results: len(services),
+		Limit:   intLimit,
+		Page:    intPage,
+		Data:    services,
+	})
 }
 
 // ----
