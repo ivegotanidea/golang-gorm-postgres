@@ -48,6 +48,15 @@ func checkAvatar(newAvatarUrl string, oldAvatarUrl string) (string, string) {
 	return newAvatarUrl, ""
 }
 
+// GetMe godoc
+// @Summary Get current authenticated user
+// @Description Retrieves the profile of the currently authenticated user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SuccessResponse{data=models.UserResponse}
+// @Failure 401 {object} models.ErrorResponse
+// @Router /users/me [get]
 func (uc *UserController) GetMe(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
@@ -61,7 +70,10 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 		UpdatedAt: currentUser.UpdatedAt,
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": userResponse})
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   userResponse,
+	})
 }
 
 func (uc *UserController) FindUsers(ctx *gin.Context) {
