@@ -19,19 +19,43 @@ func NewPaymentController(DB *gorm.DB, apiKey string, baseUrl string) PaymentCon
 	return PaymentController{DB, apiKey, baseUrl}
 }
 
+// PaymentWebhook godoc
+// @Summary Webhook for payment updates
+// @Description Receives payment updates and updates the payment status in the database.
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param body body models.Payment true "Payment Update"
+// @Success 200 {object} models.SuccessResponse{data=string} "payment updated"
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /payments/webhook [post]
 func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 	var paymentUpdate models.Payment
 
+	// Bind the incoming JSON data to the payment model
 	if err := ctx.ShouldBindJSON(&paymentUpdate); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: "Invalid data",
+		})
 		return
 	}
+
 	// Update payment in the database
 	if err := pc.DB.Model(&models.Payment{}).Where("id = ?", paymentUpdate.ID).Updates(paymentUpdate).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update payment"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Status:  "error",
+			Message: "Failed to update payment",
+		})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"status": "payment updated"})
+
+	// Return success response
+	ctx.JSON(http.StatusOK, models.SuccessResponse{
+		Status: "success",
+		Data:   "payment updated",
+	})
 }
 
 func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
