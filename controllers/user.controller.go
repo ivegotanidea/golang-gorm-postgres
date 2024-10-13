@@ -209,24 +209,38 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 	})
 }
 
+// DeleteSelf godoc
+// @Summary Delete the currently authenticated user
+// @Description Allows the current user to delete their own account.
+// @Tags Users
+// @Produce json
+// @Success 204 {object} nil
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /users/self [delete]
 func (uc *UserController) DeleteSelf(ctx *gin.Context) {
-
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	userId := currentUser.ID.String()
 
-	fmt.Printf("User %v has commited self-deletion", currentUser.ID)
+	fmt.Printf("User %v has committed self-deletion", currentUser.ID)
 
 	var result *gorm.DB
 
 	if userId != "" {
 		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
 	} else {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "userId or telegramUserId or phone is required"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Status:  "fail",
+			Message: "userId or telegramUserId or phone is required",
+		})
 		return
 	}
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			Status:  "fail",
+			Message: "No user with that ID exists",
+		})
 		return
 	}
 
