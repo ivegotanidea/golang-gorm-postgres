@@ -76,6 +76,17 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 	})
 }
 
+// FindUsers godoc
+// @Summary Retrieve users based on the current user's role
+// @Description Retrieves a paginated list of users based on the current user's role. Regular users can only see other users, while non-owners can see all users except owners.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Limit per page" default(10)
+// @Success 200 {object} models.SuccessResponse{data=[]models.User}
+// @Failure 502 {object} models.ErrorResponse
+// @Router /users [get]
 func (uc *UserController) FindUsers(ctx *gin.Context) {
 
 	currentUser := ctx.MustGet("currentUser").(models.User)
@@ -98,11 +109,23 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 	}
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+			Status:  "error",
+			Message: results.Error.Error(),
+		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(users), "data": users, "page": page, "limit": limit})
+	intPage, _ = strconv.Atoi(page)
+	intLimit, _ = strconv.Atoi(limit)
+
+	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+		Status:  "success",
+		Results: len(users),
+		Data:    users,
+		Page:    intPage,
+		Limit:   intLimit,
+	})
 }
 
 func (uc *UserController) GetUser(ctx *gin.Context) {
