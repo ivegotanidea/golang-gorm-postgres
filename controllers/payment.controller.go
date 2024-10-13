@@ -94,6 +94,17 @@ func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 	})
 }
 
+// ListPayments godoc
+// @Summary List all payments
+// @Description Retrieves all payments, sorted by payment date in descending order with pagination.
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Limit per page" default(10)
+// @Success 200 {object} models.SuccessResponse{data=[]models.Payment}
+// @Failure 500 {object} models.ErrorResponse
+// @Router /payments [get]
 func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 	// Pagination parameters
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
@@ -101,17 +112,28 @@ func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 	offset := (page - 1) * limit
 
 	var payments []models.Payment
-	result := pc.DB.Order("payment_date DESC"). // Sort by payment_date in descending order
-							Limit(limit).Offset(offset).Find(&payments)
+
+	// Retrieve payments with sorting and pagination
+	result := pc.DB.Order("payment_date DESC").
+		Limit(limit).Offset(offset).Find(&payments)
 
 	// Check if any error occurred during the query
 	if result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to retrieve payments"})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Status:  "error",
+			Message: "Failed to retrieve payments",
+		})
 		return
 	}
 
 	// Return the payments in the response
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(payments), "data": payments})
+	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+		Status:  "success",
+		Results: len(payments),
+		Page:    page,
+		Limit:   limit,
+		Data:    payments,
+	})
 }
 
 func (pc *PaymentController) GetMyPayments(ctx *gin.Context) {
