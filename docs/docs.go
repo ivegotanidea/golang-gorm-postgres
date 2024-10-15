@@ -574,6 +574,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/profiles/list": {
+            "get": {
+                "description": "Retrieves all profiles, supports pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Lists all profiles with pagination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/profiles/my": {
             "get": {
                 "description": "Retrieves the profiles created by the currently authenticated user",

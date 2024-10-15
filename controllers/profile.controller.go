@@ -637,7 +637,7 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 // @Param limit query string false "Items per page"
 // @Success 200 {object} models.SuccessResponse
 // @Failure 502 {object} models.ErrorResponse
-// @Router /profiles [get]
+// @Router /profiles/list [get]
 func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")

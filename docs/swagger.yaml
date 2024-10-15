@@ -1374,6 +1374,32 @@ paths:
       summary: Get a specific service by profile and service ID
       tags:
       - Services
+  /profiles/list:
+    get:
+      description: Retrieves all profiles, supports pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: string
+      - description: Items per page
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Lists all profiles with pagination
+      tags:
+      - Profiles
   /profiles/my:
     get:
       description: Retrieves the profiles created by the currently authenticated user
