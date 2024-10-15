@@ -14,8 +14,23 @@ func NewRouteUserController(userController controllers.UserController) UserRoute
 	return UserRouteController{userController}
 }
 
-func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
+// @BasePath /api/v1/user
 
+func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 	router := rg.Group("users")
-	router.GET("/me", middleware.DeserializeUser(), uc.userController.GetMe)
+
+	router.Use(middleware.DeserializeUser())
+
+	router.GET("/", middleware.AbacMiddleware("users", "list"), uc.userController.FindUsers)
+
+	router.GET("/me", uc.userController.GetMe)
+	router.GET("/user", uc.userController.GetUser)
+
+	router.DELETE("/user", uc.userController.DeleteSelf)
+	router.DELETE("/user/:id", middleware.AbacMiddleware("users", "delete"), uc.userController.DeleteUser)
+
+	router.PUT("/user", uc.userController.UpdateSelf)
+	router.PUT("/user/:id", middleware.AbacMiddleware("users", "update"), uc.userController.UpdateUser)
+
+	router.PUT("/role", middleware.AbacMiddleware("users", "promote"), uc.userController.AssignRole)
 }

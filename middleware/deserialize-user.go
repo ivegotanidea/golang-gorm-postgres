@@ -13,6 +13,7 @@ import (
 
 func DeserializeUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
 		var access_token string
 		cookie, err := ctx.Cookie("access_token")
 
@@ -26,25 +27,28 @@ func DeserializeUser() gin.HandlerFunc {
 		}
 
 		if access_token == "" {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "fail", "message": "You are not logged in"})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "You are not logged in"})
 			return
 		}
 
 		config, _ := initializers.LoadConfig(".")
 		sub, err := utils.ValidateToken(access_token, config.AccessTokenPublicKey)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "fail", "message": err.Error()})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "message": err.Error()})
 			return
 		}
 
 		var user models.User
 		result := initializers.DB.First(&user, "id = ?", fmt.Sprint(sub))
 		if result.Error != nil {
-			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": "the user belonging to this token no logger exists"})
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "error", "message": "the user belonging to this token no logger exists"})
 			return
 		}
 
 		ctx.Set("currentUser", user)
+		ctx.Set("currentUserID", user.ID)
+		ctx.Set("currentUserTier", user.Tier)
+		ctx.Set("currentUserRole", user.Role)
 		ctx.Next()
 	}
 }
