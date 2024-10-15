@@ -36,7 +36,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
 	if currentUser.Role != "user" {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{Status: "fail", Message: "unauthorized"})
+		ctx.JSON(http.StatusForbidden, models.ErrorResponse{Status: "error", Message: "unauthorized"})
 		return
 	}
 
@@ -44,7 +44,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	// Bind and validate the input payload
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -121,7 +121,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Insert profile into the database
 	if err := tx.Create(&newProfile).Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Failed to create profile: %s", err.Error())})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create profile: %s", err.Error())})
 		return
 	}
 
@@ -159,7 +159,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		}
 		if err := tx.Create(&photos).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Failed to create photos: %s", err.Error())})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create photos: %s", err.Error())})
 			return
 		}
 	}
@@ -181,7 +181,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		}
 		if err := tx.Create(&options).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Failed to create profile options: %s", err.Error())})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create profile options: %s", err.Error())})
 			return
 		}
 	}
@@ -190,7 +190,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	// Commit the transaction if everything was successful
 	if err := tx.Commit().Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -217,7 +217,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 	var payload models.UpdateOwnProfileRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -225,7 +225,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	var existingProfile models.Profile
 	result := pc.DB.First(&existingProfile, "id = ?", profileId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "fail", Message: "No profile with that ID exists"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "error", Message: "No profile with that ID exists"})
 		return
 	}
 
@@ -466,7 +466,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 
 	var payload models.UpdateProfileRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -474,7 +474,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	var existingProfile models.Profile
 	result := pc.DB.First(&existingProfile, "id = ?", profileId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "fail", Message: "No profile with that ID exists"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "error", Message: "No profile with that ID exists"})
 		return
 	}
 
@@ -517,7 +517,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	// Update only the fields that have changed
 	if err := tx.Model(&existingProfile).Updates(updateFields).Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Update failed: %s", err.Error())})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
 		return
 	}
 
@@ -525,7 +525,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	if payload.Photos != nil {
 		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Update failed: %s", err.Error())})
+			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
 			return
 		}
 
@@ -542,7 +542,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 
 			if err := tx.Create(&photos).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Update failed: %s", err.Error())})
+				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
 				return
 			}
 		}
@@ -550,7 +550,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "fail", Message: fmt.Sprintf("Update failed: %s", err.Error())})
+		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
 		return
 	}
 
@@ -578,7 +578,7 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 		First(&profile, "phone = ?", phone)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "fail", Message: "No profile with that title exists"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "error", Message: "No profile with that title exists"})
 		return
 	}
 
@@ -734,7 +734,7 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	var query models.FindProfilesQuery
 	if err := ctx.ShouldBindJSON(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -909,7 +909,7 @@ func (pc *ProfileController) DeleteProfile(ctx *gin.Context) {
 	result := pc.DB.Delete(&models.Profile{}, "id = ?", profileId)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "fail", Message: "No profile with that title exists"})
+		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "error", Message: "No profile with that title exists"})
 		return
 	}
 

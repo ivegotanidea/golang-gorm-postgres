@@ -107,7 +107,7 @@ func TestAuthRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		message := jsonResponse["message"]
 		assert.NoError(t, err)
-		assert.Equal(t, "fail", jsonResponse["status"])
+		assert.Equal(t, "error", jsonResponse["status"])
 
 		// Check name and phone
 		assert.Equal(t, errMessage, message)
@@ -133,7 +133,7 @@ func TestAuthRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		message := jsonResponse["message"]
 		assert.NoError(t, err)
-		assert.Equal(t, "fail", jsonResponse["status"])
+		assert.Equal(t, "error", jsonResponse["status"])
 
 		// Check name and phone
 		assert.Equal(t, errMessage, message)
@@ -159,7 +159,7 @@ func TestAuthRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		message := jsonResponse["message"]
 		assert.NoError(t, err)
-		assert.Equal(t, "fail", jsonResponse["status"])
+		assert.Equal(t, "error", jsonResponse["status"])
 
 		// Check name and phone
 		assert.Equal(t, errMessage, message)
@@ -185,7 +185,7 @@ func TestAuthRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		message := jsonResponse["message"]
 		assert.NoError(t, err)
-		assert.Equal(t, "fail", jsonResponse["status"])
+		assert.Equal(t, "error", jsonResponse["status"])
 
 		// Check name and phone
 		assert.Equal(t, errMessage, message)
@@ -210,7 +210,7 @@ func TestAuthRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		message := jsonResponse["message"]
 		assert.NoError(t, err)
-		assert.Equal(t, "fail", jsonResponse["status"])
+		assert.Equal(t, "error", jsonResponse["status"])
 
 		// Check name and phone
 		assert.Equal(t, errMessage, message)
@@ -235,7 +235,7 @@ func TestAuthRoutes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &jsonResponse)
 		message := jsonResponse["message"]
 		assert.NoError(t, err)
-		assert.Equal(t, "fail", jsonResponse["status"])
+		assert.Equal(t, "error", jsonResponse["status"])
 
 		// Check name and phone
 		assert.Equal(t, errMessage, message)

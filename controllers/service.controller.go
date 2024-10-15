@@ -61,7 +61,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -284,7 +284,7 @@ func (sc *ServiceController) GetService(ctx *gin.Context) {
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "No services found for specified profile",
 		})
 		return
@@ -333,7 +333,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "No services found for specified profile",
 		})
 		return
@@ -430,7 +430,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	// Check if the service exists
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "No services found for the specified profile",
 		})
 		return
@@ -439,7 +439,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	// Check if the current user is the one who left the review
 	if service.ClientUserID != currentUser.ID {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "You are not authorized to update this review",
 		})
 		return
@@ -450,7 +450,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 
 	if hoursSinceReview > float64(sc.reviewUpdateLimitHours) {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: fmt.Sprintf("Review can only be updated within %d hours of creation", sc.reviewUpdateLimitHours),
 		})
 		return
@@ -460,7 +460,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	var payload *models.CreateUserRatingRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -553,7 +553,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	// Check if the service exists
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "No services found for the specified profile",
 		})
 		return
@@ -562,7 +562,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	// Check if the current user is the one who left the review
 	if service.ClientUserID != currentUser.ID {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "You are not authorized to update this review",
 		})
 		return
@@ -571,7 +571,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	var payload *models.SetReviewVisibilityRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -625,7 +625,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	// Check if the service exists
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "No services found for the specified profile",
 		})
 		return
@@ -634,7 +634,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	// Check if the current user is the owner of the profile in the service
 	if service.ProfileOwnerID != currentUser.ID {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "You are not authorized to update this review",
 		})
 		return
@@ -644,7 +644,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	hoursSinceReview := time.Since(service.ProfileRating.CreatedAt).Hours()
 	if hoursSinceReview > float64(sc.reviewUpdateLimitHours) {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: fmt.Sprintf("Review can only be updated within %d hours of creation", sc.reviewUpdateLimitHours),
 		})
 		return
@@ -654,7 +654,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	var payload *models.CreateProfileRatingRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -747,7 +747,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	// Check if the service exists
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "No services found for the specified profile",
 		})
 		return
@@ -756,7 +756,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	// Check if the current user is the owner of the profile in the service
 	if service.ProfileOwnerID != currentUser.ID {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "You are not authorized to update this review",
 		})
 		return
@@ -765,7 +765,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	// Check if the user is allowed to hide the review
 	if currentUser.Tier == "basic" {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "Basic-tier users can't hide profile reviews",
 		})
 		return
@@ -775,7 +775,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	var payload *models.SetReviewVisibilityRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return

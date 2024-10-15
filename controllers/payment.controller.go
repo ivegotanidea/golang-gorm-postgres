@@ -36,7 +36,7 @@ func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 	// Bind the incoming JSON data to the payment model
 	if err := ctx.ShouldBindJSON(&paymentUpdate); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "Invalid data",
 		})
 		return

@@ -146,7 +146,7 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -158,7 +158,7 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 
 	if userId == "" && telegramUserId == 0 && phone == "" {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "userId or telegramUserId or phone is required",
 		})
 		return
@@ -178,14 +178,14 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 	if result.Error != nil {
 		if result.Error.Error() == "record not found" && result.RowsAffected == 0 {
 			ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-				Status:  "fail",
+				Status:  "error",
 				Message: "No user with that ID exists",
 			})
 			return
 		}
 
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: result.Error.Error(),
 		})
 		return
@@ -230,7 +230,7 @@ func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
 	} else {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "userId or telegramUserId or phone is required",
 		})
 		return
@@ -238,7 +238,7 @@ func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "No user with that ID exists",
 		})
 		return
@@ -266,7 +266,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 
 	if err := initializers.DB.First(&targetUser, "id = ?", userId).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "User not found",
 		})
 		return
@@ -275,7 +275,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	// Role-based restrictions
 	if currentUser.Role == "moderator" && (targetUser.Role == "moderator" || targetUser.Role == "admin" || targetUser.Role == "owner") {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "You are not authorized to delete this user",
 		})
 		return
@@ -283,7 +283,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 
 	if currentUser.Role == "admin" && (targetUser.Role == "admin" || targetUser.Role == "owner") {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "You are not authorized to delete this user",
 		})
 		return
@@ -295,7 +295,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
 	} else {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "User ID is required",
 		})
 		return
@@ -303,7 +303,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "User not found",
 		})
 		return
@@ -332,7 +332,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	var payload *models.UpdateUser
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -340,7 +340,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 
 	if err := uc.validator.Struct(payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -351,7 +351,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "User not found",
 		})
 		return
@@ -361,7 +361,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	avatarUrl, err := checkAvatar(payload.Avatar, updatedUser.Avatar)
 	if err != "" {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err,
 		})
 		return
@@ -420,7 +420,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	var payload *models.UpdateUserPrivileged
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -429,7 +429,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	// Validate the payload
 	if err := uc.validator.Struct(payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -440,7 +440,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	result := uc.DB.First(&updatedUser, "id = ?", userId)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "User not found",
 		})
 		return
@@ -453,7 +453,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 		newTelegramId, err = strconv.ParseInt(payload.TelegramUserId, 10, 64)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-				Status:  "fail",
+				Status:  "error",
 				Message: "Invalid telegram id",
 			})
 			return
@@ -479,7 +479,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	tx := uc.DB.Model(&updatedUser).Updates(userToUpdate)
 	if tx.Error != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: tx.Error.Error(),
 		})
 		return
@@ -512,7 +512,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 	var payload models.AssignRole
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -521,7 +521,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 	// Validate the payload
 	if err := uc.validator.Struct(payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: err.Error(),
 		})
 		return
@@ -531,7 +531,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 	var targetUser models.User
 	if err := initializers.DB.First(&targetUser, "id = ?", payload.Id).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "User not found",
 		})
 		return
@@ -540,7 +540,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 	// Role validation for the current admin
 	if currentUser.Role == "admin" && (targetUser.Role == "admin" || targetUser.Role == "owner") {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "Cannot assign role to admins or owners",
 		})
 		return
@@ -549,7 +549,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 	// Check if the target user already has a profile
 	if targetUser.HasProfile {
 		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
-			Status:  "fail",
+			Status:  "error",
 			Message: "User already has a profile",
 		})
 		return

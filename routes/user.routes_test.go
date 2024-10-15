@@ -404,7 +404,7 @@ func TestUserRoutes(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
-		assert.Equal(t, jsonResponse["status"], "fail")
+		assert.Equal(t, jsonResponse["status"], "error")
 		assert.Nil(t, jsonResponse["access_token"])
 	})
 
@@ -423,7 +423,7 @@ func TestUserRoutes(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 		assert.Equal(t, jsonResponse["message"], "You are not logged in")
-		assert.Equal(t, jsonResponse["status"], "fail")
+		assert.Equal(t, jsonResponse["status"], "error")
 	})
 
 	t.Run("DELETE /api/users/user: fail moderator deletes user", func(t *testing.T) {
@@ -488,7 +488,7 @@ func TestUserRoutes(t *testing.T) {
 		var userResponse UserResponse
 		err = json.Unmarshal(w.Body.Bytes(), &userResponse)
 		assert.Nil(t, err)
-		assert.Equal(t, userResponse.Status, "fail")
+		assert.Equal(t, userResponse.Status, "error")
 
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
@@ -607,7 +607,7 @@ func TestUserRoutes(t *testing.T) {
 		var jsonResponse map[string]interface{}
 
 		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
-		assert.Equal(t, jsonResponse["status"], "fail")
+		assert.Equal(t, jsonResponse["status"], "error")
 
 		assert.Equal(t, http.StatusForbidden, w.Code)
 	})
@@ -692,7 +692,7 @@ func TestUserRoutes(t *testing.T) {
 		var jsonResponse map[string]interface{}
 
 		err = json.Unmarshal(w.Body.Bytes(), &jsonResponse)
-		assert.Equal(t, jsonResponse["status"], "fail")
+		assert.Equal(t, jsonResponse["status"], "error")
 
 		assert.Equal(t, http.StatusForbidden, w.Code)
 	})

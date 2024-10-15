@@ -1,5 +1,6 @@
 services:
   postgres:
+    platform: linux/amd64
     image: postgres
     container_name: postgres
     ports:
@@ -8,11 +9,10 @@ services:
       - ./app.env
     volumes:
       - postgres:/var/lib/postgresql/data
-    networks:
-      - common
 
   pgadmin:
     image: dpage/pgadmin4
+    platform: linux/amd64
     container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: rblbl@mail.ru
@@ -21,34 +21,6 @@ services:
       - "8080:80"
     depends_on:
       - postgres
-    networks:
-      - common
-
-  go-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: go_service
-    command: >
-      sh -c "sleep 5 &&
-             /app/main"
-    ports:
-      - "8888:8888"  # Change this if your Go service exposes a different port
-    env_file:
-      - ./app.env
-    environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: golang-gorm
-      POSTGRES_PORT: 5432
-    depends_on:
-      - postgres
-    networks:
-      - common
 
 volumes:
   postgres:
-
-networks:
-  common:

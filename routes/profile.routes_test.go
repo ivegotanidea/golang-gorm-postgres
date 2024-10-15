@@ -911,7 +911,7 @@ func TestProfileRoutes(t *testing.T) {
 		profileRouter.ServeHTTP(w, findProfileByPhoneReq)
 
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
-		assert.JSONEq(t, "{\"message\":\"You are not logged in\",\"status\":\"fail\"}", w.Body.String())
+		assert.JSONEq(t, "{\"message\":\"You are not logged in\",\"status\":\"error\"}", w.Body.String())
 	})
 
 	t.Run("GET /api/profiles/phoneId: success for logged user", func(t *testing.T) {
@@ -1106,7 +1106,7 @@ func TestProfileRoutes(t *testing.T) {
 		profileRouter.ServeHTTP(w, deleteProfileReq)
 
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
-		assert.JSONEq(t, "{\"message\":\"You are not logged in\",\"status\":\"fail\"}", w.Body.String())
+		assert.JSONEq(t, "{\"message\":\"You are not logged in\",\"status\":\"error\"}", w.Body.String())
 	})
 
 	t.Run("GET /api/profiles/list: success list non authorized user", func(t *testing.T) {

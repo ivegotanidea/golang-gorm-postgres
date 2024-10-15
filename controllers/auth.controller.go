@@ -40,7 +40,7 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 	var payload *models.BotSignUpInput
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -49,13 +49,13 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 	hashedPassword, err := utils.HashPassword(generatedPassword)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	telegramUserId, err := strconv.ParseInt(payload.TelegramUserId, 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: err.Error()})
 	}
 
 	now := time.Now()
@@ -74,10 +74,10 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 	result := ac.DB.Create(&newUser)
 
 	if result.Error != nil && strings.Contains(result.Error.Error(), "duplicate key value violates unique") {
-		ctx.JSON(http.StatusConflict, models.ErrorResponse{Status: "fail", Message: "User with that email already exists"})
+		ctx.JSON(http.StatusConflict, models.ErrorResponse{Status: "error", Message: "User with that email already exists"})
 		return
 	} else if result.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "fail", Message: "Something bad happened"})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: "Something bad happened"})
 		return
 	}
 
@@ -113,18 +113,18 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	var payload *models.SignUpInput
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	if payload.Password != payload.PasswordConfirm {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: "Passwords do not match"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: "Passwords do not match"})
 		return
 	}
 
 	hashedPassword, err := utils.HashPassword(payload.Password)
 	if err != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -145,10 +145,10 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	result := ac.DB.Create(&newUser)
 
 	if result.Error != nil && strings.Contains(result.Error.Error(), "duplicate key value violates unique") {
-		ctx.JSON(http.StatusConflict, models.ErrorResponse{Status: "fail", Message: "User with that email already exists"})
+		ctx.JSON(http.StatusConflict, models.ErrorResponse{Status: "error", Message: "User with that email already exists"})
 		return
 	} else if result.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "fail", Message: "Something bad happened"})
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: "Something bad happened"})
 		return
 	}
 
@@ -179,14 +179,14 @@ func (ac *AuthController) BotSignInUser(ctx *gin.Context) {
 	var payload *models.BotSignInInput
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	var user models.User
 	result := ac.DB.First(&user, "telegram_user_id = ?", strings.ToLower(payload.TelegramUserId))
 	if result.Error != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: "Invalid phone or Password"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: "Invalid phone or Password"})
 		return
 	}
 
@@ -194,13 +194,13 @@ func (ac *AuthController) BotSignInUser(ctx *gin.Context) {
 
 	access_token, err := utils.CreateToken(config.AccessTokenExpiresIn, user.ID, config.AccessTokenPrivateKey)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	refresh_token, err := utils.CreateToken(config.RefreshTokenExpiresIn, user.ID, config.RefreshTokenPrivateKey)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -225,19 +225,19 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 	var payload *models.SignInInput
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	var user models.User
 	result := ac.DB.First(&user, "phone = ?", strings.ToLower(payload.Phone))
 	if result.Error != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: "Invalid phone or Password"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: "Invalid phone or Password"})
 		return
 	}
 
 	if err := utils.VerifyPassword(user.Password, payload.Password); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: "Invalid email or Password"})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: "Invalid email or Password"})
 		return
 	}
 
@@ -245,13 +245,13 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 
 	access_token, err := utils.CreateToken(config.AccessTokenExpiresIn, user.ID, config.AccessTokenPrivateKey)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	refresh_token, err := utils.CreateToken(config.RefreshTokenExpiresIn, user.ID, config.RefreshTokenPrivateKey)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -276,7 +276,7 @@ func (ac *AuthController) RefreshAccessToken(ctx *gin.Context) {
 	cookie, err := ctx.Cookie("refresh_token")
 
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusForbidden, models.ErrorResponse{Status: "fail", Message: message})
+		ctx.AbortWithStatusJSON(http.StatusForbidden, models.ErrorResponse{Status: "error", Message: message})
 		return
 	}
 
@@ -284,20 +284,20 @@ func (ac *AuthController) RefreshAccessToken(ctx *gin.Context) {
 
 	sub, err := utils.ValidateToken(cookie, config.RefreshTokenPublicKey)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusForbidden, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.AbortWithStatusJSON(http.StatusForbidden, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	var user models.User
 	result := ac.DB.First(&user, "id = ?", fmt.Sprint(sub))
 	if result.Error != nil {
-		ctx.AbortWithStatusJSON(http.StatusForbidden, models.ErrorResponse{Status: "fail", Message: "user not exist"})
+		ctx.AbortWithStatusJSON(http.StatusForbidden, models.ErrorResponse{Status: "error", Message: "user not exist"})
 		return
 	}
 
 	access_token, err := utils.CreateToken(config.AccessTokenExpiresIn, user.ID, config.AccessTokenPrivateKey)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusForbidden, models.ErrorResponse{Status: "fail", Message: err.Error()})
+		ctx.AbortWithStatusJSON(http.StatusForbidden, models.ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
