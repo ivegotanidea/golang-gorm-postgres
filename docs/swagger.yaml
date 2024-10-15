@@ -203,10 +203,17 @@ definitions:
         type: integer
     type: object
   models.ErrorResponse:
+    description: This model is returned when an API call fails due to an error.
     properties:
       message:
+        description: |-
+          Message provides a human-readable description of the error that occurred.
+          Example: "Invalid request payload"
         type: string
       status:
+        description: |-
+          Status represents the status of the response, usually set to "error".
+          Example: "error"
         type: string
     type: object
   models.FindProfilesQuery:
@@ -582,16 +589,31 @@ definitions:
     - phone
     type: object
   models.SuccessResponse:
+    description: This model is returned when an API call succeeds.
     properties:
-      data: {}
+      data:
+        description: |-
+          Data contains the result of the successful operation. Can be any type of data.
+          Example: {"id": 1, "name": "John Doe"}
       status:
+        description: |-
+          Status represents the status of the response, typically set to "success".
+          Example: "success"
         type: string
     type: object
   models.TokenResponse:
+    description: This model is used to return an access token after a user logs in
+      or when a token is refreshed.
     properties:
       access_token:
+        description: |-
+          AccessToken is the token that allows the user to authenticate subsequent API requests.
+          Example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         type: string
       status:
+        description: |-
+          Status represents the status of the response, typically set to "success".
+          Example: "success"
         type: string
     type: object
   models.UpdateOwnProfileRequest:

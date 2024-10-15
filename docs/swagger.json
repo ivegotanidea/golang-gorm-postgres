@@ -2116,12 +2116,15 @@
             }
         },
         "models.ErrorResponse": {
+            "description": "This model is returned when an API call fails due to an error.",
             "type": "object",
             "properties": {
                 "message": {
+                    "description": "Message provides a human-readable description of the error that occurred.\nExample: \"Invalid request payload\"",
                     "type": "string"
                 },
                 "status": {
+                    "description": "Status represents the status of the response, usually set to \"error\".\nExample: \"error\"",
                     "type": "string"
                 }
             }
@@ -2686,21 +2689,28 @@
             }
         },
         "models.SuccessResponse": {
+            "description": "This model is returned when an API call succeeds.",
             "type": "object",
             "properties": {
-                "data": {},
+                "data": {
+                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}"
+                },
                 "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
                     "type": "string"
                 }
             }
         },
         "models.TokenResponse": {
+            "description": "This model is used to return an access token after a user logs in or when a token is refreshed.",
             "type": "object",
             "properties": {
                 "access_token": {
+                    "description": "AccessToken is the token that allows the user to authenticate subsequent API requests.\nExample: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
                     "type": "string"
                 },
                 "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
                     "type": "string"
                 }
             }
