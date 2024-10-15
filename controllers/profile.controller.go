@@ -624,6 +624,50 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 		Data:    profiles})
 }
 
+// todo: ListProfilesNonAuth
+// todo: restricting logic for non authorized users
+// todo: add tests
+
+// ListProfilesNonAuth godoc
+// @Summary Lists all profiles with pagination
+// @Description Retrieves all profiles, supports pagination
+// @Tags Profiles
+// @Produce json
+// @Param page query string false "Page number"
+// @Param limit query string false "Items per page"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 502 {object} models.ErrorResponse
+// @Router /profiles [get]
+func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
+	var page = ctx.DefaultQuery("page", "1")
+	var limit = ctx.DefaultQuery("limit", "10")
+
+	intPage, _ := strconv.Atoi(page)
+	intLimit, _ := strconv.Atoi(limit)
+	offset := (intPage - 1) * intLimit
+
+	var profiles []models.Profile
+
+	dbQuery := pc.DB.Preload("Photos").
+		Preload("BodyArts").
+		Preload("ProfileOptions.ProfileTag").
+		Where("active = ?", true).
+		Limit(intLimit).Offset(offset)
+
+	results := dbQuery.Find(&profiles)
+
+	if results.Error != nil {
+		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: results.Error.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+		Status:  "success",
+		Results: len(profiles),
+		Page:    intPage,
+		Data:    profiles})
+}
+
 // GetMyProfiles godoc
 // @Summary Get current user's profiles
 // @Description Retrieves the profiles created by the currently authenticated user

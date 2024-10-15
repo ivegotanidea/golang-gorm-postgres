@@ -19,22 +19,22 @@ func NewRouteProfileController(profileController controllers.ProfileController) 
 func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("profiles")
-	router.Use(middleware.DeserializeUser())
 
-	router.POST("/", pc.profileController.CreateProfile)
+	router.POST("/", middleware.DeserializeUser(), pc.profileController.CreateProfile)
 
-	router.GET("/my", pc.profileController.GetMyProfiles)
+	router.GET("/my", middleware.DeserializeUser(), pc.profileController.GetMyProfiles)
 
-	router.GET("", middleware.AbacMiddleware("profiles", "query"), pc.profileController.FindProfiles)
+	router.GET("", middleware.DeserializeUser(), middleware.AbacMiddleware("profiles", "query"), pc.profileController.FindProfiles)
 
-	router.GET("/all", middleware.AbacMiddleware("profiles", "list"), pc.profileController.ListProfiles)
+	router.GET("/list", pc.profileController.ListProfilesNonAuth)
+	router.GET("/all", middleware.DeserializeUser(), middleware.AbacMiddleware("profiles", "list"), pc.profileController.ListProfiles)
 
-	router.PUT("/my/:id", pc.profileController.UpdateOwnProfile)
-	router.PUT("/update/:id", middleware.AbacMiddleware("profiles", "update"), pc.profileController.UpdateProfile)
+	router.PUT("/my/:id", middleware.DeserializeUser(), pc.profileController.UpdateOwnProfile)
+	router.PUT("/update/:id", middleware.DeserializeUser(), middleware.AbacMiddleware("profiles", "update"), pc.profileController.UpdateProfile)
 
 	// todo: should have captcha set
 	// todo: should have rate limiter set
-	router.GET("/:phone", pc.profileController.FindProfileByPhone)
+	router.GET("/:phone", middleware.DeserializeUser(), pc.profileController.FindProfileByPhone)
 
-	router.DELETE("/:id", pc.profileController.DeleteProfile)
+	router.DELETE("/:id", middleware.DeserializeUser(), pc.profileController.DeleteProfile)
 }

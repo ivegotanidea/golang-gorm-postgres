@@ -1108,4 +1108,97 @@ func TestProfileRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 		assert.JSONEq(t, "{\"message\":\"You are not logged in\",\"status\":\"fail\"}", w.Body.String())
 	})
+
+	t.Run("GET /api/profiles/list: success list non authorized user", func(t *testing.T) {
+		user := generateUser(random, authRouter, t, "")
+		secondUser := generateUser(random, authRouter, t, "")
+
+		_ = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "moderator")
+
+		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
+		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
+
+		for i := 0; i < 3; i++ {
+			w := httptest.NewRecorder()
+
+			payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+
+			jsonPayload, err := json.Marshal(payload)
+			if err != nil {
+				fmt.Println("Error marshaling payload:", err)
+				return
+			}
+
+			createProfileReq, _ := http.NewRequest("POST", "/api/profiles/", bytes.NewBuffer(jsonPayload))
+			createProfileReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
+			createProfileReq.Header.Set("Content-Type", "application/json")
+
+			profileRouter.ServeHTTP(w, createProfileReq)
+
+			assert.Equal(t, http.StatusCreated, w.Code)
+
+			if i == 2 {
+
+				var profileResponse CreateProfileResponse
+				err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
+
+				updatePayload := &models.UpdateOwnProfileRequest{
+					Active: boolPtr(false),
+					Name:   fmt.Sprintf("%s-new", payload.Name),
+				}
+
+				jsonPayload, err = json.Marshal(updatePayload)
+				if err != nil {
+					fmt.Println("Error marshaling payload:", err)
+					return
+				}
+
+				updateProfileReq, _ := http.NewRequest(
+					"PUT",
+					fmt.Sprintf("/api/profiles/update/%s",
+						profileResponse.Data.ID.String()),
+					bytes.NewBuffer(jsonPayload))
+
+				updateProfileReq.AddCookie(&http.Cookie{Name: secondUserAccessTokenCookie.Name, Value: secondUserAccessTokenCookie.Value})
+				updateProfileReq.Header.Set("Content-Type", "application/json")
+
+				w = httptest.NewRecorder()
+				profileRouter.ServeHTTP(w, updateProfileReq)
+
+				assert.Equal(t, http.StatusOK, w.Code)
+			}
+		}
+
+		listProfilesReq, _ := http.NewRequest(
+			"GET",
+			"/api/profiles/list?page=1&limit=10",
+			nil)
+
+		listProfilesReq.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+		profileRouter.ServeHTTP(w, listProfilesReq)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var profilesResponse ProfilesResponse
+		err := json.Unmarshal(w.Body.Bytes(), &profilesResponse)
+
+		if err != nil {
+			panic(err)
+		}
+
+		assert.True(t, profilesResponse.Length >= 2)
+
+		foundInactive := false
+		for _, profile := range profilesResponse.Data {
+			if !profile.Active {
+				foundInactive = true
+				break
+			}
+		}
+
+		assert.False(t, foundInactive)
+
+	})
 }
