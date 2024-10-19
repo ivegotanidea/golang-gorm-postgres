@@ -1,7 +1,7 @@
 services:
   postgres:
     platform: linux/amd64
-    image: postgres
+    image: postgres:16
     container_name: postgres
     ports:
       - 6500:5432
