@@ -848,7 +848,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /auth/bot/signin:
+  /auth/bot/login:
     post:
       consumes:
       - application/json
@@ -1151,31 +1151,6 @@ paths:
       tags:
       - Payments
   /profiles:
-    get:
-      description: Retrieves all profiles, supports pagination
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: string
-      - description: Items per page
-        in: query
-        name: limit
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/SuccessResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Lists all profiles with pagination
-      tags:
-      - Profiles
     post:
       consumes:
       - application/json
@@ -1230,23 +1205,15 @@ paths:
       summary: Deletes a profile by ID
       tags:
       - Profiles
-    put:
-      consumes:
-      - application/json
-      description: Updates the profile with the given ID, allows updating specific
-        fields
+  /profiles/{phone}:
+    get:
+      description: Retrieves a profile based on the phone number provided
       parameters:
-      - description: Profile ID
+      - description: Phone Number
         in: path
-        name: id
+        name: phone
         required: true
         type: string
-      - description: Profile Update Payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/UpdateProfileRequest'
       produces:
       - application/json
       responses:
@@ -1254,58 +1221,11 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Updates an existing profile
-      tags:
-      - Profiles
-  /profiles/{id}/own:
-    put:
-      consumes:
-      - application/json
-      description: Updates the user's own profile with the provided fields
-      parameters:
-      - description: Profile ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Profile Update Payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/UpdateOwnProfileRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Updates own profile
+      summary: Find a profile by phone number
       tags:
       - Profiles
   /profiles/{profileID}/services:
@@ -1396,6 +1316,32 @@ paths:
       summary: Get a specific service by profile and service ID
       tags:
       - Services
+  /profiles/all:
+    get:
+      description: Retrieves all profiles, supports pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: string
+      - description: Items per page
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SuccessResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Lists all profiles with pagination, auth required
+      tags:
+      - Profiles
   /profiles/list:
     get:
       description: Retrieves all profiles, supports pagination
@@ -1419,7 +1365,7 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: Lists all profiles with pagination
+      summary: Lists all active profiles with pagination, no auth required
       tags:
       - Profiles
   /profiles/my:
@@ -1448,15 +1394,23 @@ paths:
       summary: Get current user's profiles
       tags:
       - Profiles
-  /profiles/phone/{phone}:
-    get:
-      description: Retrieves a profile based on the phone number provided
+  /profiles/my/{id}:
+    put:
+      consumes:
+      - application/json
+      description: User updates his own profile with the provided fields
       parameters:
-      - description: Phone Number
+      - description: Profile ID
         in: path
-        name: phone
+        name: id
         required: true
         type: string
+      - description: Profile Update Payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateOwnProfileRequest'
       produces:
       - application/json
       responses:
@@ -1464,11 +1418,19 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: Find a profile by phone number
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: User updates his own profile
       tags:
       - Profiles
   /profiles/search:
@@ -1501,6 +1463,242 @@ paths:
       summary: Search for profiles
       tags:
       - Profiles
+  /profiles/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Updates the profile with the given ID, allows updating specific
+        fields
+      parameters:
+      - description: Profile ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Profile Update Payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Updates an existing profile
+      tags:
+      - Profiles
+  /reviews/client/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates the user review for a service if the current user is authorized
+        to do so and within the allowed time limit.
+      parameters:
+      - description: Service ID
+        in: query
+        name: service_id
+        required: true
+        type: string
+      - description: User Rating Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateUserRatingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Service'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update a client's user review on a profile service
+      tags:
+      - Services
+  /reviews/client/visibility:
+    put:
+      consumes:
+      - application/json
+      description: Set visibility of the profile owner's review based on the client's
+        request. Only available for non-basic tier users.
+      parameters:
+      - description: Service ID
+        in: query
+        name: service_id
+        required: true
+        type: string
+      - description: Set Review Visibility Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/SetReviewVisibilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Service'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Set visibility of the profile owner's review
+      tags:
+      - Services
+  /reviews/host/update:
+    put:
+      consumes:
+      - application/json
+      description: Allows a profile owner to update their review on a client user
+        within the allowed time limit.
+      parameters:
+      - description: Service ID
+        in: query
+        name: service_id
+        required: true
+        type: string
+      - description: Create Profile Rating Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateProfileRatingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Service'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update the profile owner's review on a client user
+      tags:
+      - Services
+  /reviews/host/visibility:
+    put:
+      consumes:
+      - application/json
+      description: Allows a profile owner to set user's review visibility. Only available
+        for non-basic tier users.
+      parameters:
+      - description: Service ID
+        in: query
+        name: service_id
+        required: true
+        type: string
+      - description: Set Review Visibility Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/SetReviewVisibilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Service'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Set visibility of user's review
+      tags:
+      - Services
   /services:
     get:
       consumes:
@@ -1571,202 +1769,6 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse'
       summary: Create a new service
-      tags:
-      - Services
-  /services/client/review/update:
-    put:
-      consumes:
-      - application/json
-      description: Updates the user review for a service if the current user is authorized
-        to do so and within the allowed time limit.
-      parameters:
-      - description: Service ID
-        in: query
-        name: service_id
-        required: true
-        type: string
-      - description: User Rating Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/CreateUserRatingRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/Service'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Update a client's user review on a profile service
-      tags:
-      - Services
-  /services/profile-owner/review/hide:
-    put:
-      consumes:
-      - application/json
-      description: Hides or shows the profile owner's review based on the client's
-        request.
-      parameters:
-      - description: Service ID
-        in: query
-        name: service_id
-        required: true
-        type: string
-      - description: Set Review Visibility Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/SetReviewVisibilityRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/Service'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Hide or show the profile owner's review visibility
-      tags:
-      - Services
-  /services/profile-owner/review/update:
-    put:
-      consumes:
-      - application/json
-      description: Allows a profile owner to update their review on a client user
-        within the allowed time limit.
-      parameters:
-      - description: Service ID
-        in: query
-        name: service_id
-        required: true
-        type: string
-      - description: Create Profile Rating Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/CreateProfileRatingRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/Service'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Update the profile owner's review on a client user
-      tags:
-      - Services
-  /services/user/review/hide:
-    put:
-      consumes:
-      - application/json
-      description: Allows a profile owner to hide a user's review on a service. Only
-        available for non-basic tier users.
-      parameters:
-      - description: Service ID
-        in: query
-        name: service_id
-        required: true
-        type: string
-      - description: Set Review Visibility Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/SetReviewVisibilityRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/Service'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Hide a user's review
       tags:
       - Services
   /users:

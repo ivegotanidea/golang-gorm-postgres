@@ -20,6 +20,7 @@ func NewProfileController(DB *gorm.DB) ProfileController {
 }
 
 // CreateProfile godoc
+//
 //	@Summary		Creates a new profile
 //	@Description	Creates a new profile for the current user
 //	@Tags			Profiles
@@ -199,8 +200,9 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 }
 
 // UpdateOwnProfile godoc
-//	@Summary		Updates own profile
-//	@Description	Updates the user's own profile with the provided fields
+//
+//	@Summary		User updates his own profile
+//	@Description	User updates his own profile with the provided fields
 //	@Tags			Profiles
 //	@Accept			json
 //	@Produce		json
@@ -210,7 +212,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
-//	@Router			/profiles/{id}/own [put]
+//	@Router			/profiles/my/{id} [put]
 func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	profileId := ctx.Param("id")
 	currentUser := ctx.MustGet("currentUser").(User)
@@ -448,6 +450,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 }
 
 // UpdateProfile godoc
+//
 //	@Summary		Updates an existing profile
 //	@Description	Updates the profile with the given ID, allows updating specific fields
 //	@Tags			Profiles
@@ -459,7 +462,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
-//	@Router			/profiles/{id} [put]
+//	@Router			/profiles/update/{id} [put]
 func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	profileId := ctx.Param("id")
 	currentUser := ctx.MustGet("currentUser").(User)
@@ -559,6 +562,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 }
 
 // FindProfileByPhone godoc
+//
 //	@Summary		Find a profile by phone number
 //	@Description	Retrieves a profile based on the phone number provided
 //	@Tags			Profiles
@@ -566,7 +570,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 //	@Param			phone	path		string	true	"Phone Number"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		404		{object}	ErrorResponse
-//	@Router			/profiles/phone/{phone} [get]
+//	@Router			/profiles/{phone} [get]
 func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 	phone := ctx.Param("phone")
 
@@ -586,7 +590,8 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 }
 
 // ListProfiles godoc
-//	@Summary		Lists all profiles with pagination
+//
+//	@Summary		Lists all profiles with pagination, auth required
 //	@Description	Retrieves all profiles, supports pagination
 //	@Tags			Profiles
 //	@Produce		json
@@ -594,7 +599,7 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 //	@Param			limit	query		string	false	"Items per page"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		502		{object}	ErrorResponse
-//	@Router			/profiles [get]
+//	@Router			/profiles/all [get]
 func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -629,7 +634,8 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 // todo: add tests
 
 // ListProfilesNonAuth godoc
-//	@Summary		Lists all profiles with pagination
+//
+//	@Summary		Lists all active profiles with pagination, no auth required
 //	@Description	Retrieves all profiles, supports pagination
 //	@Tags			Profiles
 //	@Produce		json
@@ -669,6 +675,7 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 }
 
 // GetMyProfiles godoc
+//
 //	@Summary		Get current user's profiles
 //	@Description	Retrieves the profiles created by the currently authenticated user
 //	@Tags			Profiles
@@ -712,6 +719,7 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 }
 
 // FindProfiles godoc
+//
 //	@Summary		Search for profiles
 //	@Description	Retrieves profiles based on filters provided in the query
 //	@Tags			Profiles
@@ -895,6 +903,7 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 }
 
 // DeleteProfile godoc
+//
 //	@Summary		Deletes a profile by ID
 //	@Description	Deletes the profile with the given ID from the database
 //	@Tags			Profiles

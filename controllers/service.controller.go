@@ -45,6 +45,7 @@ func getDistanceBetweenCoordinates(latA, lonA, latB, lonB float32) float64 {
 }
 
 // CreateService godoc
+//
 //	@Summary		Create a new service
 //	@Description	Creates a new service between a client user and a profile, including optional ratings for both the profile and the user.
 //	@Tags			Services
@@ -260,6 +261,7 @@ func MutateService(tier string, service Service) map[string]interface{} {
 }
 
 // GetService godoc
+//
 //	@Summary		Get a specific service by profile and service ID
 //	@Description	Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.
 //	@Tags			Services
@@ -301,6 +303,7 @@ func (sc *ServiceController) GetService(ctx *gin.Context) {
 }
 
 // GetProfileServices godoc
+//
 //	@Summary		Get all services for a specific profile
 //	@Description	Retrieves all services for a specific profile, with filtered data based on the user's tier.
 //	@Tags			Services
@@ -357,6 +360,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 }
 
 // ListServices godoc
+//
 //	@Summary		Get a list of services
 //	@Description	Retrieves a paginated list of services with all related information.
 //	@Tags			Services
@@ -403,6 +407,7 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 // ----
 
 // UpdateClientUserReviewOnProfile godoc
+//
 //	@Summary		Update a client's user review on a profile service
 //	@Description	Updates the user review for a service if the current user is authorized to do so and within the allowed time limit.
 //	@Tags			Services
@@ -415,7 +420,7 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 //	@Failure		403			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse
 //	@Failure		500			{object}	ErrorResponse
-//	@Router			/services/client/review/update [put]
+//	@Router			/reviews/client/update [put]
 func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
@@ -526,8 +531,9 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 }
 
 // HideProfileOwnerReview godoc
-//	@Summary		Hide or show the profile owner's review visibility
-//	@Description	Hides or shows the profile owner's review based on the client's request.
+//
+//	@Summary		Set visibility of the profile owner's review
+//	@Description	Set visibility of the profile owner's review based on the client's request. Only available for non-basic tier users.
 //	@Tags			Services
 //	@Accept			json
 //	@Produce		json
@@ -538,7 +544,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 //	@Failure		403			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse
 //	@Failure		500			{object}	ErrorResponse
-//	@Router			/services/profile-owner/review/hide [put]
+//	@Router			/reviews/client/visibility [put]
 func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
@@ -598,6 +604,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 }
 
 // UpdateProfileOwnerReviewOnClientUser godoc
+//
 //	@Summary		Update the profile owner's review on a client user
 //	@Description	Allows a profile owner to update their review on a client user within the allowed time limit.
 //	@Tags			Services
@@ -610,7 +617,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 //	@Failure		403			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse
 //	@Failure		500			{object}	ErrorResponse
-//	@Router			/services/profile-owner/review/update [put]
+//	@Router			/reviews/host/update [put]
 func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
@@ -720,8 +727,9 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 }
 
 // HideUserReview godoc
-//	@Summary		Hide a user's review
-//	@Description	Allows a profile owner to hide a user's review on a service. Only available for non-basic tier users.
+//
+//	@Summary		Set visibility of user's review
+//	@Description	Allows a profile owner to set user's review visibility. Only available for non-basic tier users.
 //	@Tags			Services
 //	@Accept			json
 //	@Produce		json
@@ -732,7 +740,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 //	@Failure		403			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse
 //	@Failure		500			{object}	ErrorResponse
-//	@Router			/services/user/review/hide [put]
+//	@Router			/reviews/host/visibility [put]
 func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
