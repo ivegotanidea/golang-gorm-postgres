@@ -22,8 +22,13 @@ var (
 	UserController      controllers.UserController
 	UserRouteController routes.UserRouteController
 
-	PostController      controllers.PostController
-	PostRouteController routes.PostRouteController
+	ProfileController      controllers.ProfileController
+	ProfileRouteController routes.ProfileRouteController
+
+	ServiceController      controllers.ServiceController
+	ServiceRouteController routes.ServiceRouteController
+
+	ReviewsRouteController routes.ReviewsRouteController
 )
 
 func init() {
@@ -40,10 +45,13 @@ func init() {
 	UserController = controllers.NewUserController(initializers.DB)
 	UserRouteController = routes.NewRouteUserController(UserController)
 
-	// todo: add profile, service controllers
+	ProfileController = controllers.NewProfileController(initializers.DB)
+	ProfileRouteController = routes.NewRouteProfileController(ProfileController)
 
-	PostController = controllers.NewPostController(initializers.DB)
-	PostRouteController = routes.NewRoutePostController(PostController)
+	ServiceController = controllers.NewServiceController(initializers.DB, config.ReviewUpdateLimitHours)
+	ServiceRouteController = routes.NewRouteServiceController(ServiceController)
+
+	ReviewsRouteController = routes.NewRouteReviewController(ServiceController)
 
 	server = gin.Default()
 }
@@ -80,6 +88,9 @@ func main() {
 
 	AuthRouteController.AuthRoute(router)
 	UserRouteController.UserRoute(router)
-	PostRouteController.PostRoute(router)
+	ProfileRouteController.ProfileRoute(router)
+	ServiceRouteController.ServiceRoute(router)
+	ReviewsRouteController.ReviewsRoute(router)
+
 	log.Fatal(server.Run(":" + config.ServerPort))
 }
