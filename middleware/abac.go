@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wpcodevo/golang-gorm-postgres/initializers"
-	"github.com/wpcodevo/golang-gorm-postgres/models"
+	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
+	"github.com/ivegotanidea/golang-gorm-postgres/models"
 	"net/http"
 )
 

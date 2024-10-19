@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/wpcodevo/golang-gorm-postgres/initializers"
-	"github.com/wpcodevo/golang-gorm-postgres/models"
+	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
+	"github.com/ivegotanidea/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 	"log"
 )

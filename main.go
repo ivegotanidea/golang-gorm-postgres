@@ -1,17 +1,17 @@
 package main
 
 import (
+	"github.com/ivegotanidea/golang-gorm-postgres/docs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/wpcodevo/golang-gorm-postgres/docs"
 	"log"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/wpcodevo/golang-gorm-postgres/controllers"
-	"github.com/wpcodevo/golang-gorm-postgres/initializers"
-	"github.com/wpcodevo/golang-gorm-postgres/routes"
+	"github.com/ivegotanidea/golang-gorm-postgres/controllers"
+	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
+	"github.com/ivegotanidea/golang-gorm-postgres/routes"
 )
 
 var (

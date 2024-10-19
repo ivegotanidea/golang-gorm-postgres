@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/wpcodevo/golang-gorm-postgres/initializers"
-	"github.com/wpcodevo/golang-gorm-postgres/models"
-	"github.com/wpcodevo/golang-gorm-postgres/utils"
+	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
+	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	"github.com/ivegotanidea/golang-gorm-postgres/utils"
 	"math/rand/v2"
 	"net/http"
 	"strconv"

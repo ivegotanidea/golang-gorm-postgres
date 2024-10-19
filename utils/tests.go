@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"github.com/wpcodevo/golang-gorm-postgres/models"
+	"github.com/ivegotanidea/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 	"math/rand/v2"
 )

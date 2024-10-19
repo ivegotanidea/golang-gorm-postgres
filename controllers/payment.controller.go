@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wpcodevo/golang-gorm-postgres/models"
+	"github.com/ivegotanidea/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
