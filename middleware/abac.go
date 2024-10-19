@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
-	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"net/http"
 )
 
@@ -18,7 +18,7 @@ func AbacMiddleware(obj string, act string) gin.HandlerFunc {
 			return
 		}
 
-		currentUser, ok := user.(models.User)
+		currentUser, ok := user.(User)
 		if !ok {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while getting user"})
 			c.Abort()

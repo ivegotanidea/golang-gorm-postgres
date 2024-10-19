@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
-	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"github.com/ivegotanidea/golang-gorm-postgres/utils"
 )
 
@@ -38,7 +38,7 @@ func DeserializeUser() gin.HandlerFunc {
 			return
 		}
 
-		var user models.User
+		var user User
 		result := initializers.DB.First(&user, "id = ?", fmt.Sprint(sub))
 		if result.Error != nil {
 			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "error", "message": "the user belonging to this token no logger exists"})

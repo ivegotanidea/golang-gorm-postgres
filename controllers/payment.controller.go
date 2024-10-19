@@ -20,16 +20,16 @@ func NewPaymentController(DB *gorm.DB, apiKey string, baseUrl string) PaymentCon
 }
 
 // PaymentWebhook godoc
-// @Summary Webhook for payment updates
-// @Description Receives payment updates and updates the payment status in the database.
-// @Tags Payments
-// @Accept json
-// @Produce json
-// @Param body body Payment true "Payment Update"
-// @Success 200 {object} SuccessResponse{data=string} "payment updated"
-// @Failure 400 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /payments/webhook [post]
+//	@Summary		Webhook for payment updates
+//	@Description	Receives payment updates and updates the payment status in the database.
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		Payment							true	"Payment Update"
+//	@Success		200		{object}	SuccessResponse{data=string}	"payment updated"
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/payments/webhook [post]
 func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 	var paymentUpdate Payment
 
@@ -59,17 +59,17 @@ func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 }
 
 // GetPaymentHistory godoc
-// @Summary Get payment history for a user
-// @Description Retrieves the payment history for a specified user between two dates.
-// @Tags Payments
-// @Accept json
-// @Produce json
-// @Param userID path string true "User ID"
-// @Param start_date query string true "Start Date in RFC3339 format"
-// @Param end_date query string true "End Date in RFC3339 format"
-// @Success 200 {object} SuccessResponse{data=[]Payment}
-// @Failure 500 {object} ErrorResponse
-// @Router /payments/history/{userID} [get]
+//	@Summary		Get payment history for a user
+//	@Description	Retrieves the payment history for a specified user between two dates.
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID		path		string	true	"User ID"
+//	@Param			start_date	query		string	true	"Start Date in RFC3339 format"
+//	@Param			end_date	query		string	true	"End Date in RFC3339 format"
+//	@Success		200			{object}	SuccessResponse{data=[]Payment}
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/payments/history/{userID} [get]
 func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 	// Get userID from path and date range from query parameters
 	userID := ctx.Param("userID")
@@ -95,16 +95,16 @@ func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 }
 
 // ListPayments godoc
-// @Summary List all payments
-// @Description Retrieves all payments, sorted by payment date in descending order with pagination.
-// @Tags Payments
-// @Accept json
-// @Produce json
-// @Param page query int false "Page number" default(1)
-// @Param limit query int false "Limit per page" default(10)
-// @Success 200 {object} SuccessResponse{data=[]Payment}
-// @Failure 500 {object} ErrorResponse
-// @Router /payments [get]
+//	@Summary		List all payments
+//	@Description	Retrieves all payments, sorted by payment date in descending order with pagination.
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		int	false	"Page number"		default(1)
+//	@Param			limit	query		int	false	"Limit per page"	default(10)
+//	@Success		200		{object}	SuccessResponse{data=[]Payment}
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/payments [get]
 func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 	// Pagination parameters
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
@@ -137,16 +137,16 @@ func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 }
 
 // GetMyPayments godoc
-// @Summary Get current user's payments
-// @Description Retrieves the payments made by the current user, sorted by payment date in descending order with pagination.
-// @Tags Payments
-// @Accept json
-// @Produce json
-// @Param page query int false "Page number" default(1)
-// @Param limit query int false "Limit per page" default(10)
-// @Success 200 {object} SuccessResponse{data=[]Payment}
-// @Failure 500 {object} ErrorResponse
-// @Router /payments/me [get]
+//	@Summary		Get current user's payments
+//	@Description	Retrieves the payments made by the current user, sorted by payment date in descending order with pagination.
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		int	false	"Page number"		default(1)
+//	@Param			limit	query		int	false	"Limit per page"	default(10)
+//	@Success		200		{object}	SuccessResponse{data=[]Payment}
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/payments/me [get]
 func (pc *PaymentController) GetMyPayments(ctx *gin.Context) {
 	// Get the current user from context (assumes middleware has set currentUser)
 	currentUser := ctx.MustGet("currentUser").(User)

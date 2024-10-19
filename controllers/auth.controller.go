@@ -26,16 +26,16 @@ func NewAuthController(DB *gorm.DB) AuthController {
 const defaultUserAvatar = ""
 
 // BotSignUpUser godoc
-// @Summary Registers a new user via bot
-// @Description Registers a new user by accepting Telegram user ID and other basic details. Automatically generates password.
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param body body BotSignUpInput true "Bot Signup Input"
-// @Success 201 {object} UserResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 502 {object} ErrorResponse
-// @Router /auth/bot/signup [post]
+//	@Summary		Registers a new user via bot
+//	@Description	Registers a new user by accepting Telegram user ID and other basic details. Automatically generates password.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		BotSignUpInput	true	"Bot Signup Input"
+//	@Success		201		{object}	UserResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/auth/bot/signup [post]
 func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 	var payload *BotSignUpInput
 
@@ -98,17 +98,17 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 }
 
 // SignUpUser godoc
-// @Summary Registers a new user
-// @Description Registers a new user by accepting basic details and password confirmation.
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param body body SignUpInput true "SignUp Input"
-// @Success 201 {object} UserResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 409 {object} ErrorResponse
-// @Failure 502 {object} ErrorResponse
-// @Router /auth/signup [post]
+//	@Summary		Registers a new user
+//	@Description	Registers a new user by accepting basic details and password confirmation.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		SignUpInput	true	"SignUp Input"
+//	@Success		201		{object}	UserResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		409		{object}	ErrorResponse
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/auth/signup [post]
 func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	var payload *SignUpInput
 
@@ -166,15 +166,15 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 }
 
 // BotSignInUser godoc
-// @Summary Logs in a bot user
-// @Description Authenticates a bot user by accepting Telegram User ID.
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param body body BotSignInInput true "Bot SignIn Input"
-// @Success 200 {object} TokenResponse
-// @Failure 400 {object} ErrorResponse
-// @Router /auth/bot/signin [post]
+//	@Summary		Logs in a bot user
+//	@Description	Authenticates a bot user by accepting Telegram User ID.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		BotSignInInput	true	"Bot SignIn Input"
+//	@Success		200		{object}	TokenResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Router			/auth/bot/signin [post]
 func (ac *AuthController) BotSignInUser(ctx *gin.Context) {
 	var payload *BotSignInInput
 
@@ -212,15 +212,15 @@ func (ac *AuthController) BotSignInUser(ctx *gin.Context) {
 }
 
 // SignInUser godoc
-// @Summary Logs in a user
-// @Description Authenticates a user by accepting phone and password.
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param body body SignInInput true "SignIn Input"
-// @Success 200 {object} TokenResponse
-// @Failure 400 {object} ErrorResponse
-// @Router /auth/signin [post]
+//	@Summary		Logs in a user
+//	@Description	Authenticates a user by accepting phone and password.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		SignInInput	true	"SignIn Input"
+//	@Success		200		{object}	TokenResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Router			/auth/signin [post]
 func (ac *AuthController) SignInUser(ctx *gin.Context) {
 	var payload *SignInInput
 
@@ -263,13 +263,13 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 }
 
 // RefreshAccessToken godoc
-// @Summary Refreshes access token
-// @Description Refreshes the access token using the refresh token cookie.
-// @Tags Auth
-// @Produce json
-// @Success 200 {object} TokenResponse
-// @Failure 403 {object} ErrorResponse
-// @Router /auth/refresh [post]
+//	@Summary		Refreshes access token
+//	@Description	Refreshes the access token using the refresh token cookie.
+//	@Tags			Auth
+//	@Produce		json
+//	@Success		200	{object}	TokenResponse
+//	@Failure		403	{object}	ErrorResponse
+//	@Router			/auth/refresh [post]
 func (ac *AuthController) RefreshAccessToken(ctx *gin.Context) {
 	message := "could not refresh access token"
 
@@ -308,12 +308,12 @@ func (ac *AuthController) RefreshAccessToken(ctx *gin.Context) {
 }
 
 // LogoutUser godoc
-// @Summary Logs out a user
-// @Description Clears the access and refresh tokens and logs out the user.
-// @Tags Auth
-// @Produce json
-// @Success 200 {object} SuccessResponse
-// @Router /auth/logout [post]
+//	@Summary		Logs out a user
+//	@Description	Clears the access and refresh tokens and logs out the user.
+//	@Tags			Auth
+//	@Produce		json
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/auth/logout [post]
 func (ac *AuthController) LogoutUser(ctx *gin.Context) {
 	ctx.SetCookie("access_token", "", -1, "/", "localhost", false, true)
 	ctx.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)

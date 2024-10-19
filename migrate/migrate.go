@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
-	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 	"log"
 )
@@ -20,7 +20,7 @@ func init() {
 
 func CreateOwnerUser(db *gorm.DB) {
 
-	owner := models.User{
+	owner := User{
 		ID:             uuid.Max,
 		Name:           "He Who Remains",
 		Phone:          "77778889900",
@@ -41,21 +41,21 @@ func Init() {
 	initializers.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	err := initializers.DB.AutoMigrate(
-		&models.HairColor{},
-		&models.IntimateHairCut{},
-		&models.Ethnos{},
-		&models.BodyType{},
-		&models.ProfileBodyArt{},
-		&models.BodyArt{},
-		&models.City{},
-		&models.User{},
-		&models.Profile{},
-		&models.Service{},
-		&models.Photo{},
-		&models.ProfileOption{},
-		&models.UserRating{},
-		&models.ProfileRating{},
-		&models.ProfileTag{})
+		&HairColor{},
+		&IntimateHairCut{},
+		&Ethnos{},
+		&BodyType{},
+		&ProfileBodyArt{},
+		&BodyArt{},
+		&City{},
+		&User{},
+		&Profile{},
+		&Service{},
+		&Photo{},
+		&ProfileOption{},
+		&UserRating{},
+		&ProfileRating{},
+		&ProfileTag{})
 
 	// Auto-migrate the User model
 	if err != nil {

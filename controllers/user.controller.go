@@ -49,14 +49,14 @@ func checkAvatar(newAvatarUrl string, oldAvatarUrl string) (string, string) {
 }
 
 // GetMe godoc
-// @Summary Get current authenticated user
-// @Description Retrieves the profile of the currently authenticated user
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Success 200 {object} SuccessResponse{data=UserResponse}
-// @Failure 401 {object} ErrorResponse
-// @Router /users/me [get]
+//	@Summary		Get current authenticated user
+//	@Description	Retrieves the profile of the currently authenticated user
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	SuccessResponse{data=UserResponse}
+//	@Failure		401	{object}	ErrorResponse
+//	@Router			/users/me [get]
 func (uc *UserController) GetMe(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 
@@ -77,16 +77,16 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 }
 
 // FindUsers godoc
-// @Summary Retrieve users based on the current user's role
-// @Description Retrieves a paginated list of users based on the current user's role. Regular users can only see other users, while non-owners can see all users except owners.
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Param page query int false "Page number" default(1)
-// @Param limit query int false "Limit per page" default(10)
-// @Success 200 {object} SuccessResponse{data=[]User}
-// @Failure 502 {object} ErrorResponse
-// @Router /users [get]
+//	@Summary		Retrieve users based on the current user's role
+//	@Description	Retrieves a paginated list of users based on the current user's role. Regular users can only see other users, while non-owners can see all users except owners.
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		int	false	"Page number"		default(1)
+//	@Param			limit	query		int	false	"Limit per page"	default(10)
+//	@Success		200		{object}	SuccessResponse{data=[]User}
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/users [get]
 func (uc *UserController) FindUsers(ctx *gin.Context) {
 
 	currentUser := ctx.MustGet("currentUser").(User)
@@ -129,18 +129,18 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 }
 
 // GetUser godoc
-// @Summary Get a user by ID, Telegram user ID, or phone
-// @Description Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required.
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Param id query string false "User ID"
-// @Param telegramUserId query int false "Telegram User ID"
-// @Param phone query string false "Phone number"
-// @Success 200 {object} SuccessResponse{data=UserResponse}
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Router /users [get]
+//	@Summary		Get a user by ID, Telegram user ID, or phone
+//	@Description	Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required.
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id				query		string	false	"User ID"
+//	@Param			telegramUserId	query		int		false	"Telegram User ID"
+//	@Param			phone			query		string	false	"Phone number"
+//	@Success		200				{object}	SuccessResponse{data=UserResponse}
+//	@Failure		400				{object}	ErrorResponse
+//	@Failure		404				{object}	ErrorResponse
+//	@Router			/users [get]
 func (uc *UserController) GetUser(ctx *gin.Context) {
 	var query *FindUserQuery
 
@@ -210,14 +210,14 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 }
 
 // DeleteSelf godoc
-// @Summary Delete the currently authenticated user
-// @Description Allows the current user to delete their own account.
-// @Tags Users
-// @Produce json
-// @Success 204 {object} nil
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Router /users/self [delete]
+//	@Summary		Delete the currently authenticated user
+//	@Description	Allows the current user to delete their own account.
+//	@Tags			Users
+//	@Produce		json
+//	@Success		204	{object}	nil
+//	@Failure		400	{object}	ErrorResponse
+//	@Failure		404	{object}	ErrorResponse
+//	@Router			/users/self [delete]
 func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	userId := currentUser.ID.String()
@@ -248,16 +248,16 @@ func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 }
 
 // DeleteUser godoc
-// @Summary Delete a user by ID
-// @Description Allows an authorized user to delete another user by their ID, with role-based restrictions.
-// @Tags Users
-// @Produce json
-// @Param id path string true "User ID"
-// @Success 204 {object} nil
-// @Failure 400 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Router /users/{id} [delete]
+//	@Summary		Delete a user by ID
+//	@Description	Allows an authorized user to delete another user by their ID, with role-based restrictions.
+//	@Tags			Users
+//	@Produce		json
+//	@Param			id	path		string	true	"User ID"
+//	@Success		204	{object}	nil
+//	@Failure		400	{object}	ErrorResponse
+//	@Failure		403	{object}	ErrorResponse
+//	@Failure		404	{object}	ErrorResponse
+//	@Router			/users/{id} [delete]
 func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 	currentUser := ctx.MustGet("currentUser").(User)
@@ -313,17 +313,17 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 }
 
 // UpdateSelf godoc
-// @Summary Update the current user's information
-// @Description Allows the current user to update their own profile, including name, phone, and avatar.
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Param body body UpdateUser true "User Update Payload"
-// @Success 200 {object} SuccessResponse{data=UserResponse}
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 502 {object} ErrorResponse
-// @Router /users/me [put]
+//	@Summary		Update the current user's information
+//	@Description	Allows the current user to update their own profile, including name, phone, and avatar.
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		UpdateUser	true	"User Update Payload"
+//	@Success		200		{object}	SuccessResponse{data=UserResponse}
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		404		{object}	ErrorResponse
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/users/me [put]
 func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 
 	currentUser := ctx.MustGet("currentUser").(User)
@@ -401,18 +401,18 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 }
 
 // UpdateUser godoc
-// @Summary Update a user's information (privileged access)
-// @Description Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Param id path string true "User ID"
-// @Param body body UpdateUserPrivileged true "User Update Payload"
-// @Success 200 {object} SuccessResponse{data=User}
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 502 {object} ErrorResponse
-// @Router /users/{id} [put]
+//	@Summary		Update a user's information (privileged access)
+//	@Description	Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string					true	"User ID"
+//	@Param			body	body		UpdateUserPrivileged	true	"User Update Payload"
+//	@Success		200		{object}	SuccessResponse{data=User}
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		404		{object}	ErrorResponse
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/users/{id} [put]
 func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 
@@ -493,18 +493,18 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 }
 
 // AssignRole godoc
-// @Summary Assign a role to a user
-// @Description Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Param body body AssignRole true "Role assignment details"
-// @Success 200 {object} SuccessResponse{data=User}
-// @Failure 400 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /users/assign-role [post]
+//	@Summary		Assign a role to a user
+//	@Description	Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		AssignRole	true	"Role assignment details"
+//	@Success		200		{object}	SuccessResponse{data=User}
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		403		{object}	ErrorResponse
+//	@Failure		404		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/users/assign-role [post]
 func (uc *UserController) AssignRole(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 

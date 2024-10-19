@@ -45,16 +45,16 @@ func getDistanceBetweenCoordinates(latA, lonA, latB, lonB float32) float64 {
 }
 
 // CreateService godoc
-// @Summary Create a new service
-// @Description Creates a new service between a client user and a profile, including optional ratings for both the profile and the user.
-// @Tags Services
-// @Accept json
-// @Produce json
-// @Param body body CreateServiceRequest true "Create Service Request"
-// @Success 201 {object} SuccessResponse{data=Service}
-// @Failure 400 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /services [post]
+//	@Summary		Create a new service
+//	@Description	Creates a new service between a client user and a profile, including optional ratings for both the profile and the user.
+//	@Tags			Services
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		CreateServiceRequest	true	"Create Service Request"
+//	@Success		201		{object}	SuccessResponse{data=Service}
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/services [post]
 func (sc *ServiceController) CreateService(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	var payload *CreateServiceRequest
@@ -260,17 +260,17 @@ func MutateService(tier string, service Service) map[string]interface{} {
 }
 
 // GetService godoc
-// @Summary Get a specific service by profile and service ID
-// @Description Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.
-// @Tags Services
-// @Accept json
-// @Produce json
-// @Param profileID path string true "Profile ID"
-// @Param serviceID path string true "Service ID"
-// @Success 200 {object} SuccessResponse{data=Service}
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /profiles/{profileID}/services/{serviceID} [get]
+//	@Summary		Get a specific service by profile and service ID
+//	@Description	Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.
+//	@Tags			Services
+//	@Accept			json
+//	@Produce		json
+//	@Param			profileID	path		string	true	"Profile ID"
+//	@Param			serviceID	path		string	true	"Service ID"
+//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Failure		404			{object}	ErrorResponse
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/profiles/{profileID}/services/{serviceID} [get]
 func (sc *ServiceController) GetService(ctx *gin.Context) {
 	profileID := ctx.Param("profileID")
 	serviceID := ctx.Param("serviceID")
@@ -301,18 +301,18 @@ func (sc *ServiceController) GetService(ctx *gin.Context) {
 }
 
 // GetProfileServices godoc
-// @Summary Get all services for a specific profile
-// @Description Retrieves all services for a specific profile, with filtered data based on the user's tier.
-// @Tags Services
-// @Accept json
-// @Produce json
-// @Param profileID path string true "Profile ID"
-// @Param page query string false "Page number" default(1)
-// @Param limit query string false "Number of items per page" default(10)
-// @Success 200 {object} SuccessResponse{data=[]map[string]interface{}}
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /profiles/{profileID}/services [get]
+//	@Summary		Get all services for a specific profile
+//	@Description	Retrieves all services for a specific profile, with filtered data based on the user's tier.
+//	@Tags			Services
+//	@Accept			json
+//	@Produce		json
+//	@Param			profileID	path		string	true	"Profile ID"
+//	@Param			page		query		string	false	"Page number"				default(1)
+//	@Param			limit		query		string	false	"Number of items per page"	default(10)
+//	@Success		200			{object}	SuccessResponse{data=[]map[string]interface{}}
+//	@Failure		404			{object}	ErrorResponse
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/profiles/{profileID}/services [get]
 func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -357,16 +357,16 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 }
 
 // ListServices godoc
-// @Summary Get a list of services
-// @Description Retrieves a paginated list of services with all related information.
-// @Tags Services
-// @Accept json
-// @Produce json
-// @Param page query string false "Page number" default(1)
-// @Param limit query string false "Number of items per page" default(10)
-// @Success 200 {object} SuccessResponse{data=[]Service}
-// @Failure 502 {object} ErrorResponse
-// @Router /services [get]
+//	@Summary		Get a list of services
+//	@Description	Retrieves a paginated list of services with all related information.
+//	@Tags			Services
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		string	false	"Page number"				default(1)
+//	@Param			limit	query		string	false	"Number of items per page"	default(10)
+//	@Success		200		{object}	SuccessResponse{data=[]Service}
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/services [get]
 func (sc *ServiceController) ListServices(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -403,19 +403,19 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 // ----
 
 // UpdateClientUserReviewOnProfile godoc
-// @Summary Update a client's user review on a profile service
-// @Description Updates the user review for a service if the current user is authorized to do so and within the allowed time limit.
-// @Tags Services
-// @Accept json
-// @Produce json
-// @Param service_id query string true "Service ID"
-// @Param body body CreateUserRatingRequest true "User Rating Request"
-// @Success 200 {object} SuccessResponse{data=Service}
-// @Failure 400 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /services/client/review/update [put]
+//	@Summary		Update a client's user review on a profile service
+//	@Description	Updates the user review for a service if the current user is authorized to do so and within the allowed time limit.
+//	@Tags			Services
+//	@Accept			json
+//	@Produce		json
+//	@Param			service_id	query		string					true	"Service ID"
+//	@Param			body		body		CreateUserRatingRequest	true	"User Rating Request"
+//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Failure		400			{object}	ErrorResponse
+//	@Failure		403			{object}	ErrorResponse
+//	@Failure		404			{object}	ErrorResponse
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/services/client/review/update [put]
 func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
@@ -526,19 +526,19 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 }
 
 // HideProfileOwnerReview godoc
-// @Summary Hide or show the profile owner's review visibility
-// @Description Hides or shows the profile owner's review based on the client's request.
-// @Tags Services
-// @Accept json
-// @Produce json
-// @Param service_id query string true "Service ID"
-// @Param body body SetReviewVisibilityRequest true "Set Review Visibility Request"
-// @Success 200 {object} SuccessResponse{data=Service}
-// @Failure 400 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /services/profile-owner/review/hide [put]
+//	@Summary		Hide or show the profile owner's review visibility
+//	@Description	Hides or shows the profile owner's review based on the client's request.
+//	@Tags			Services
+//	@Accept			json
+//	@Produce		json
+//	@Param			service_id	query		string						true	"Service ID"
+//	@Param			body		body		SetReviewVisibilityRequest	true	"Set Review Visibility Request"
+//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Failure		400			{object}	ErrorResponse
+//	@Failure		403			{object}	ErrorResponse
+//	@Failure		404			{object}	ErrorResponse
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/services/profile-owner/review/hide [put]
 func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
@@ -598,19 +598,19 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 }
 
 // UpdateProfileOwnerReviewOnClientUser godoc
-// @Summary Update the profile owner's review on a client user
-// @Description Allows a profile owner to update their review on a client user within the allowed time limit.
-// @Tags Services
-// @Accept json
-// @Produce json
-// @Param service_id query string true "Service ID"
-// @Param body body CreateProfileRatingRequest true "Create Profile Rating Request"
-// @Success 200 {object} SuccessResponse{data=Service}
-// @Failure 400 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /services/profile-owner/review/update [put]
+//	@Summary		Update the profile owner's review on a client user
+//	@Description	Allows a profile owner to update their review on a client user within the allowed time limit.
+//	@Tags			Services
+//	@Accept			json
+//	@Produce		json
+//	@Param			service_id	query		string						true	"Service ID"
+//	@Param			body		body		CreateProfileRatingRequest	true	"Create Profile Rating Request"
+//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Failure		400			{object}	ErrorResponse
+//	@Failure		403			{object}	ErrorResponse
+//	@Failure		404			{object}	ErrorResponse
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/services/profile-owner/review/update [put]
 func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
@@ -720,19 +720,19 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 }
 
 // HideUserReview godoc
-// @Summary Hide a user's review
-// @Description Allows a profile owner to hide a user's review on a service. Only available for non-basic tier users.
-// @Tags Services
-// @Accept json
-// @Produce json
-// @Param service_id query string true "Service ID"
-// @Param body body SetReviewVisibilityRequest true "Set Review Visibility Request"
-// @Success 200 {object} SuccessResponse{data=Service}
-// @Failure 400 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /services/user/review/hide [put]
+//	@Summary		Hide a user's review
+//	@Description	Allows a profile owner to hide a user's review on a service. Only available for non-basic tier users.
+//	@Tags			Services
+//	@Accept			json
+//	@Produce		json
+//	@Param			service_id	query		string						true	"Service ID"
+//	@Param			body		body		SetReviewVisibilityRequest	true	"Set Review Visibility Request"
+//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Failure		400			{object}	ErrorResponse
+//	@Failure		403			{object}	ErrorResponse
+//	@Failure		404			{object}	ErrorResponse
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/services/user/review/hide [put]
 func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
