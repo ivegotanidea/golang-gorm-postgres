@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
-	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"github.com/ivegotanidea/golang-gorm-postgres/utils"
 	"gorm.io/gorm"
 	"net/http"
@@ -54,13 +54,13 @@ func checkAvatar(newAvatarUrl string, oldAvatarUrl string) (string, string) {
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.SuccessResponse{data=models.UserResponse}
-// @Failure 401 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=UserResponse}
+// @Failure 401 {object} ErrorResponse
 // @Router /users/me [get]
 func (uc *UserController) GetMe(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
-	userResponse := &models.UserResponse{
+	userResponse := &UserResponse{
 		ID:        currentUser.ID,
 		Name:      currentUser.Name,
 		Phone:     currentUser.Phone,
@@ -70,7 +70,7 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 		UpdatedAt: currentUser.UpdatedAt,
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   userResponse,
 	})
@@ -84,12 +84,12 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Limit per page" default(10)
-// @Success 200 {object} models.SuccessResponse{data=[]models.User}
-// @Failure 502 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=[]User}
+// @Failure 502 {object} ErrorResponse
 // @Router /users [get]
 func (uc *UserController) FindUsers(ctx *gin.Context) {
 
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -98,7 +98,7 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var users []models.User
+	var users []User
 
 	var results *gorm.DB
 
@@ -109,7 +109,7 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 	}
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{
 			Status:  "error",
 			Message: results.Error.Error(),
 		})
@@ -119,7 +119,7 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 	intPage, _ = strconv.Atoi(page)
 	intLimit, _ = strconv.Atoi(limit)
 
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Results: len(users),
 		Data:    users,
@@ -137,15 +137,15 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 // @Param id query string false "User ID"
 // @Param telegramUserId query int false "Telegram User ID"
 // @Param phone query string false "Phone number"
-// @Success 200 {object} models.SuccessResponse{data=models.UserResponse}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=UserResponse}
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
 // @Router /users [get]
 func (uc *UserController) GetUser(ctx *gin.Context) {
-	var query *models.FindUserQuery
+	var query *FindUserQuery
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -157,14 +157,14 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 	phone := query.Phone
 
 	if userId == "" && telegramUserId == 0 && phone == "" {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: "userId or telegramUserId or phone is required",
 		})
 		return
 	}
 
-	var user models.User
+	var user User
 	var result *gorm.DB
 
 	if userId != "" {
@@ -177,21 +177,21 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 
 	if result.Error != nil {
 		if result.Error.Error() == "record not found" && result.RowsAffected == 0 {
-			ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+			ctx.JSON(http.StatusNotFound, ErrorResponse{
 				Status:  "error",
 				Message: "No user with that ID exists",
 			})
 			return
 		}
 
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: result.Error.Error(),
 		})
 		return
 	}
 
-	userResponse := &models.UserResponse{
+	userResponse := &UserResponse{
 		ID:             user.ID,
 		TelegramUserID: user.TelegramUserId,
 		Name:           user.Name,
@@ -203,7 +203,7 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 		Tier:           user.Tier,
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   userResponse,
 	})
@@ -215,11 +215,11 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 // @Tags Users
 // @Produce json
 // @Success 204 {object} nil
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
 // @Router /users/self [delete]
 func (uc *UserController) DeleteSelf(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 	userId := currentUser.ID.String()
 
 	fmt.Printf("User %v has committed self-deletion", currentUser.ID)
@@ -227,9 +227,9 @@ func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 	var result *gorm.DB
 
 	if userId != "" {
-		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
+		result = uc.DB.Delete(&User{}, "id = ?", userId)
 	} else {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: "userId or telegramUserId or phone is required",
 		})
@@ -237,7 +237,7 @@ func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 	}
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "No user with that ID exists",
 		})
@@ -254,18 +254,18 @@ func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 // @Produce json
 // @Param id path string true "User ID"
 // @Success 204 {object} nil
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 403 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
 // @Router /users/{id} [delete]
 func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
-	var targetUser models.User
+	var targetUser User
 
 	if err := initializers.DB.First(&targetUser, "id = ?", userId).Error; err != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "User not found",
 		})
@@ -274,7 +274,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 
 	// Role-based restrictions
 	if currentUser.Role == "moderator" && (targetUser.Role == "moderator" || targetUser.Role == "admin" || targetUser.Role == "owner") {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "You are not authorized to delete this user",
 		})
@@ -282,7 +282,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	}
 
 	if currentUser.Role == "admin" && (targetUser.Role == "admin" || targetUser.Role == "owner") {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "You are not authorized to delete this user",
 		})
@@ -292,9 +292,9 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	// Proceed with deletion
 	var result *gorm.DB
 	if userId != "" {
-		result = uc.DB.Delete(&models.User{}, "id = ?", userId)
+		result = uc.DB.Delete(&User{}, "id = ?", userId)
 	} else {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: "User ID is required",
 		})
@@ -302,7 +302,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	}
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "User not found",
 		})
@@ -318,20 +318,20 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param body body models.UpdateUser true "User Update Payload"
-// @Success 200 {object} models.SuccessResponse{data=models.UserResponse}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 502 {object} models.ErrorResponse
+// @Param body body UpdateUser true "User Update Payload"
+// @Success 200 {object} SuccessResponse{data=UserResponse}
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 502 {object} ErrorResponse
 // @Router /users/me [put]
 func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 	userId := currentUser.ID.String()
 
-	var payload *models.UpdateUser
+	var payload *UpdateUser
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -339,18 +339,18 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	}
 
 	if err := uc.validator.Struct(payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
 		return
 	}
 
-	var updatedUser models.User
+	var updatedUser User
 	result := uc.DB.First(&updatedUser, "id = ?", userId)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "User not found",
 		})
@@ -360,7 +360,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	// Validate and update avatar if needed
 	avatarUrl, err := checkAvatar(payload.Avatar, updatedUser.Avatar)
 	if err != "" {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err,
 		})
@@ -370,7 +370,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	now := time.Now()
 
 	// Prepare the updated user data
-	userToUpdate := models.User{
+	userToUpdate := User{
 		Name:      payload.Name,
 		Phone:     payload.Phone,
 		Avatar:    avatarUrl,
@@ -381,7 +381,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	uc.DB.Model(&updatedUser).Updates(userToUpdate)
 
 	// Prepare the user response
-	userResponse := &models.UserResponse{
+	userResponse := &UserResponse{
 		ID:             updatedUser.ID,
 		TelegramUserID: updatedUser.TelegramUserId,
 		Name:           updatedUser.Name,
@@ -394,7 +394,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	}
 
 	// Return the updated user data in the response
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   userResponse,
 	})
@@ -407,19 +407,19 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "User ID"
-// @Param body body models.UpdateUserPrivileged true "User Update Payload"
-// @Success 200 {object} models.SuccessResponse{data=models.User}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 502 {object} models.ErrorResponse
+// @Param body body UpdateUserPrivileged true "User Update Payload"
+// @Success 200 {object} SuccessResponse{data=User}
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 502 {object} ErrorResponse
 // @Router /users/{id} [put]
 func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 
 	// Parse and bind the payload from the request
-	var payload *models.UpdateUserPrivileged
+	var payload *UpdateUserPrivileged
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -428,7 +428,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 
 	// Validate the payload
 	if err := uc.validator.Struct(payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -436,10 +436,10 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	}
 
 	// Find the user to be updated
-	var updatedUser models.User
+	var updatedUser User
 	result := uc.DB.First(&updatedUser, "id = ?", userId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "User not found",
 		})
@@ -452,7 +452,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	if payload.TelegramUserId != "" {
 		newTelegramId, err = strconv.ParseInt(payload.TelegramUserId, 10, 64)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{
 				Status:  "error",
 				Message: "Invalid telegram id",
 			})
@@ -464,7 +464,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	now := time.Now()
 
 	// Prepare the updated user data
-	userToUpdate := models.User{
+	userToUpdate := User{
 		Name:           payload.Name,
 		Phone:          payload.Phone,
 		Avatar:         payload.Avatar,
@@ -478,7 +478,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	// Apply the updates to the database
 	tx := uc.DB.Model(&updatedUser).Updates(userToUpdate)
 	if tx.Error != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: tx.Error.Error(),
 		})
@@ -486,7 +486,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	}
 
 	// Return the updated user data in the response
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   updatedUser,
 	})
@@ -498,20 +498,20 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param body body models.AssignRole true "Role assignment details"
-// @Success 200 {object} models.SuccessResponse{data=models.User}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 403 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body AssignRole true "Role assignment details"
+// @Success 200 {object} SuccessResponse{data=User}
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /users/assign-role [post]
 func (uc *UserController) AssignRole(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
 	// Bind the request payload
-	var payload models.AssignRole
+	var payload AssignRole
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -520,7 +520,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 
 	// Validate the payload
 	if err := uc.validator.Struct(payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -528,9 +528,9 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 	}
 
 	// Find the target user
-	var targetUser models.User
+	var targetUser User
 	if err := initializers.DB.First(&targetUser, "id = ?", payload.Id).Error; err != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "User not found",
 		})
@@ -539,7 +539,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 
 	// Role validation for the current admin
 	if currentUser.Role == "admin" && (targetUser.Role == "admin" || targetUser.Role == "owner") {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "Cannot assign role to admins or owners",
 		})
@@ -548,7 +548,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 
 	// Check if the target user already has a profile
 	if targetUser.HasProfile {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "User already has a profile",
 		})
@@ -565,7 +565,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 
 	// Save the updated user in the database
 	if err := initializers.DB.Save(&targetUser).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to change user's role",
 		})
@@ -573,7 +573,7 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 	}
 
 	// Return the updated user in the response
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   targetUser,
 	})

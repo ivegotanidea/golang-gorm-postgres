@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 )
 
@@ -50,17 +50,17 @@ func getDistanceBetweenCoordinates(latA, lonA, latB, lonB float32) float64 {
 // @Tags Services
 // @Accept json
 // @Produce json
-// @Param body body models.CreateServiceRequest true "Create Service Request"
-// @Success 201 {object} models.SuccessResponse{data=models.Service}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body CreateServiceRequest true "Create Service Request"
+// @Success 201 {object} SuccessResponse{data=Service}
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /services [post]
 func (sc *ServiceController) CreateService(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
-	var payload *models.CreateServiceRequest
+	currentUser := ctx.MustGet("currentUser").(User)
+	var payload *CreateServiceRequest
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -74,7 +74,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 		*payload.ProfileUserLatitude, *payload.ProfileUserLongitude)
 
 	// Create the new service object
-	newService := models.Service{
+	newService := Service{
 		ClientUserID:  payload.ClientUserID,
 		ClientUserLat: strconv.FormatFloat(float64(*payload.ClientUserLatitude), 'f', -1, 32),
 		ClientUserLon: strconv.FormatFloat(float64(*payload.ClientUserLongitude), 'f', -1, 32),
@@ -98,7 +98,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 	err := tx.Create(&newService).Error
 	if err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to create service",
 		})
@@ -107,7 +107,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 	// If profile rating exists
 	if payload.ProfileRating != nil {
-		reviewOfProfile := models.ProfileRating{
+		reviewOfProfile := ProfileRating{
 			ServiceID: newService.ID,
 			ProfileID: newService.ProfileID,
 			Review:    payload.ProfileRating.Review,
@@ -118,7 +118,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 		if err := tx.Create(&reviewOfProfile).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 				Status:  "error",
 				Message: "Failed to create profile rating",
 			})
@@ -128,9 +128,9 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 		newService.ProfileRatingID = &reviewOfProfile.ID
 
 		if len(payload.ProfileRating.RatedProfileTags) > 0 {
-			var ratedProfileTags []models.RatedProfileTag
+			var ratedProfileTags []RatedProfileTag
 			for _, profileTag := range payload.ProfileRating.RatedProfileTags {
-				ratedProfileTags = append(ratedProfileTags, models.RatedProfileTag{
+				ratedProfileTags = append(ratedProfileTags, RatedProfileTag{
 					RatingID:     reviewOfProfile.ID,
 					ProfileTagID: profileTag.TagID,
 					Type:         profileTag.Type,
@@ -139,7 +139,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 			if err := tx.Create(&ratedProfileTags).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 					Status:  "error",
 					Message: "Failed to create rated profile tags",
 				})
@@ -150,7 +150,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 	// If user rating exists
 	if payload.UserRating != nil {
-		reviewOfUser := models.UserRating{
+		reviewOfUser := UserRating{
 			ServiceID: newService.ID,
 			UserID:    newService.ClientUserID,
 			Review:    payload.UserRating.Review,
@@ -161,7 +161,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 		if err := tx.Create(&reviewOfUser).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 				Status:  "error",
 				Message: "Failed to create user rating",
 			})
@@ -171,9 +171,9 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 		newService.ClientUserRatingID = &reviewOfUser.ID
 
 		if len(payload.UserRating.RatedUserTags) > 0 {
-			var ratedUserTags []models.RatedUserTag
+			var ratedUserTags []RatedUserTag
 			for _, userTag := range payload.UserRating.RatedUserTags {
-				ratedUserTags = append(ratedUserTags, models.RatedUserTag{
+				ratedUserTags = append(ratedUserTags, RatedUserTag{
 					RatingID:  reviewOfUser.ID,
 					UserTagID: userTag.TagID,
 					Type:      userTag.Type,
@@ -182,7 +182,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 
 			if err := tx.Create(&ratedUserTags).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 					Status:  "error",
 					Message: "Failed to create rated user tags",
 				})
@@ -194,7 +194,7 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 	// Commit the transaction
 	if err := tx.Save(&newService).Commit().Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to commit transaction",
 		})
@@ -202,13 +202,13 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 	}
 
 	// Return the created service in the response
-	ctx.JSON(http.StatusCreated, models.SuccessResponse{
+	ctx.JSON(http.StatusCreated, SuccessResponse{
 		Status: "success",
 		Data:   newService,
 	})
 }
 
-func MutateService(tier string, service models.Service) map[string]interface{} {
+func MutateService(tier string, service Service) map[string]interface{} {
 
 	filteredService := make(map[string]interface{})
 
@@ -267,23 +267,23 @@ func MutateService(tier string, service models.Service) map[string]interface{} {
 // @Produce json
 // @Param profileID path string true "Profile ID"
 // @Param serviceID path string true "Service ID"
-// @Success 200 {object} models.SuccessResponse{data=models.Service}
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=Service}
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /profiles/{profileID}/services/{serviceID} [get]
 func (sc *ServiceController) GetService(ctx *gin.Context) {
 	profileID := ctx.Param("profileID")
 	serviceID := ctx.Param("serviceID")
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
-	var service models.Service
+	var service Service
 	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
 		Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Where("profile_id = ? and id = ?", profileID, serviceID).
 		First(&service)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "No services found for specified profile",
 		})
@@ -294,7 +294,7 @@ func (sc *ServiceController) GetService(ctx *gin.Context) {
 	filteredService := MutateService(currentUser.Tier, service)
 
 	// Return the filtered response
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   filteredService,
 	})
@@ -309,22 +309,22 @@ func (sc *ServiceController) GetService(ctx *gin.Context) {
 // @Param profileID path string true "Profile ID"
 // @Param page query string false "Page number" default(1)
 // @Param limit query string false "Number of items per page" default(10)
-// @Success 200 {object} models.SuccessResponse{data=[]map[string]interface{}}
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=[]map[string]interface{}}
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /profiles/{profileID}/services [get]
 func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
 
 	profileID := ctx.Param("profileID")
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
 	intPage, _ := strconv.Atoi(page)
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var services []models.Service
+	var services []Service
 	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
 		Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Where("profile_id = ?", profileID).
@@ -332,7 +332,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 		Find(&services)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "No services found for specified profile",
 		})
@@ -347,7 +347,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	}
 
 	// Return the filtered response
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Results: len(filteredServices),
 		Page:    intPage,
@@ -364,8 +364,8 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 // @Produce json
 // @Param page query string false "Page number" default(1)
 // @Param limit query string false "Number of items per page" default(10)
-// @Success 200 {object} models.SuccessResponse{data=[]models.Service}
-// @Failure 502 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=[]Service}
+// @Failure 502 {object} ErrorResponse
 // @Router /services [get]
 func (sc *ServiceController) ListServices(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
@@ -375,7 +375,7 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var services []models.Service
+	var services []Service
 
 	dbQuery := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
 		Preload("ProfileRating.RatedProfileTags.ProfileTag").
@@ -384,14 +384,14 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 	results := dbQuery.Find(&services)
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{
 			Status:  "error",
 			Message: results.Error.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Results: len(services),
 		Limit:   intLimit,
@@ -409,19 +409,19 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param service_id query string true "Service ID"
-// @Param body body models.CreateUserRatingRequest true "User Rating Request"
-// @Success 200 {object} models.SuccessResponse{data=models.Service}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 403 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body CreateUserRatingRequest true "User Rating Request"
+// @Success 200 {object} SuccessResponse{data=Service}
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /services/client/review/update [put]
 func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
 
 	// Find the service with the associated user review
-	var service models.Service
+	var service Service
 	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
 		Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Where("id = ?", serviceID).
@@ -429,7 +429,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 
 	// Check if the service exists
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "No services found for the specified profile",
 		})
@@ -438,7 +438,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 
 	// Check if the current user is the one who left the review
 	if service.ClientUserID != currentUser.ID {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "You are not authorized to update this review",
 		})
@@ -449,7 +449,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	hoursSinceReview := time.Since(service.ClientUserRating.CreatedAt).Hours()
 
 	if hoursSinceReview > float64(sc.reviewUpdateLimitHours) {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: fmt.Sprintf("Review can only be updated within %d hours of creation", sc.reviewUpdateLimitHours),
 		})
@@ -457,9 +457,9 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	}
 
 	// Parse the request payload
-	var payload *models.CreateUserRatingRequest
+	var payload *CreateUserRatingRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -477,8 +477,8 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	// Handle the rated user tags if they exist in the payload
 	if len(payload.RatedUserTags) > 0 {
 		// First, delete the existing tags for this user rating
-		if err := sc.DB.Where("rating_id = ?", service.ClientUserRating.ID).Delete(&models.RatedUserTag{}).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		if err := sc.DB.Where("rating_id = ?", service.ClientUserRating.ID).Delete(&RatedUserTag{}).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 				Status:  "error",
 				Message: "Failed to delete old user tags",
 			})
@@ -486,9 +486,9 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 		}
 
 		// Iterate over the new tags and add them
-		var ratedUserTags []models.RatedUserTag
+		var ratedUserTags []RatedUserTag
 		for _, tagReq := range payload.RatedUserTags {
-			ratedUserTag := models.RatedUserTag{
+			ratedUserTag := RatedUserTag{
 				RatingID:  service.ClientUserRating.ID,
 				UserTagID: tagReq.TagID,
 				Type:      tagReq.Type,
@@ -498,7 +498,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 
 		// Save the new tags
 		if err := sc.DB.Create(&ratedUserTags).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 				Status:  "error",
 				Message: "Failed to create new user tags",
 			})
@@ -511,7 +511,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 
 	// Update the user rating in the database
 	if err := sc.DB.Save(&service.ClientUserRating).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to update the user review",
 		})
@@ -519,7 +519,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	}
 
 	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   service,
 	})
@@ -532,19 +532,19 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param service_id query string true "Service ID"
-// @Param body body models.SetReviewVisibilityRequest true "Set Review Visibility Request"
-// @Success 200 {object} models.SuccessResponse{data=models.Service}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 403 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body SetReviewVisibilityRequest true "Set Review Visibility Request"
+// @Success 200 {object} SuccessResponse{data=Service}
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /services/profile-owner/review/hide [put]
 func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
 
 	// Find the service with the associated user review
-	var service models.Service
+	var service Service
 	result := sc.DB.Preload("ClientUserRating.RatedUserTags.UserTag").
 		Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Where("id = ?", serviceID).
@@ -552,7 +552,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 
 	// Check if the service exists
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "No services found for the specified profile",
 		})
@@ -561,16 +561,16 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 
 	// Check if the current user is the one who left the review
 	if service.ClientUserID != currentUser.ID {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "You are not authorized to update this review",
 		})
 		return
 	}
 
-	var payload *models.SetReviewVisibilityRequest
+	var payload *SetReviewVisibilityRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -582,7 +582,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 		service.ClientUserRating.ReviewTextVisible = *payload.Visible
 
 		if err := sc.DB.Save(&service.ClientUserRating).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 				Status:  "error",
 				Message: "Failed to update the user review",
 			})
@@ -591,7 +591,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	}
 
 	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   service,
 	})
@@ -604,19 +604,19 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param service_id query string true "Service ID"
-// @Param body body models.CreateProfileRatingRequest true "Create Profile Rating Request"
-// @Success 200 {object} models.SuccessResponse{data=models.Service}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 403 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body CreateProfileRatingRequest true "Create Profile Rating Request"
+// @Success 200 {object} SuccessResponse{data=Service}
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /services/profile-owner/review/update [put]
 func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
 
 	// Find the service with the associated profile review
-	var service models.Service
+	var service Service
 	result := sc.DB.Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Preload("ClientUserRating.RatedUserTags.UserTag").
 		Where("id = ?", serviceID).
@@ -624,7 +624,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 	// Check if the service exists
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "No services found for the specified profile",
 		})
@@ -633,7 +633,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 	// Check if the current user is the owner of the profile in the service
 	if service.ProfileOwnerID != currentUser.ID {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "You are not authorized to update this review",
 		})
@@ -643,7 +643,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	// Check if the review can still be updated (within the allowed time limit)
 	hoursSinceReview := time.Since(service.ProfileRating.CreatedAt).Hours()
 	if hoursSinceReview > float64(sc.reviewUpdateLimitHours) {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: fmt.Sprintf("Review can only be updated within %d hours of creation", sc.reviewUpdateLimitHours),
 		})
@@ -651,9 +651,9 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	}
 
 	// Parse the request payload
-	var payload *models.CreateProfileRatingRequest
+	var payload *CreateProfileRatingRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -671,8 +671,8 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	// Handle the rated profile tags if they exist in the payload
 	if len(payload.RatedProfileTags) > 0 {
 		// First, delete the existing tags for this profile rating
-		if err := sc.DB.Where("rating_id = ?", service.ProfileRating.ID).Delete(&models.RatedProfileTag{}).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		if err := sc.DB.Where("rating_id = ?", service.ProfileRating.ID).Delete(&RatedProfileTag{}).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 				Status:  "error",
 				Message: "Failed to delete old profile tags",
 			})
@@ -680,9 +680,9 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 		}
 
 		// Iterate over the new tags and add them
-		var ratedProfileTags []models.RatedProfileTag
+		var ratedProfileTags []RatedProfileTag
 		for _, tagReq := range payload.RatedProfileTags {
-			ratedProfileTag := models.RatedProfileTag{
+			ratedProfileTag := RatedProfileTag{
 				RatingID:     service.ProfileRating.ID,
 				ProfileTagID: tagReq.TagID,
 				Type:         tagReq.Type,
@@ -692,7 +692,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 		// Save the new tags
 		if err := sc.DB.Create(&ratedProfileTags).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 				Status:  "error",
 				Message: "Failed to create new profile tags",
 			})
@@ -705,7 +705,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 
 	// Update the profile rating in the database
 	if err := sc.DB.Save(&service.ProfileRating).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to update the profile review",
 		})
@@ -713,7 +713,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 	}
 
 	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   service,
 	})
@@ -726,19 +726,19 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 // @Accept json
 // @Produce json
 // @Param service_id query string true "Service ID"
-// @Param body body models.SetReviewVisibilityRequest true "Set Review Visibility Request"
-// @Success 200 {object} models.SuccessResponse{data=models.Service}
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 403 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body SetReviewVisibilityRequest true "Set Review Visibility Request"
+// @Success 200 {object} SuccessResponse{data=Service}
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /services/user/review/hide [put]
 func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 	serviceID := ctx.Query("service_id")
 
 	// Find the service with the associated profile review
-	var service models.Service
+	var service Service
 	result := sc.DB.Preload("ProfileRating.RatedProfileTags.ProfileTag").
 		Preload("ClientUserRating.RatedUserTags.UserTag").
 		Where("id = ?", serviceID).
@@ -746,7 +746,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 
 	// Check if the service exists
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
 			Status:  "error",
 			Message: "No services found for the specified profile",
 		})
@@ -755,7 +755,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 
 	// Check if the current user is the owner of the profile in the service
 	if service.ProfileOwnerID != currentUser.ID {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "You are not authorized to update this review",
 		})
@@ -764,7 +764,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 
 	// Check if the user is allowed to hide the review
 	if currentUser.Tier == "basic" {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{
+		ctx.JSON(http.StatusForbidden, ErrorResponse{
 			Status:  "error",
 			Message: "Basic-tier users can't hide profile reviews",
 		})
@@ -772,9 +772,9 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	}
 
 	// Parse the request payload
-	var payload *models.SetReviewVisibilityRequest
+	var payload *SetReviewVisibilityRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
@@ -789,7 +789,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 
 		// Update the profile rating in the database
 		if err := sc.DB.Save(&service.ProfileRating).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 				Status:  "error",
 				Message: "Failed to update the profile review",
 			})
@@ -798,7 +798,7 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	}
 
 	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   service,
 	})

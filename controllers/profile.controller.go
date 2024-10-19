@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 )
 
@@ -25,26 +25,26 @@ func NewProfileController(DB *gorm.DB) ProfileController {
 // @Tags Profiles
 // @Accept json
 // @Produce json
-// @Param body body models.CreateProfileRequest true "Create Profile Request"
-// @Success 201 {object} models.SuccessResponse
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 403 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body CreateProfileRequest true "Create Profile Request"
+// @Success 201 {object} SuccessResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /profiles [post]
 func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Get the current user
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
 	if currentUser.Role != "user" {
-		ctx.JSON(http.StatusForbidden, models.ErrorResponse{Status: "error", Message: "unauthorized"})
+		ctx.JSON(http.StatusForbidden, ErrorResponse{Status: "error", Message: "unauthorized"})
 		return
 	}
 
-	var payload *models.CreateProfileRequest
+	var payload *CreateProfileRequest
 
 	// Bind and validate the input payload
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
@@ -53,7 +53,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	// Create the profile
 	now := time.Now()
-	newProfile := models.Profile{
+	newProfile := Profile{
 		UserID:       currentUser.ID,
 		CreatedAt:    now,
 		UpdatedAt:    now,
@@ -121,16 +121,16 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Insert profile into the database
 	if err := tx.Create(&newProfile).Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create profile: %s", err.Error())})
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create profile: %s", err.Error())})
 		return
 	}
 
-	var bodyArts []models.ProfileBodyArt
+	var bodyArts []ProfileBodyArt
 
 	// Insert associated body arts
 	if len(payload.BodyArts) > 0 {
 		for _, bodyArtReq := range payload.BodyArts {
-			profileBodyArt := models.ProfileBodyArt{
+			profileBodyArt := ProfileBodyArt{
 				BodyArtID: bodyArtReq.ID,
 				ProfileID: newProfile.ID,
 			}
@@ -145,12 +145,12 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	newProfile.BodyArts = bodyArts
 
-	var photos []models.Photo
+	var photos []Photo
 
 	// Insert associated photos
 	if len(payload.Photos) > 0 {
 		for _, photoReq := range payload.Photos {
-			photo := models.Photo{
+			photo := Photo{
 				ProfileID: newProfile.ID,
 				URL:       photoReq.URL,
 				CreatedAt: time.Now(),
@@ -159,19 +159,19 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		}
 		if err := tx.Create(&photos).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create photos: %s", err.Error())})
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create photos: %s", err.Error())})
 			return
 		}
 	}
 
 	newProfile.Photos = photos
 
-	var options []models.ProfileOption
+	var options []ProfileOption
 
 	// Insert associated profile options
 	if len(payload.Options) > 0 {
 		for _, optionReq := range payload.Options {
-			option := models.ProfileOption{
+			option := ProfileOption{
 				ProfileID:    newProfile.ID,
 				ProfileTagID: int(optionReq.ProfileTagID),
 				Price:        optionReq.Price,
@@ -181,7 +181,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		}
 		if err := tx.Create(&options).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create profile options: %s", err.Error())})
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create profile options: %s", err.Error())})
 			return
 		}
 	}
@@ -190,12 +190,12 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	// Commit the transaction if everything was successful
 	if err := tx.Commit().Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: err.Error()})
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	// Return the created profile in the response
-	ctx.JSON(http.StatusCreated, models.SuccessResponse{Status: "success", Data: newProfile})
+	ctx.JSON(http.StatusCreated, SuccessResponse{Status: "success", Data: newProfile})
 }
 
 // UpdateOwnProfile godoc
@@ -205,27 +205,27 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "Profile ID"
-// @Param body body models.UpdateOwnProfileRequest true "Profile Update Payload"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body UpdateOwnProfileRequest true "Profile Update Payload"
+// @Success 200 {object} SuccessResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /profiles/{id}/own [put]
 func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	profileId := ctx.Param("id")
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
-	var payload models.UpdateOwnProfileRequest
+	var payload UpdateOwnProfileRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	// Find the existing profile
-	var existingProfile models.Profile
+	var existingProfile Profile
 	result := pc.DB.First(&existingProfile, "id = ?", profileId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "error", Message: "No profile with that ID exists"})
+		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "No profile with that ID exists"})
 		return
 	}
 
@@ -352,22 +352,22 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 	// Update only the fields that have changed
 	if err := tx.Model(&existingProfile).Updates(updateFields).Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to update profile"})
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to update profile"})
 		return
 	}
 
 	// Handle the update of BodyArts
 	if payload.BodyArts != nil {
-		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileBodyArt{}).Error; err != nil {
+		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&ProfileBodyArt{}).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to delete old body arts"})
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to delete old body arts"})
 			return
 		}
 
 		if len(payload.BodyArts) > 0 {
-			var bodyArts []models.ProfileBodyArt
+			var bodyArts []ProfileBodyArt
 			for _, bodyArtReq := range payload.BodyArts {
-				profileBodyArt := models.ProfileBodyArt{
+				profileBodyArt := ProfileBodyArt{
 					BodyArtID: bodyArtReq.ID,
 					ProfileID: existingProfile.ID,
 				}
@@ -376,7 +376,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 			if err := tx.Create(&bodyArts).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to update body arts"})
+				ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to update body arts"})
 				return
 			}
 		}
@@ -384,16 +384,16 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 	// Handle the update of Photos
 	if payload.Photos != nil {
-		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
+		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&Photo{}).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to delete old photos"})
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to delete old photos"})
 			return
 		}
 
 		if len(payload.Photos) > 0 {
-			var photos []models.Photo
+			var photos []Photo
 			for _, photoReq := range payload.Photos {
-				photo := models.Photo{
+				photo := Photo{
 					ProfileID: existingProfile.ID,
 					URL:       photoReq.URL,
 					CreatedAt: time.Now(),
@@ -403,7 +403,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 			if err := tx.Create(&photos).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to update photos"})
+				ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to update photos"})
 				return
 			}
 		}
@@ -411,16 +411,16 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 	// Handle the update of ProfileOptions
 	if payload.Options != nil {
-		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.ProfileOption{}).Error; err != nil {
+		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&ProfileOption{}).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to delete old profile options"})
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to delete old profile options"})
 			return
 		}
 
 		if len(payload.Options) > 0 {
-			var options []models.ProfileOption
+			var options []ProfileOption
 			for _, optionReq := range payload.Options {
-				option := models.ProfileOption{
+				option := ProfileOption{
 					ProfileID:    existingProfile.ID,
 					ProfileTagID: int(optionReq.ProfileTagID),
 					Price:        optionReq.Price,
@@ -431,7 +431,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 			if err := tx.Create(&options).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to update profile options"})
+				ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to update profile options"})
 				return
 			}
 		}
@@ -439,12 +439,12 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: "Failed to commit transaction"})
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to commit transaction"})
 		return
 	}
 
 	// Return the updated profile
-	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: existingProfile})
+	ctx.JSON(http.StatusOK, SuccessResponse{Status: "success", Data: existingProfile})
 }
 
 // UpdateProfile godoc
@@ -454,27 +454,27 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "Profile ID"
-// @Param body body models.UpdateProfileRequest true "Profile Update Payload"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 404 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body UpdateProfileRequest true "Profile Update Payload"
+// @Success 200 {object} SuccessResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /profiles/{id} [put]
 func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	profileId := ctx.Param("id")
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
-	var payload models.UpdateProfileRequest
+	var payload UpdateProfileRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{Status: "error", Message: err.Error()})
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
 	// Find the existing profile
-	var existingProfile models.Profile
+	var existingProfile Profile
 	result := pc.DB.First(&existingProfile, "id = ?", profileId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "error", Message: "No profile with that ID exists"})
+		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "No profile with that ID exists"})
 		return
 	}
 
@@ -517,22 +517,22 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	// Update only the fields that have changed
 	if err := tx.Model(&existingProfile).Updates(updateFields).Error; err != nil {
 		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
 		return
 	}
 
 	// Handle the update of Photos
 	if payload.Photos != nil {
-		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&models.Photo{}).Error; err != nil {
+		if err := tx.Where("profile_id = ?", existingProfile.ID).Delete(&Photo{}).Error; err != nil {
 			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
 			return
 		}
 
 		if len(payload.Photos) > 0 {
-			var photos []models.Photo
+			var photos []Photo
 			for _, photoReq := range payload.Photos {
-				photo := models.Photo{
+				photo := Photo{
 					ProfileID: existingProfile.ID,
 					URL:       photoReq.URL,
 					CreatedAt: time.Now(),
@@ -542,7 +542,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 
 			if err := tx.Create(&photos).Error; err != nil {
 				tx.Rollback()
-				ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
+				ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
 				return
 			}
 		}
@@ -550,12 +550,12 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Update failed: %s", err.Error())})
 		return
 	}
 
 	// Return the updated profile
-	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: existingProfile})
+	ctx.JSON(http.StatusOK, SuccessResponse{Status: "success", Data: existingProfile})
 }
 
 // FindProfileByPhone godoc
@@ -564,13 +564,13 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 // @Tags Profiles
 // @Produce json
 // @Param phone path string true "Phone Number"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 404 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse
+// @Failure 404 {object} ErrorResponse
 // @Router /profiles/phone/{phone} [get]
 func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 	phone := ctx.Param("phone")
 
-	var profile models.Profile
+	var profile Profile
 
 	result := pc.DB.Preload("Photos").
 		Preload("BodyArts").
@@ -578,11 +578,11 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 		First(&profile, "phone = ?", phone)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "error", Message: "No profile with that title exists"})
+		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "No profile with that title exists"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessResponse{Status: "success", Data: profile})
+	ctx.JSON(http.StatusOK, SuccessResponse{Status: "success", Data: profile})
 }
 
 // ListProfiles godoc
@@ -592,8 +592,8 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 // @Produce json
 // @Param page query string false "Page number"
 // @Param limit query string false "Items per page"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 502 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse
+// @Failure 502 {object} ErrorResponse
 // @Router /profiles [get]
 func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
@@ -603,7 +603,7 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var profiles []models.Profile
+	var profiles []Profile
 
 	dbQuery := pc.DB.Preload("Photos").
 		Preload("BodyArts").
@@ -613,11 +613,11 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	results := dbQuery.Find(&profiles)
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: results.Error.Error()})
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: results.Error.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Results: len(profiles),
 		Page:    intPage,
@@ -635,8 +635,8 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 // @Produce json
 // @Param page query string false "Page number"
 // @Param limit query string false "Items per page"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 502 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse
+// @Failure 502 {object} ErrorResponse
 // @Router /profiles/list [get]
 func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
@@ -646,7 +646,7 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var profiles []models.Profile
+	var profiles []Profile
 
 	dbQuery := pc.DB.Preload("Photos").
 		Preload("BodyArts").
@@ -657,11 +657,11 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 	results := dbQuery.Find(&profiles)
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: results.Error.Error()})
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: results.Error.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Results: len(profiles),
 		Page:    intPage,
@@ -675,20 +675,20 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 // @Produce json
 // @Param page query string false "Page number"
 // @Param limit query string false "Items per page"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 502 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse
+// @Failure 502 {object} ErrorResponse
 // @Router /profiles/my [get]
 func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
 
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
 	intPage, _ := strconv.Atoi(page)
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var profiles []models.Profile
+	var profiles []Profile
 
 	dbQuery := pc.DB.Preload("Photos").
 		Preload("BodyArts").
@@ -698,12 +698,12 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 	results := dbQuery.Find(&profiles, "user_id = ?", currentUser.ID.String())
 
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{Status: "error", Message: results.Error.Error()})
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: results.Error.Error()})
 		return
 	}
 
 	intPage, _ = strconv.Atoi(page)
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Data:    profiles,
 		Results: len(profiles),
@@ -717,10 +717,10 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 // @Tags Profiles
 // @Accept json
 // @Produce json
-// @Param body body models.FindProfilesQuery true "Search Filters"
-// @Success 200 {object} models.SuccessResponse
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 502 {object} models.ErrorResponse
+// @Param body body FindProfilesQuery true "Search Filters"
+// @Success 200 {object} SuccessResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 502 {object} ErrorResponse
 // @Router /profiles/search [post]
 func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
@@ -731,16 +731,16 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	offset := (intPage - 1) * intLimit
 
 	// Bind the JSON payload to the struct
-	var query models.FindProfilesQuery
+	var query FindProfilesQuery
 	if err := ctx.ShouldBindJSON(&query); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: err.Error(),
 		})
 		return
 	}
 
-	var profiles []models.Profile
+	var profiles []Profile
 	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
 
 	// Apply filtering based on query parameters
@@ -869,7 +869,7 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 		dbQuery = dbQuery.Where("price_car_hour <= ?", query.PriceCarHourMax)
 	}
 
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 	if currentUser.Role == "user" {
 		dbQuery = dbQuery.Where("active = ?", true)
 	}
@@ -877,7 +877,7 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	// Execute the query
 	results := dbQuery.Find(&profiles)
 	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, models.ErrorResponse{
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{
 			Status:  "error",
 			Message: results.Error.Error(),
 		})
@@ -886,7 +886,7 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 
 	intPage, _ = strconv.Atoi(page)
 	// Return the results in the response
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Results: len(profiles),
 		Page:    intPage,
@@ -901,15 +901,15 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 // @Produce json
 // @Param id path string true "Profile ID"
 // @Success 204 {object} nil
-// @Failure 404 {object} models.ErrorResponse
+// @Failure 404 {object} ErrorResponse
 // @Router /profiles/{id} [delete]
 func (pc *ProfileController) DeleteProfile(ctx *gin.Context) {
 	profileId := ctx.Param("id")
 
-	result := pc.DB.Delete(&models.Profile{}, "id = ?", profileId)
+	result := pc.DB.Delete(&Profile{}, "id = ?", profileId)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, models.ErrorResponse{Status: "error", Message: "No profile with that title exists"})
+		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "No profile with that title exists"})
 		return
 	}
 

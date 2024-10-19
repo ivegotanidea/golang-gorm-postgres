@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
@@ -25,17 +25,17 @@ func NewPaymentController(DB *gorm.DB, apiKey string, baseUrl string) PaymentCon
 // @Tags Payments
 // @Accept json
 // @Produce json
-// @Param body body models.Payment true "Payment Update"
-// @Success 200 {object} models.SuccessResponse{data=string} "payment updated"
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 500 {object} models.ErrorResponse
+// @Param body body Payment true "Payment Update"
+// @Success 200 {object} SuccessResponse{data=string} "payment updated"
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /payments/webhook [post]
 func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
-	var paymentUpdate models.Payment
+	var paymentUpdate Payment
 
 	// Bind the incoming JSON data to the payment model
 	if err := ctx.ShouldBindJSON(&paymentUpdate); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.ErrorResponse{
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{
 			Status:  "error",
 			Message: "Invalid data",
 		})
@@ -43,8 +43,8 @@ func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 	}
 
 	// Update payment in the database
-	if err := pc.DB.Model(&models.Payment{}).Where("id = ?", paymentUpdate.ID).Updates(paymentUpdate).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+	if err := pc.DB.Model(&Payment{}).Where("id = ?", paymentUpdate.ID).Updates(paymentUpdate).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to update payment",
 		})
@@ -52,7 +52,7 @@ func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 	}
 
 	// Return success response
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   "payment updated",
 	})
@@ -67,8 +67,8 @@ func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 // @Param userID path string true "User ID"
 // @Param start_date query string true "Start Date in RFC3339 format"
 // @Param end_date query string true "End Date in RFC3339 format"
-// @Success 200 {object} models.SuccessResponse{data=[]models.Payment}
-// @Failure 500 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=[]Payment}
+// @Failure 500 {object} ErrorResponse
 // @Router /payments/history/{userID} [get]
 func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 	// Get userID from path and date range from query parameters
@@ -76,11 +76,11 @@ func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 	startDate, _ := time.Parse(time.RFC3339, ctx.Query("start_date"))
 	endDate, _ := time.Parse(time.RFC3339, ctx.Query("end_date"))
 
-	var payments []models.Payment
+	var payments []Payment
 
 	// Fetch payments from the database for the given user and date range
 	if err := pc.DB.Where("user_id = ? AND payment_date BETWEEN ? AND ?", userID, startDate, endDate).Find(&payments).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to retrieve payments",
 		})
@@ -88,7 +88,7 @@ func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 	}
 
 	// Return success response with the payment data
-	ctx.JSON(http.StatusOK, models.SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse{
 		Status: "success",
 		Data:   payments,
 	})
@@ -102,8 +102,8 @@ func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Limit per page" default(10)
-// @Success 200 {object} models.SuccessResponse{data=[]models.Payment}
-// @Failure 500 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=[]Payment}
+// @Failure 500 {object} ErrorResponse
 // @Router /payments [get]
 func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 	// Pagination parameters
@@ -111,7 +111,7 @@ func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
 	offset := (page - 1) * limit
 
-	var payments []models.Payment
+	var payments []Payment
 
 	// Retrieve payments with sorting and pagination
 	result := pc.DB.Order("payment_date DESC").
@@ -119,7 +119,7 @@ func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 
 	// Check if any error occurred during the query
 	if result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to retrieve payments",
 		})
@@ -127,7 +127,7 @@ func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 	}
 
 	// Return the payments in the response
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Results: len(payments),
 		Page:    page,
@@ -144,19 +144,19 @@ func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Limit per page" default(10)
-// @Success 200 {object} models.SuccessResponse{data=[]models.Payment}
-// @Failure 500 {object} models.ErrorResponse
+// @Success 200 {object} SuccessResponse{data=[]Payment}
+// @Failure 500 {object} ErrorResponse
 // @Router /payments/me [get]
 func (pc *PaymentController) GetMyPayments(ctx *gin.Context) {
 	// Get the current user from context (assumes middleware has set currentUser)
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
 	// Pagination parameters
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
 	offset := (page - 1) * limit
 
-	var payments []models.Payment
+	var payments []Payment
 
 	// Retrieve payments for the current user with sorting and pagination
 	result := pc.DB.Where("user_id = ?", currentUser.ID).
@@ -165,7 +165,7 @@ func (pc *PaymentController) GetMyPayments(ctx *gin.Context) {
 
 	// Check if any error occurred during the query
 	if result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, models.ErrorResponse{
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
 			Status:  "error",
 			Message: "Failed to retrieve user payments",
 		})
@@ -173,7 +173,7 @@ func (pc *PaymentController) GetMyPayments(ctx *gin.Context) {
 	}
 
 	// Return the user's payments in the response
-	ctx.JSON(http.StatusOK, models.SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse{
 		Status:  "success",
 		Page:    page,
 		Limit:   limit,

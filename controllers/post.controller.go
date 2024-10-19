@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ivegotanidea/golang-gorm-postgres/models"
+	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"gorm.io/gorm"
 )
 
@@ -20,8 +20,8 @@ func NewPostController(DB *gorm.DB) PostController {
 }
 
 func (pc *PostController) CreatePost(ctx *gin.Context) {
-	currentUser := ctx.MustGet("currentUser").(models.User)
-	var payload *models.CreatePostRequest
+	currentUser := ctx.MustGet("currentUser").(User)
+	var payload *CreatePostRequest
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
@@ -29,7 +29,7 @@ func (pc *PostController) CreatePost(ctx *gin.Context) {
 	}
 
 	now := time.Now()
-	newPost := models.Post{
+	newPost := Post{
 		Title:     payload.Title,
 		Content:   payload.Content,
 		Image:     payload.Image,
@@ -53,21 +53,21 @@ func (pc *PostController) CreatePost(ctx *gin.Context) {
 
 func (pc *PostController) UpdatePost(ctx *gin.Context) {
 	postId := ctx.Param("postId")
-	currentUser := ctx.MustGet("currentUser").(models.User)
+	currentUser := ctx.MustGet("currentUser").(User)
 
-	var payload *models.UpdatePost
+	var payload *UpdatePost
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
-	var updatedPost models.Post
+	var updatedPost Post
 	result := pc.DB.First(&updatedPost, "id = ?", postId)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "error", "message": "No post with that title exists"})
 		return
 	}
 	now := time.Now()
-	postToUpdate := models.Post{
+	postToUpdate := Post{
 		Title:     payload.Title,
 		Content:   payload.Content,
 		Image:     payload.Image,
@@ -84,7 +84,7 @@ func (pc *PostController) UpdatePost(ctx *gin.Context) {
 func (pc *PostController) FindPostById(ctx *gin.Context) {
 	postId := ctx.Param("postId")
 
-	var post models.Post
+	var post Post
 	result := pc.DB.First(&post, "id = ?", postId)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "error", "message": "No post with that title exists"})
@@ -102,7 +102,7 @@ func (pc *PostController) FindPosts(ctx *gin.Context) {
 	intLimit, _ := strconv.Atoi(limit)
 	offset := (intPage - 1) * intLimit
 
-	var posts []models.Post
+	var posts []Post
 	results := pc.DB.Limit(intLimit).Offset(offset).Find(&posts)
 	if results.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
@@ -115,7 +115,7 @@ func (pc *PostController) FindPosts(ctx *gin.Context) {
 func (pc *PostController) DeletePost(ctx *gin.Context) {
 	postId := ctx.Param("postId")
 
-	result := pc.DB.Delete(&models.Post{}, "id = ?", postId)
+	result := pc.DB.Delete(&Post{}, "id = ?", postId)
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "error", "message": "No post with that title exists"})
