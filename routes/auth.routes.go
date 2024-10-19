@@ -19,8 +19,8 @@ func NewAuthRouteController(authController controllers.AuthController) AuthRoute
 func (rc *AuthRouteController) AuthRoute(rg *gin.RouterGroup) {
 	router := rg.Group("auth")
 
-	router.POST("/register", rc.authController.BotSignUpUser)
-	router.POST("/login", rc.authController.BotSignInUser)
+	router.POST("/bot/signup", rc.authController.BotSignUpUser)
+	router.POST("/bot/login", rc.authController.BotSignInUser)
 	router.GET("/refresh", rc.authController.RefreshAccessToken)
 	router.GET("/logout", middleware.DeserializeUser(), rc.authController.LogoutUser)
 }
