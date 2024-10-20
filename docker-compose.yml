@@ -35,8 +35,6 @@ services:
     command: >
       sh -c "sleep 5 &&
              /app/main"
-    ports:
-      - "8888:8888"
     env_file:
       - ./app.env
     environment:
@@ -76,21 +74,19 @@ services:
       - common
     restart: "no" # Ensures it doesn't restart after completion
 
-  https-portal:
-    image: steveltn/https-portal:1
-    container_name: https-portal
-    environment:
-      STAGE: staging # Change to 'production' for production environment
-      DOMAINS: "app.localhost -> http://go-service:8888"
+  nginx:
+    platform: linux/amd64
+    image: nginx:latest
+    container_name: nginx
     ports:
       - "443:443"
       - "80:80"
     volumes:
-      - ./nginx:/etc/nginx/custom:ro
-    networks:
-      - common
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - go-service
+    networks:
+      - common
 
 volumes:
   postgres:
