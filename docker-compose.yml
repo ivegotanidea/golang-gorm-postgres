@@ -81,7 +81,7 @@ services:
     container_name: https-portal
     environment:
       STAGE: staging # Change to 'production' for production environment
-      DOMAINS: "localhost -> http://go-service:8888"
+      DOMAINS: "app.localhost -> http://go-service:8888"
     ports:
       - "443:443"
       - "80:80"
