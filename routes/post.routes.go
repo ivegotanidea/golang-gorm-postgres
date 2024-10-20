@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wpcodevo/golang-gorm-postgres/controllers"
-	"github.com/wpcodevo/golang-gorm-postgres/middleware"
+	"github.com/ivegotanidea/golang-gorm-postgres/controllers"
+	"github.com/ivegotanidea/golang-gorm-postgres/middleware"
 )
 
 type PostRouteController struct {
@@ -18,6 +18,7 @@ func (pc *PostRouteController) PostRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("posts")
 	router.Use(middleware.DeserializeUser())
+
 	router.POST("/", pc.postController.CreatePost)
 	router.GET("/", pc.postController.FindPosts)
 	router.PUT("/:postId", pc.postController.UpdatePost)

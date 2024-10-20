@@ -1,14 +1,17 @@
 package main
 
 import (
+	"github.com/ivegotanidea/golang-gorm-postgres/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/wpcodevo/golang-gorm-postgres/controllers"
-	"github.com/wpcodevo/golang-gorm-postgres/initializers"
-	"github.com/wpcodevo/golang-gorm-postgres/routes"
+	"github.com/ivegotanidea/golang-gorm-postgres/controllers"
+	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
+	"github.com/ivegotanidea/golang-gorm-postgres/routes"
 )
 
 var (
@@ -19,8 +22,13 @@ var (
 	UserController      controllers.UserController
 	UserRouteController routes.UserRouteController
 
-	PostController      controllers.PostController
-	PostRouteController routes.PostRouteController
+	ProfileController      controllers.ProfileController
+	ProfileRouteController routes.ProfileRouteController
+
+	ServiceController      controllers.ServiceController
+	ServiceRouteController routes.ServiceRouteController
+
+	ReviewsRouteController routes.ReviewsRouteController
 )
 
 func init() {
@@ -37,10 +45,27 @@ func init() {
 	UserController = controllers.NewUserController(initializers.DB)
 	UserRouteController = routes.NewRouteUserController(UserController)
 
-	PostController = controllers.NewPostController(initializers.DB)
-	PostRouteController = routes.NewRoutePostController(PostController)
+	ProfileController = controllers.NewProfileController(initializers.DB)
+	ProfileRouteController = routes.NewRouteProfileController(ProfileController)
+
+	ServiceController = controllers.NewServiceController(initializers.DB, config.ReviewUpdateLimitHours)
+	ServiceRouteController = routes.NewRouteServiceController(ServiceController)
+
+	ReviewsRouteController = routes.NewRouteReviewController(ServiceController)
 
 	server = gin.Default()
+}
+
+func healthCheckHandler(ctx *gin.Context) {
+
+	var message string
+
+	if ctx.Request.Method == "GET" {
+		message = "Welcome to Golang with Gorm and Postgres"
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
+	} else if ctx.Request.Method == "HEAD" {
+		ctx.Status(http.StatusOK)
+	}
 }
 
 func main() {
@@ -55,14 +80,17 @@ func main() {
 
 	server.Use(cors.New(corsConfig))
 
-	router := server.Group("/api")
-	router.GET("/healthchecker", func(ctx *gin.Context) {
-		message := "Welcome to Golang with Gorm and Postgres"
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
-	})
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	router := server.Group("/api/v1")
+	router.HEAD("/healthchecker", healthCheckHandler)
+	router.GET("/healthchecker", healthCheckHandler)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	AuthRouteController.AuthRoute(router)
 	UserRouteController.UserRoute(router)
-	PostRouteController.PostRoute(router)
+	ProfileRouteController.ProfileRoute(router)
+	ServiceRouteController.ServiceRoute(router)
+	ReviewsRouteController.ReviewsRoute(router)
+
 	log.Fatal(server.Run(":" + config.ServerPort))
 }

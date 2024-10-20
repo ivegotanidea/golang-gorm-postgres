@@ -7,6 +7,9 @@ import (
 )
 
 type Config struct {
+	CasbinModelPath  string `mapstructure:"CASBIN_MODEL_PATH"`
+	CasbinPolicyPath string `mapstructure:"CASBIN_POLICY_PATH"`
+
 	DBHost         string `mapstructure:"POSTGRES_HOST"`
 	DBUserName     string `mapstructure:"POSTGRES_USER"`
 	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
@@ -24,6 +27,9 @@ type Config struct {
 	RefreshTokenExpiresIn  time.Duration `mapstructure:"REFRESH_TOKEN_EXPIRED_IN"`
 	AccessTokenMaxAge      int           `mapstructure:"ACCESS_TOKEN_MAXAGE"`
 	RefreshTokenMaxAge     int           `mapstructure:"REFRESH_TOKEN_MAXAGE"`
+
+	VerifiedDistanceThreshold int `mapstructure:"VERIFIED_DISTANCE_THRESHOLD"`
+	ReviewUpdateLimitHours    int `mapstructure:"REVIEW_UPDATE_LIMIT_HOURS"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
