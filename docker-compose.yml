@@ -76,6 +76,22 @@ services:
       - common
     restart: "no" # Ensures it doesn't restart after completion
 
+  https-portal:
+    image: steveltn/https-portal:1
+    container_name: https-portal
+    environment:
+      STAGE: staging # Change to 'production' for production environment
+      DOMAINS: "localhost -> http://go-service:8888"
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/custom:ro
+    networks:
+      - common
+    depends_on:
+      - go-service
+
 volumes:
   postgres:
 
