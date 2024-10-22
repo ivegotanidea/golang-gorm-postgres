@@ -1,5 +1,5 @@
 definitions:
-  AssignRole:
+  models.AssignRole:
     properties:
       id:
         type: string
@@ -12,14 +12,14 @@ definitions:
     - id
     - role
     type: object
-  BotSignInInput:
+  models.BotSignInInput:
     properties:
       telegramUserId:
         type: string
     required:
     - telegramUserId
     type: object
-  BotSignUpInput:
+  models.BotSignUpInput:
     properties:
       name:
         minLength: 5
@@ -35,21 +35,21 @@ definitions:
     - phone
     - telegramUserId
     type: object
-  CreateBodyArtRequest:
+  models.CreateBodyArtRequest:
     properties:
       bodyArtId:
         type: integer
     required:
     - bodyArtId
     type: object
-  CreatePhotoRequest:
+  models.CreatePhotoRequest:
     properties:
       url:
         type: string
     required:
     - url
     type: object
-  CreateProfileOption:
+  models.CreateProfileOption:
     properties:
       comment:
         maxLength: 50
@@ -62,18 +62,18 @@ definitions:
     required:
     - profileTagId
     type: object
-  CreateProfileRatingRequest:
+  models.CreateProfileRatingRequest:
     properties:
       ratedProfileTags:
         items:
-          $ref: '#/definitions/CreateRatedProfileTagRequest'
+          $ref: '#/definitions/models.CreateRatedProfileTagRequest'
         type: array
       review:
         type: string
       score:
         type: integer
     type: object
-  CreateProfileRequest:
+  models.CreateProfileRequest:
     properties:
       age:
         type: integer
@@ -81,7 +81,7 @@ definitions:
         type: string
       bodyArts:
         items:
-          $ref: '#/definitions/CreateBodyArtRequest'
+          $ref: '#/definitions/models.CreateBodyArtRequest'
         type: array
       bodyTypeId:
         type: integer
@@ -113,7 +113,7 @@ definitions:
         type: string
       photos:
         items:
-          $ref: '#/definitions/CreatePhotoRequest'
+          $ref: '#/definitions/models.CreatePhotoRequest'
         type: array
       priceCarContact:
         description: PriceCarNightRatio     float64 `json:"priceCarNightRatio,omitempty"`
@@ -137,7 +137,7 @@ definitions:
         type: integer
       profileOptions:
         items:
-          $ref: '#/definitions/CreateProfileOption'
+          $ref: '#/definitions/models.CreateProfileOption'
         type: array
       weight:
         type: integer
@@ -156,21 +156,21 @@ definitions:
     - profileOptions
     - weight
     type: object
-  CreateRatedProfileTagRequest:
+  models.CreateRatedProfileTagRequest:
     properties:
       tagId:
         type: integer
       type:
         type: string
     type: object
-  CreateRatedUserTagRequest:
+  models.CreateRatedUserTagRequest:
     properties:
       tagId:
         type: integer
       type:
         type: string
     type: object
-  CreateServiceRequest:
+  models.CreateServiceRequest:
     properties:
       clientUserLatitude:
         type: number
@@ -181,7 +181,7 @@ definitions:
       profileOwnerId:
         type: string
       profileRating:
-        $ref: '#/definitions/CreateProfileRatingRequest'
+        $ref: '#/definitions/models.CreateProfileRatingRequest'
       profileUserLatitude:
         type: number
       profileUserLongitude:
@@ -189,20 +189,20 @@ definitions:
       userId:
         type: string
       userRating:
-        $ref: '#/definitions/CreateUserRatingRequest'
+        $ref: '#/definitions/models.CreateUserRatingRequest'
     type: object
-  CreateUserRatingRequest:
+  models.CreateUserRatingRequest:
     properties:
       ratedUserTags:
         items:
-          $ref: '#/definitions/CreateRatedUserTagRequest'
+          $ref: '#/definitions/models.CreateRatedUserTagRequest'
         type: array
       review:
         type: string
       score:
         type: integer
     type: object
-  ErrorResponse:
+  models.ErrorResponse:
     description: This model is returned when an API call fails due to an error.
     properties:
       message:
@@ -216,7 +216,7 @@ definitions:
           Example: "error"
         type: string
     type: object
-  FindProfilesQuery:
+  models.FindProfilesQuery:
     properties:
       active:
         type: boolean
@@ -291,7 +291,7 @@ definitions:
       weight:
         type: integer
     type: object
-  Payment:
+  models.Payment:
     properties:
       amount:
         type: number
@@ -313,7 +313,7 @@ definitions:
       userID:
         type: string
     type: object
-  Photo:
+  models.Photo:
     properties:
       approved:
         type: boolean
@@ -330,7 +330,7 @@ definitions:
       url:
         type: string
     type: object
-  Profile:
+  models.Profile:
     properties:
       active:
         type: boolean
@@ -344,7 +344,7 @@ definitions:
         type: string
       bodyArts:
         items:
-          $ref: '#/definitions/ProfileBodyArt'
+          $ref: '#/definitions/models.ProfileBodyArt'
         type: array
       bodyTypeID:
         type: integer
@@ -385,7 +385,7 @@ definitions:
         type: string
       photos:
         items:
-          $ref: '#/definitions/Photo'
+          $ref: '#/definitions/models.Photo'
         type: array
       priceCarContact:
         type: integer
@@ -413,11 +413,11 @@ definitions:
         type: number
       profileOptions:
         items:
-          $ref: '#/definitions/ProfileOption'
+          $ref: '#/definitions/models.ProfileOption'
         type: array
       services:
         items:
-          $ref: '#/definitions/Service'
+          $ref: '#/definitions/models.Service'
         type: array
       updatedAt:
         type: string
@@ -434,7 +434,7 @@ definitions:
       weight:
         type: integer
     type: object
-  ProfileBodyArt:
+  models.ProfileBodyArt:
     properties:
       bodyArtID:
         description: Part of composite primary key, and also a foreign key
@@ -443,7 +443,7 @@ definitions:
         description: Part of composite primary key
         type: string
     type: object
-  ProfileOption:
+  models.ProfileOption:
     properties:
       comment:
         type: string
@@ -453,12 +453,12 @@ definitions:
         description: Part of composite primary key
         type: string
       profileTag:
-        $ref: '#/definitions/ProfileTag'
+        $ref: '#/definitions/models.ProfileTag'
       profileTagID:
         description: Part of composite primary key, and also a foreign key
         type: integer
     type: object
-  ProfileRating:
+  models.ProfileRating:
     properties:
       createdAt:
         type: string
@@ -468,7 +468,7 @@ definitions:
         type: string
       ratedProfileTags:
         items:
-          $ref: '#/definitions/RatedProfileTag'
+          $ref: '#/definitions/models.RatedProfileTag'
         type: array
       review:
         type: string
@@ -483,17 +483,17 @@ definitions:
       updatedBy:
         type: string
     type: object
-  ProfileTag:
+  models.ProfileTag:
     properties:
       id:
         type: integer
       name:
         type: string
     type: object
-  RatedProfileTag:
+  models.RatedProfileTag:
     properties:
       profileTag:
-        $ref: '#/definitions/ProfileTag'
+        $ref: '#/definitions/models.ProfileTag'
       profileTagID:
         type: integer
       ratingID:
@@ -501,18 +501,18 @@ definitions:
       type:
         type: string
     type: object
-  RatedUserTag:
+  models.RatedUserTag:
     properties:
       ratingID:
         type: string
       type:
         type: string
       userTag:
-        $ref: '#/definitions/UserTag'
+        $ref: '#/definitions/models.UserTag'
       userTagID:
         type: integer
     type: object
-  Service:
+  models.Service:
     properties:
       clientUserID:
         type: string
@@ -522,7 +522,7 @@ definitions:
         type: string
       clientUserRating:
         allOf:
-        - $ref: '#/definitions/UserRating'
+        - $ref: '#/definitions/models.UserRating'
         description: profile owner's review on client
       clientUserRatingID:
         type: string
@@ -538,7 +538,7 @@ definitions:
         type: string
       profileRating:
         allOf:
-        - $ref: '#/definitions/ProfileRating'
+        - $ref: '#/definitions/models.ProfileRating'
         description: client's review on profile
       profileRatingID:
         type: string
@@ -553,12 +553,12 @@ definitions:
       updatedBy:
         type: string
     type: object
-  SetReviewVisibilityRequest:
+  models.SetReviewVisibilityRequest:
     properties:
       visible:
         type: boolean
     type: object
-  SignInInput:
+  models.SignInInput:
     properties:
       password:
         minLength: 8
@@ -571,7 +571,7 @@ definitions:
     - password
     - phone
     type: object
-  SignUpInput:
+  models.SignUpInput:
     properties:
       password:
         minLength: 8
@@ -588,7 +588,7 @@ definitions:
     - passwordConfirm
     - phone
     type: object
-  SuccessResponse:
+  models.SuccessResponse:
     description: This model is returned when an API call succeeds.
     properties:
       data:
@@ -601,7 +601,7 @@ definitions:
           Example: "success"
         type: string
     type: object
-  TokenResponse:
+  models.TokenResponse:
     description: This model is used to return an access token after a user logs in
       or when a token is refreshed.
     properties:
@@ -616,7 +616,7 @@ definitions:
           Example: "success"
         type: string
     type: object
-  UpdateOwnProfileRequest:
+  models.UpdateOwnProfileRequest:
     properties:
       active:
         type: boolean
@@ -626,7 +626,7 @@ definitions:
         type: string
       bodyArts:
         items:
-          $ref: '#/definitions/CreateBodyArtRequest'
+          $ref: '#/definitions/models.CreateBodyArtRequest'
         type: array
       bodyTypeId:
         type: integer
@@ -658,7 +658,7 @@ definitions:
         type: string
       photos:
         items:
-          $ref: '#/definitions/CreatePhotoRequest'
+          $ref: '#/definitions/models.CreatePhotoRequest'
         type: array
       priceCarContact:
         type: integer
@@ -686,12 +686,12 @@ definitions:
         type: number
       profileOptions:
         items:
-          $ref: '#/definitions/CreateProfileOption'
+          $ref: '#/definitions/models.CreateProfileOption'
         type: array
       weight:
         type: integer
     type: object
-  UpdateProfileRequest:
+  models.UpdateProfileRequest:
     properties:
       active:
         type: boolean
@@ -703,12 +703,12 @@ definitions:
         type: string
       photos:
         items:
-          $ref: '#/definitions/CreatePhotoRequest'
+          $ref: '#/definitions/models.CreatePhotoRequest'
         type: array
       verified:
         type: boolean
     type: object
-  UpdateUser:
+  models.UpdateUser:
     properties:
       name:
         maxLength: 20
@@ -721,7 +721,7 @@ definitions:
       photo:
         type: string
     type: object
-  UpdateUserPrivileged:
+  models.UpdateUserPrivileged:
     properties:
       active:
         type: boolean
@@ -747,7 +747,7 @@ definitions:
       verified:
         type: boolean
     type: object
-  User:
+  models.User:
     properties:
       active:
         type: boolean
@@ -767,14 +767,14 @@ definitions:
         type: string
       profiles:
         items:
-          $ref: '#/definitions/Profile'
+          $ref: '#/definitions/models.Profile'
         type: array
       role:
         description: 'oneOf: user, moderator, admin'
         type: string
       services:
         items:
-          $ref: '#/definitions/Service'
+          $ref: '#/definitions/models.Service'
         type: array
       telegramUserId:
         type: integer
@@ -786,7 +786,7 @@ definitions:
       verified:
         type: boolean
     type: object
-  UserRating:
+  models.UserRating:
     properties:
       createdAt:
         type: string
@@ -794,7 +794,7 @@ definitions:
         type: string
       ratedUserTags:
         items:
-          $ref: '#/definitions/RatedUserTag'
+          $ref: '#/definitions/models.RatedUserTag'
         type: array
       review:
         type: string
@@ -811,7 +811,7 @@ definitions:
       userID:
         type: string
     type: object
-  UserResponse:
+  models.UserResponse:
     properties:
       active:
         type: boolean
@@ -838,7 +838,7 @@ definitions:
       verified:
         type: boolean
     type: object
-  UserTag:
+  models.UserTag:
     properties:
       id:
         type: integer
@@ -859,18 +859,18 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/BotSignInInput'
+          $ref: '#/definitions/models.BotSignInInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/TokenResponse'
+            $ref: '#/definitions/models.TokenResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Logs in a bot user
       tags:
       - Auth
@@ -886,23 +886,49 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/BotSignUpInput'
+          $ref: '#/definitions/models.BotSignUpInput'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/UserResponse'
+            $ref: '#/definitions/models.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Registers a new user via bot
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user by accepting phone and password.
+      parameters:
+      - description: SignIn Input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Logs in a user
       tags:
       - Auth
   /auth/logout:
@@ -914,7 +940,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
       summary: Logs out a user
       tags:
       - Auth
@@ -927,38 +953,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/TokenResponse'
+            $ref: '#/definitions/models.TokenResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Refreshes access token
-      tags:
-      - Auth
-  /auth/signin:
-    post:
-      consumes:
-      - application/json
-      description: Authenticates a user by accepting phone and password.
-      parameters:
-      - description: SignIn Input
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/SignInInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/TokenResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-      summary: Logs in a user
       tags:
       - Auth
   /auth/signup:
@@ -972,26 +972,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/SignUpInput'
+          $ref: '#/definitions/models.SignUpInput'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/UserResponse'
+            $ref: '#/definitions/models.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Registers a new user
       tags:
       - Auth
@@ -1019,17 +1019,17 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/Payment'
+                    $ref: '#/definitions/models.Payment'
                   type: array
               type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: List all payments
       tags:
       - Payments
@@ -1062,17 +1062,17 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/Payment'
+                    $ref: '#/definitions/models.Payment'
                   type: array
               type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Get payment history for a user
       tags:
       - Payments
@@ -1100,17 +1100,17 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/Payment'
+                    $ref: '#/definitions/models.Payment'
                   type: array
               type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Get current user's payments
       tags:
       - Payments
@@ -1126,7 +1126,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/Payment'
+          $ref: '#/definitions/models.Payment'
       produces:
       - application/json
       responses:
@@ -1134,7 +1134,7 @@ paths:
           description: payment updated
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
                   type: string
@@ -1142,11 +1142,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Webhook for payment updates
       tags:
       - Payments
@@ -1161,26 +1161,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/CreateProfileRequest'
+          $ref: '#/definitions/models.CreateProfileRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Creates a new profile
       tags:
       - Profiles
@@ -1201,7 +1201,7 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Deletes a profile by ID
       tags:
       - Profiles
@@ -1220,11 +1220,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Find a profile by phone number
       tags:
       - Profiles
@@ -1257,7 +1257,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -1268,11 +1268,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Get all services for a specific profile
       tags:
       - Services
@@ -1300,19 +1300,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/Service'
+                  $ref: '#/definitions/models.Service'
               type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Get a specific service by profile and service ID
       tags:
       - Services
@@ -1334,11 +1334,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Lists all profiles with pagination, auth required
       tags:
       - Profiles
@@ -1360,11 +1360,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Lists all active profiles with pagination, no auth required
       tags:
       - Profiles
@@ -1386,11 +1386,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Get current user's profiles
       tags:
       - Profiles
@@ -1410,26 +1410,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UpdateOwnProfileRequest'
+          $ref: '#/definitions/models.UpdateOwnProfileRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: User updates his own profile
       tags:
       - Profiles
@@ -1444,22 +1444,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/FindProfilesQuery'
+          $ref: '#/definitions/models.FindProfilesQuery'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Search for profiles
       tags:
       - Profiles
@@ -1480,26 +1480,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UpdateProfileRequest'
+          $ref: '#/definitions/models.UpdateProfileRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Updates an existing profile
       tags:
       - Profiles
@@ -1520,7 +1520,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/CreateUserRatingRequest'
+          $ref: '#/definitions/models.CreateUserRatingRequest'
       produces:
       - application/json
       responses:
@@ -1528,27 +1528,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/Service'
+                  $ref: '#/definitions/models.Service'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Update a client's user review on a profile service
       tags:
       - Services
@@ -1569,7 +1569,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/SetReviewVisibilityRequest'
+          $ref: '#/definitions/models.SetReviewVisibilityRequest'
       produces:
       - application/json
       responses:
@@ -1577,27 +1577,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/Service'
+                  $ref: '#/definitions/models.Service'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Set visibility of the profile owner's review
       tags:
       - Services
@@ -1618,7 +1618,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/CreateProfileRatingRequest'
+          $ref: '#/definitions/models.CreateProfileRatingRequest'
       produces:
       - application/json
       responses:
@@ -1626,27 +1626,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/Service'
+                  $ref: '#/definitions/models.Service'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Update the profile owner's review on a client user
       tags:
       - Services
@@ -1667,7 +1667,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/SetReviewVisibilityRequest'
+          $ref: '#/definitions/models.SetReviewVisibilityRequest'
       produces:
       - application/json
       responses:
@@ -1675,27 +1675,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/Service'
+                  $ref: '#/definitions/models.Service'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Set visibility of user's review
       tags:
       - Services
@@ -1722,17 +1722,17 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/Service'
+                    $ref: '#/definitions/models.Service'
                   type: array
               type: object
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Get a list of services
       tags:
       - Services
@@ -1747,7 +1747,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/CreateServiceRequest'
+          $ref: '#/definitions/models.CreateServiceRequest'
       produces:
       - application/json
       responses:
@@ -1755,19 +1755,19 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/Service'
+                  $ref: '#/definitions/models.Service'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Create a new service
       tags:
       - Services
@@ -1797,19 +1797,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/UserResponse'
+                  $ref: '#/definitions/models.UserResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Get a user by ID, Telegram user ID, or phone
       tags:
       - Users
@@ -1831,15 +1831,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Delete a user by ID
       tags:
       - Users
@@ -1859,7 +1859,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UpdateUserPrivileged'
+          $ref: '#/definitions/models.UpdateUserPrivileged'
       produces:
       - application/json
       responses:
@@ -1867,23 +1867,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/User'
+                  $ref: '#/definitions/models.User'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Update a user's information (privileged access)
       tags:
       - Users
@@ -1899,7 +1899,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/AssignRole'
+          $ref: '#/definitions/models.AssignRole'
       produces:
       - application/json
       responses:
@@ -1907,27 +1907,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/User'
+                  $ref: '#/definitions/models.User'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Assign a role to a user
       tags:
       - Users
@@ -1943,15 +1943,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/UserResponse'
+                  $ref: '#/definitions/models.UserResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Get current authenticated user
       tags:
       - Users
@@ -1966,7 +1966,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UpdateUser'
+          $ref: '#/definitions/models.UpdateUser'
       produces:
       - application/json
       responses:
@@ -1974,23 +1974,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/SuccessResponse'
+            - $ref: '#/definitions/models.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/UserResponse'
+                  $ref: '#/definitions/models.UserResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Update the current user's information
       tags:
       - Users
@@ -2005,11 +2005,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       summary: Delete the currently authenticated user
       tags:
       - Users

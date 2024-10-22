@@ -224,7 +224,7 @@ func (ac *AuthController) BotSignInUser(ctx *gin.Context) {
 //	@Param			body	body		SignInInput	true	"SignIn Input"
 //	@Success		200		{object}	TokenResponse
 //	@Failure		400		{object}	ErrorResponse
-//	@Router			/auth/signin [post]
+//	@Router			/auth/login [post]
 func (ac *AuthController) SignInUser(ctx *gin.Context) {
 	var payload *SignInInput
 

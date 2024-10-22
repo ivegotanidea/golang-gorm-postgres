@@ -21,6 +21,10 @@ func (rc *AuthRouteController) AuthRoute(rg *gin.RouterGroup) {
 
 	router.POST("/bot/signup", rc.authController.BotSignUpUser)
 	router.POST("/bot/login", rc.authController.BotSignInUser)
+
+	router.POST("/signup", rc.authController.SignUpUser)
+	router.POST("/login", rc.authController.SignInUser)
+
 	router.GET("/refresh", rc.authController.RefreshAccessToken)
 	router.GET("/logout", middleware.DeserializeUser(), rc.authController.LogoutUser)
 }
