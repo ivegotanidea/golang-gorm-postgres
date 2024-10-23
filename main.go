@@ -74,14 +74,11 @@ func main() {
 		log.Fatal("🚀 Could not load environment variables", err)
 	}
 
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"http://localhost:8000", config.ClientOrigin}
-	corsConfig.AllowCredentials = true
-
-	server.Use(cors.New(corsConfig))
+	server.Use(cors.Default())
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	router := server.Group("/api/v1")
+
 	router.HEAD("/healthchecker", healthCheckHandler)
 	router.GET("/healthchecker", healthCheckHandler)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
