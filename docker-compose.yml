@@ -88,6 +88,20 @@ services:
     networks:
       - common
 
+  caddy:
+    image: caddy
+    container_name: caddy
+    ports:
+      - "8081:80"   # Change HTTP port for Caddy to 8081
+      - "8443:443"  # Change HTTPS port for Caddy to 8443
+      - "2019:2019"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - go-service
+    networks:
+      - common
+
 volumes:
   postgres:
 
