@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/ivegotanidea/golang-gorm-postgres/controllers"
 	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
@@ -73,8 +72,6 @@ func main() {
 	if err != nil {
 		log.Fatal("🚀 Could not load environment variables", err)
 	}
-
-	server.Use(cors.Default())
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	router := server.Group("/api/v1")
