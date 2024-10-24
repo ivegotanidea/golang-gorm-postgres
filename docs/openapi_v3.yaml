@@ -1,0 +1,2119 @@
+openapi: "3.0.0"
+info:
+  title: Your API Title
+  version: "1.0.0"
+  description: Your API Description
+  contact: {}
+servers:
+  - url: https://api.yourdomain.com
+    description: Production server
+components:
+  schemas:
+    AssignRole:
+      type: object
+      required:
+        - id
+        - role
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum:
+            - moderator
+            - admin
+    BotSignInInput:
+      type: object
+      required:
+        - telegramUserId
+      properties:
+        telegramUserId:
+          type: string
+    BotSignUpInput:
+      type: object
+      required:
+        - name
+        - phone
+        - telegramUserId
+      properties:
+        name:
+          type: string
+          minLength: 5
+        phone:
+          type: string
+          minLength: 11
+          maxLength: 11
+        telegramUserId:
+          type: string
+    CreateBodyArtRequest:
+      type: object
+      required:
+        - bodyArtId
+      properties:
+        bodyArtId:
+          type: integer
+    CreatePhotoRequest:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+    CreateProfileOption:
+      type: object
+      required:
+        - profileTagId
+      properties:
+        comment:
+          type: string
+          maxLength: 50
+        price:
+          type: integer
+          minimum: 0
+        profileTagId:
+          type: integer
+    CreateProfileRatingRequest:
+      type: object
+      properties:
+        ratedProfileTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateRatedProfileTagRequest'
+        review:
+          type: string
+        score:
+          type: integer
+    CreateProfileRequest:
+      type: object
+      required:
+        - age
+        - bio
+        - bust
+        - cityId
+        - contactPhone
+        - contactTG
+        - ethnosId
+        - height
+        - name
+        - phone
+        - photos
+        - profileOptions
+        - weight
+      properties:
+        age:
+          type: integer
+        bio:
+          type: string
+        bodyArts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateBodyArtRequest'
+        bodyTypeId:
+          type: integer
+        bust:
+          type: number
+        cityId:
+          type: integer
+        contactPhone:
+          type: string
+        contactTG:
+          type: string
+        contactWA:
+          type: string
+        ethnosId:
+          type: integer
+        hairColorId:
+          type: integer
+        height:
+          type: integer
+        intimateHairCutId:
+          type: integer
+        latitude:
+          type: string
+        longitude:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePhotoRequest'
+        priceCarContact:
+          type: integer
+          description: PriceCarNightRatio float64 `json:"priceCarNightRatio,omitempty"`
+        priceCarHour:
+          type: integer
+        priceInHouseContact:
+          type: integer
+          description: PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
+        priceInHouseHour:
+          type: integer
+        priceSaunaContact:
+          type: integer
+          description: PrinceSaunaNightRatio float64 `json:"princeSaunaNightRatio,omitempty"`
+        priceSaunaHour:
+          type: integer
+        priceVisitContact:
+          type: integer
+          description: PriceVisitNightRatio float64 `json:"priceVisitNightRatio,omitempty"`
+        priceVisitHour:
+          type: integer
+        profileOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateProfileOption'
+        weight:
+          type: integer
+    CreateRatedProfileTagRequest:
+      type: object
+      properties:
+        tagId:
+          type: integer
+        type:
+          type: string
+    CreateRatedUserTagRequest:
+      type: object
+      properties:
+        tagId:
+          type: integer
+        type:
+          type: string
+    CreateServiceRequest:
+      type: object
+      properties:
+        clientUserLatitude:
+          type: number
+        clientUserLongitude:
+          type: number
+        profileId:
+          type: string
+        profileOwnerId:
+          type: string
+        profileRating:
+          $ref: '#/components/schemas/CreateProfileRatingRequest'
+        profileUserLatitude:
+          type: number
+        profileUserLongitude:
+          type: number
+        userId:
+          type: string
+        userRating:
+          $ref: '#/components/schemas/CreateUserRatingRequest'
+    CreateUserRatingRequest:
+      type: object
+      properties:
+        ratedUserTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateRatedUserTagRequest'
+        review:
+          type: string
+        score:
+          type: integer
+    ErrorResponse:
+      type: object
+      description: This model is returned when an API call fails due to an error.
+      properties:
+        message:
+          type: string
+          description: |
+            Message provides a human-readable description of the error that occurred.
+            Example: "Invalid request payload"
+        status:
+          type: string
+          description: |
+            Status represents the status of the response, usually set to "error".
+            Example: "error"
+    FindProfilesQuery:
+      type: object
+      properties:
+        active:
+          type: boolean
+        age:
+          type: integer
+        bodyArtIds:
+          type: array
+          items:
+            type: integer
+        bodyTypeId:
+          type: integer
+        bust:
+          type: number
+        cityId:
+          type: integer
+        ethnosId:
+          type: integer
+        hairColorId:
+          type: integer
+        height:
+          type: integer
+        intimateHairCutId:
+          type: integer
+        latitude:
+          type: string
+        longitude:
+          type: string
+        moderated:
+          type: boolean
+        name:
+          type: string
+        phone:
+          type: string
+        priceCarContactMax:
+          type: integer
+        priceCarContactMin:
+          type: integer
+        priceCarHourMax:
+          type: integer
+        priceCarHourMin:
+          type: integer
+        priceInHouseContactMax:
+          type: integer
+        priceInHouseContactMin:
+          type: integer
+        priceInHouseHourMax:
+          type: integer
+        priceInHouseHourMin:
+          type: integer
+        priceSaunaContactMax:
+          type: integer
+        priceSaunaContactMin:
+          type: integer
+        priceSaunaHourMax:
+          type: integer
+        priceSaunaHourMin:
+          type: integer
+        priceVisitContactMax:
+          type: integer
+        priceVisitContactMin:
+          type: integer
+        priceVisitHourMax:
+          type: integer
+        priceVisitHourMin:
+          type: integer
+        profileTagIds:
+          type: array
+          items:
+            type: integer
+        verified:
+          type: boolean
+        weight:
+          type: integer
+    Payment:
+      type: object
+      properties:
+        amount:
+          type: number
+        createdAt:
+          type: string
+        id:
+          type: string
+        paymentDate:
+          type: string
+          description: date at which payment is completed
+        status:
+          type: string
+        type:
+          type: string
+          description: 'type: subscription, one_hour, three_hours, twelve_hours, two_days, one_week'
+        updatedAt:
+          type: string
+        userID:
+          type: string
+    Photo:
+      type: object
+      properties:
+        approved:
+          type: boolean
+        createdAt:
+          type: string
+        deleted:
+          type: boolean
+        disabled:
+          type: boolean
+        id:
+          type: string
+        profileID:
+          type: string
+        url:
+          type: string
+    Profile:
+      type: object
+      properties:
+        active:
+          type: boolean
+        addressLatitude:
+          type: string
+        addressLongitude:
+          type: string
+        age:
+          type: integer
+        bio:
+          type: string
+        bodyArts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileBodyArt'
+        bodyTypeID:
+          type: integer
+        bust:
+          type: number
+        cityID:
+          type: integer
+        contactPhone:
+          type: string
+        contactTG:
+          type: string
+        contactWA:
+          type: string
+        createdAt:
+          type: string
+        ethnosID:
+          type: integer
+        hairColorID:
+          type: integer
+        height:
+          type: integer
+        id:
+          type: string
+        intimateHairCutID:
+          type: integer
+        moderated:
+          type: boolean
+        moderatedAt:
+          type: string
+        moderatedBy:
+          type: string
+        name:
+          type: string
+        parsedUrl:
+          type: string
+        phone:
+          type: string
+          description: ";index:,unique,composite:idx_single_profile"
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        priceCarContact:
+          type: integer
+        priceCarHour:
+          type: integer
+        priceCarNightRatio:
+          type: number
+        priceInHouseContact:
+          type: integer
+        priceInHouseHour:
+          type: integer
+        priceInHouseNightRatio:
+          type: number
+        priceSaunaContact:
+          type: integer
+        priceSaunaHour:
+          type: integer
+        priceVisitContact:
+          type: integer
+        priceVisitHour:
+          type: integer
+        priceVisitNightRatio:
+          type: number
+        princeSaunaNightRatio:
+          type: number
+        profileOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileOption'
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+        updatedAt:
+          type: string
+        updatedBy:
+          type: string
+        userID:
+          type: string
+        verified:
+          type: boolean
+        verifiedAt:
+          type: string
+        verifiedBy:
+          type: string
+        weight:
+          type: integer
+    ProfileBodyArt:
+      type: object
+      properties:
+        bodyArtID:
+          type: integer
+          description: Part of composite primary key, and also a foreign key
+        profileID:
+          type: string
+          description: Part of composite primary key
+    ProfileOption:
+      type: object
+      properties:
+        comment:
+          type: string
+        price:
+          type: integer
+        profileID:
+          type: string
+          description: Part of composite primary key
+        profileTag:
+          $ref: '#/components/schemas/ProfileTag'
+        profileTagID:
+          type: integer
+          description: Part of composite primary key, and also a foreign key
+    ProfileRating:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        id:
+          type: string
+        profileID:
+          type: string
+        ratedProfileTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/RatedProfileTag'
+        review:
+          type: string
+        reviewTextVisible:
+          type: boolean
+        score:
+          type: integer
+        serviceID:
+          type: string
+        updatedAt:
+          type: string
+        updatedBy:
+          type: string
+    ProfileTag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    RatedProfileTag:
+      type: object
+      properties:
+        profileTag:
+          $ref: '#/components/schemas/ProfileTag'
+        profileTagID:
+          type: integer
+        ratingID:
+          type: string
+        type:
+          type: string
+    RatedUserTag:
+      type: object
+      properties:
+        ratingID:
+          type: string
+        type:
+          type: string
+        userTag:
+          $ref: '#/components/schemas/UserTag'
+        userTagID:
+          type: integer
+    Service:
+      type: object
+      properties:
+        clientUserID:
+          type: string
+        clientUserLat:
+          type: string
+        clientUserLon:
+          type: string
+        clientUserRating:
+          $ref: '#/components/schemas/UserRating'
+        clientUserRatingID:
+          type: string
+        createdAt:
+          type: string
+        distanceBetweenUsers:
+          type: number
+        id:
+          type: string
+        profileID:
+          type: string
+        profileOwnerID:
+          type: string
+        profileRating:
+          $ref: '#/components/schemas/ProfileRating'
+        profileRatingID:
+          type: string
+        profileUserLat:
+          type: string
+        profileUserLon:
+          type: string
+        trustedDistance:
+          type: boolean
+        updatedAt:
+          type: string
+        updatedBy:
+          type: string
+    SetReviewVisibilityRequest:
+      type: object
+      properties:
+        visible:
+          type: boolean
+    SignInInput:
+      type: object
+      required:
+        - password
+        - phone
+      properties:
+        password:
+          type: string
+          minLength: 8
+        phone:
+          type: string
+          minLength: 11
+          maxLength: 11
+    SignUpInput:
+      type: object
+      required:
+        - password
+        - passwordConfirm
+        - phone
+      properties:
+        password:
+          type: string
+          minLength: 8
+        passwordConfirm:
+          type: string
+          minLength: 8
+        phone:
+          type: string
+          minLength: 11
+          maxLength: 11
+    SuccessResponse:
+      type: object
+      description: This model is returned when an API call succeeds.
+      properties:
+        data:
+          type: object
+          description: |
+            Data contains the result of the successful operation. Can be any type of data.
+            Example: {"id": 1, "name": "John Doe"}
+        status:
+          type: string
+          description: |
+            Status represents the status of the response, typically set to "success".
+            Example: "success"
+    TokenResponse:
+      type: object
+      description: This model is used to return an access token after a user logs in or when a token is refreshed.
+      properties:
+        access_token:
+          type: string
+          description: |
+            AccessToken is the token that allows the user to authenticate subsequent API requests.
+            Example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        status:
+          type: string
+          description: |
+            Status represents the status of the response, typically set to "success".
+            Example: "success"
+    UpdateOwnProfileRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+        age:
+          type: integer
+        bio:
+          type: string
+        bodyArts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateBodyArtRequest'
+        bodyTypeId:
+          type: integer
+        bust:
+          type: number
+        cityId:
+          type: integer
+        contactPhone:
+          type: string
+        contactTG:
+          type: string
+        contactWA:
+          type: string
+        ethnosId:
+          type: integer
+        hairColorId:
+          type: integer
+        height:
+          type: integer
+        intimateHairCutId:
+          type: integer
+        latitude:
+          type: string
+        longitude:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePhotoRequest'
+        priceCarContact:
+          type: integer
+        priceCarHour:
+          type: integer
+        priceCarNightRatio:
+          type: number
+        priceInHouseContact:
+          type: integer
+        priceInHouseHour:
+          type: integer
+        priceInHouseNightRatio:
+          type: number
+        priceSaunaContact:
+          type: integer
+        priceSaunaHour:
+          type: integer
+        priceVisitContact:
+          type: integer
+        priceVisitHour:
+          type: integer
+        priceVisitNightRatio:
+          type: number
+        princeSaunaNightRatio:
+          type: number
+        profileOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateProfileOption'
+        weight:
+          type: integer
+    UpdateProfileRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+        bio:
+          type: string
+        moderated:
+          type: boolean
+        name:
+          type: string
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePhotoRequest'
+        verified:
+          type: boolean
+    UpdateUser:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 20
+        phone:
+          type: string
+          minLength: 11
+          maxLength: 11
+        photo:
+          type: string
+    UpdateUserPrivileged:
+      type: object
+      properties:
+        active:
+          type: boolean
+        name:
+          type: string
+          minLength: 3
+          maxLength: 20
+        phone:
+          type: string
+          minLength: 11
+          maxLength: 11
+        photo:
+          type: string
+        telegramUserId:
+          type: string
+          minLength: 6
+        tier:
+          type: string
+          enum:
+            - basic
+            - expert
+            - guru
+        verified:
+          type: boolean
+    User:
+      type: object
+      properties:
+        active:
+          type: boolean
+        avatar:
+          type: string
+        createdAt:
+          type: string
+        hasProfile:
+          type: boolean
+        id:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Profile'
+        role:
+          type: string
+          description: 'oneOf: user, moderator, admin'
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+        telegramUserId:
+          type: integer
+        tier:
+          type: string
+          description: 'oneOf: basic, expert, guru'
+        updatedAt:
+          type: string
+        verified:
+          type: boolean
+    UserRating:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        id:
+          type: string
+        ratedUserTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/RatedUserTag'
+        review:
+          type: string
+        reviewTextVisible:
+          type: boolean
+        score:
+          type: integer
+        serviceID:
+          type: string
+        updatedAt:
+          type: string
+        updatedBy:
+          type: string
+        userID:
+          type: string
+    UserResponse:
+      type: object
+      properties:
+        active:
+          type: boolean
+        created_at:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+        photo:
+          type: string
+        role:
+          type: string
+        telegramUserId:
+          type: integer
+        tier:
+          type: string
+        updated_at:
+          type: string
+        verified:
+          type: boolean
+    UserTag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+  parameters: {}
+paths:
+  /auth/bot/login:
+    post:
+      summary: Logs in a bot user
+      tags:
+        - Auth
+      description: Authenticates a bot user by accepting Telegram User ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BotSignInInput'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/bot/signup:
+    post:
+      summary: Registers a new user via bot
+      tags:
+        - Auth
+      description: Registers a new user by accepting Telegram user ID and other basic details. Automatically generates password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BotSignUpInput'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/logout:
+    post:
+      summary: Logs out a user
+      tags:
+        - Auth
+      description: Clears the access and refresh tokens and logs out the user.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /auth/refresh:
+    post:
+      summary: Refreshes access token
+      tags:
+        - Auth
+      description: Refreshes the access token using the refresh token cookie.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/login:
+    post:
+      summary: Logs in a user
+      tags:
+        - Auth
+      description: Authenticates a user by accepting phone and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInInput'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/signup:
+    post:
+      summary: Registers a new user
+      tags:
+        - Auth
+      description: Registers a new user by accepting basic details and password confirmation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpInput'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payments:
+    get:
+      summary: List all payments
+      tags:
+        - Payments
+      description: Retrieves all payments, sorted by payment date in descending order with pagination.
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+          required: false
+          example: 1
+        - name: limit
+          in: query
+          description: Limit per page
+          schema:
+            type: integer
+          required: false
+          example: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Payment'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payments/history/{userID}:
+    get:
+      summary: Get payment history for a user
+      tags:
+        - Payments
+      description: Retrieves the payment history for a specified user between two dates.
+      parameters:
+        - name: userID
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date in RFC3339 format
+          required: true
+          schema:
+            type: string
+        - name: end_date
+          in: query
+          description: End Date in RFC3339 format
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Payment'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payments/me:
+    get:
+      summary: Get current user's payments
+      tags:
+        - Payments
+      description: Retrieves the payments made by the current user, sorted by payment date in descending order with pagination.
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+          required: false
+          example: 1
+        - name: limit
+          in: query
+          description: Limit per page
+          schema:
+            type: integer
+          required: false
+          example: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Payment'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payments/webhook:
+    post:
+      summary: Webhook for payment updates
+      tags:
+        - Payments
+      description: Receives payment updates and updates the payment status in the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        "200":
+          description: payment updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles:
+    post:
+      summary: Creates a new profile
+      tags:
+        - Profiles
+      description: Creates a new profile for the current user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfileRequest'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/{id}:
+    delete:
+      summary: Deletes a profile by ID
+      tags:
+        - Profiles
+      description: Deletes the profile with the given ID from the database
+      parameters:
+        - name: id
+          in: path
+          description: Profile ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/{phone}:
+    get:
+      summary: Find a profile by phone number
+      tags:
+        - Profiles
+      description: Retrieves a profile based on the phone number provided
+      parameters:
+        - name: phone
+          in: path
+          description: Phone Number
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/{profileID}/services:
+    get:
+      summary: Get all services for a specific profile
+      tags:
+        - Services
+      description: Retrieves all services for a specific profile, with filtered data based on the user's tier.
+      parameters:
+        - name: profileID
+          in: path
+          description: Profile ID
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: string
+          required: false
+          example: "1"
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: string
+          required: false
+          example: "10"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/{profileID}/services/{serviceID}:
+    get:
+      summary: Get a specific service by profile and service ID
+      tags:
+        - Services
+      description: Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.
+      parameters:
+        - name: profileID
+          in: path
+          description: Profile ID
+          required: true
+          schema:
+            type: string
+        - name: serviceID
+          in: path
+          description: Service ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Service'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/all:
+    get:
+      summary: Lists all profiles with pagination, auth required
+      tags:
+        - Profiles
+      description: Retrieves all profiles, supports pagination
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/list:
+    get:
+      summary: Lists all active profiles with pagination, no auth required
+      tags:
+        - Profiles
+      description: Retrieves all profiles, supports pagination
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/my:
+    get:
+      summary: Get current user's profiles
+      tags:
+        - Profiles
+      description: Retrieves the profiles created by the currently authenticated user
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/my/{id}:
+    put:
+      summary: User updates his own profile
+      tags:
+        - Profiles
+      description: User updates his own profile with the provided fields
+      parameters:
+        - name: id
+          in: path
+          description: Profile ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOwnProfileRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/search:
+    post:
+      summary: Search for profiles
+      tags:
+        - Profiles
+      description: Retrieves profiles based on filters provided in the query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindProfilesQuery'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profiles/update/{id}:
+    put:
+      summary: Updates an existing profile
+      tags:
+        - Profiles
+      description: Updates the profile with the given ID, allows updating specific fields
+      parameters:
+        - name: id
+          in: path
+          description: Profile ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reviews/client/update:
+    put:
+      summary: Update a client's user review on a profile service
+      tags:
+        - Services
+      description: Updates the user review for a service if the current user is authorized to do so and within the allowed time limit.
+      parameters:
+        - name: service_id
+          in: query
+          description: Service ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRatingRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Service'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reviews/client/visibility:
+    put:
+      summary: Set visibility of the profile owner's review
+      tags:
+        - Services
+      description: Set visibility of the profile owner's review based on the client's request. Only available for non-basic tier users.
+      parameters:
+        - name: service_id
+          in: query
+          description: Service ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetReviewVisibilityRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Service'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reviews/host/update:
+    put:
+      summary: Update the profile owner's review on a client user
+      tags:
+        - Services
+      description: Allows a profile owner to update their review on a client user within the allowed time limit.
+      parameters:
+        - name: service_id
+          in: query
+          description: Service ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfileRatingRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Service'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reviews/host/visibility:
+    put:
+      summary: Set visibility of user's review
+      tags:
+        - Services
+      description: Allows a profile owner to set user's review visibility. Only available for non-basic tier users.
+      parameters:
+        - name: service_id
+          in: query
+          description: Service ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetReviewVisibilityRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Service'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /services:
+    get:
+      summary: Get a list of services
+      tags:
+        - Services
+      description: Retrieves a paginated list of services with all related information.
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: string
+          required: false
+          example: "1"
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: string
+          required: false
+          example: "10"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Service'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a new service
+      tags:
+        - Services
+      description: Creates a new service between a client user and a profile, including optional ratings for both the profile and the user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServiceRequest'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Service'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users:
+    get:
+      summary: Get a user by ID, Telegram user ID, or phone
+      tags:
+        - Users
+      description: Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required.
+      parameters:
+        - name: id
+          in: query
+          description: User ID
+          schema:
+            type: string
+          required: false
+        - name: telegramUserId
+          in: query
+          description: Telegram User ID
+          schema:
+            type: integer
+          required: false
+        - name: phone
+          in: query
+          description: Phone number
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/{id}:
+    delete:
+      summary: Delete a user by ID
+      tags:
+        - Users
+      description: Allows an authorized user to delete another user by their ID, with role-based restrictions.
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update a user's information (privileged access)
+      tags:
+        - Users
+      description: Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserPrivileged'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/assign-role:
+    post:
+      summary: Assign a role to a user
+      tags:
+        - Users
+      description: Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/me:
+    get:
+      summary: Get current authenticated user
+      tags:
+        - Users
+      description: Retrieves the profile of the currently authenticated user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the current user's information
+      tags:
+        - Users
+      description: Allows the current user to update their own profile, including name, phone, and avatar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/self:
+    delete:
+      summary: Delete the currently authenticated user
+      tags:
+        - Users
+      description: Allows the current user to delete their own account.
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

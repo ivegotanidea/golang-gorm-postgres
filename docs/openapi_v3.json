@@ -1,0 +1,3384 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Test",
+        "version": "1.0.0",
+        "contact": {}
+    },
+    "servers": [
+        {
+            "url": "http://localhost",
+            "description": "Local server"
+        }
+    ],
+    "paths": {
+        "/auth/bot/login": {
+            "post": {
+                "description": "Authenticates a bot user by accepting Telegram User ID.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs in a bot user",
+                "requestBody": {
+                    "description": "Bot SignIn Input",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BotSignInInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/bot/signup": {
+            "post": {
+                "description": "Registers a new user by accepting Telegram user ID and other basic details. Automatically generates password.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registers a new user via bot",
+                "requestBody": {
+                    "description": "Bot Signup Input",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BotSignUpInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "description": "Clears the access and refresh tokens and logs out the user.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs out a user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "description": "Refreshes the access token using the refresh token cookie.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refreshes access token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "description": "Authenticates a user by accepting phone and password.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs in a user",
+                "requestBody": {
+                    "description": "SignIn Input",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SignInInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/signup": {
+            "post": {
+                "description": "Registers a new user by accepting basic details and password confirmation.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registers a new user",
+                "requestBody": {
+                    "description": "SignUp Input",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SignUpInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments": {
+            "get": {
+                "description": "Retrieves all payments, sorted by payment date in descending order with pagination.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "List all payments",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit per page",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Payment"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/history/{userID}": {
+            "get": {
+                "description": "Retrieves the payment history for a specified user between two dates.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Get payment history for a user",
+                "parameters": [
+                    {
+                        "name": "userID",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Start Date in RFC3339 format",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "End Date in RFC3339 format",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Payment"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/me": {
+            "get": {
+                "description": "Retrieves the payments made by the current user, sorted by payment date in descending order with pagination.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Get current user's payments",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit per page",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Payment"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/webhook": {
+            "post": {
+                "description": "Receives payment updates and updates the payment status in the database.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Webhook for payment updates",
+                "requestBody": {
+                    "description": "Payment Update",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Payment"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "payment updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles": {
+            "post": {
+                "description": "Creates a new profile for the current user",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Creates a new profile",
+                "requestBody": {
+                    "description": "Create Profile Request",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/all": {
+            "get": {
+                "description": "Retrieves all profiles, supports pagination",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Lists all profiles with pagination, auth required",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/list": {
+            "get": {
+                "description": "Retrieves all profiles, supports pagination",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Lists all active profiles with pagination, no auth required",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/my": {
+            "get": {
+                "description": "Retrieves the profiles created by the currently authenticated user",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Get current user's profiles",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/my/{id}": {
+            "put": {
+                "description": "User updates his own profile with the provided fields",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "User updates his own profile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Profile Update Payload",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateOwnProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/search": {
+            "post": {
+                "description": "Retrieves profiles based on filters provided in the query",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Search for profiles",
+                "requestBody": {
+                    "description": "Search Filters",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FindProfilesQuery"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/update/{id}": {
+            "put": {
+                "description": "Updates the profile with the given ID, allows updating specific fields",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Updates an existing profile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Profile Update Payload",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{id}": {
+            "delete": {
+                "description": "Deletes the profile with the given ID from the database",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Deletes a profile by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{phone}": {
+            "get": {
+                "description": "Retrieves a profile based on the phone number provided",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Find a profile by phone number",
+                "parameters": [
+                    {
+                        "name": "phone",
+                        "in": "path",
+                        "description": "Phone Number",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{profileID}/services": {
+            "get": {
+                "description": "Retrieves all services for a specific profile, with filtered data based on the user's tier.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get all services for a specific profile",
+                "parameters": [
+                    {
+                        "name": "profileID",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "string",
+                            "default": "1"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "schema": {
+                            "type": "string",
+                            "default": "10"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{profileID}/services/{serviceID}": {
+            "get": {
+                "description": "Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get a specific service by profile and service ID",
+                "parameters": [
+                    {
+                        "name": "profileID",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "serviceID",
+                        "in": "path",
+                        "description": "Service ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Service"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reviews/client/update": {
+            "put": {
+                "description": "Updates the user review for a service if the current user is authorized to do so and within the allowed time limit.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Update a client's user review on a profile service",
+                "parameters": [
+                    {
+                        "name": "service_id",
+                        "in": "query",
+                        "description": "Service ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "User Rating Request",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserRatingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Service"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reviews/client/visibility": {
+            "put": {
+                "description": "Set visibility of the profile owner's review based on the client's request. Only available for non-basic tier users.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Set visibility of the profile owner's review",
+                "parameters": [
+                    {
+                        "name": "service_id",
+                        "in": "query",
+                        "description": "Service ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Set Review Visibility Request",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SetReviewVisibilityRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Service"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reviews/host/update": {
+            "put": {
+                "description": "Allows a profile owner to update their review on a client user within the allowed time limit.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Update the profile owner's review on a client user",
+                "parameters": [
+                    {
+                        "name": "service_id",
+                        "in": "query",
+                        "description": "Service ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Create Profile Rating Request",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateProfileRatingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Service"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reviews/host/visibility": {
+            "put": {
+                "description": "Allows a profile owner to set user's review visibility. Only available for non-basic tier users.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Set visibility of user's review",
+                "parameters": [
+                    {
+                        "name": "service_id",
+                        "in": "query",
+                        "description": "Service ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Set Review Visibility Request",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SetReviewVisibilityRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Service"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/services": {
+            "get": {
+                "description": "Retrieves a paginated list of services with all related information.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get a list of services",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "string",
+                            "default": "1"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "schema": {
+                            "type": "string",
+                            "default": "10"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Service"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new service between a client user and a profile, including optional ratings for both the profile and the user.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Create a new service",
+                "requestBody": {
+                    "description": "Create Service Request",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateServiceRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Service"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get a user by ID, Telegram user ID, or phone",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "User ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "telegramUserId",
+                        "in": "query",
+                        "description": "Telegram User ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "phone",
+                        "in": "query",
+                        "description": "Phone number",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/UserResponse"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/assign-role": {
+            "post": {
+                "description": "Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Assign a role to a user",
+                "requestBody": {
+                    "description": "Role assignment details",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignRole"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/User"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "description": "Retrieves the profile of the currently authenticated user",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get current authenticated user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/UserResponse"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Allows the current user to update their own profile, including name, phone, and avatar.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update the current user's information",
+                "requestBody": {
+                    "description": "User Update Payload",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/UserResponse"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/self": {
+            "delete": {
+                "description": "Allows the current user to delete their own account.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete the currently authenticated user",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "put": {
+                "description": "Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update a user's information (privileged access)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "User Update Payload",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserPrivileged"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/User"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Allows an authorized user to delete another user by their ID, with role-based restrictions.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AssignRole": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "role"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "moderator",
+                            "admin"
+                        ]
+                    }
+                }
+            },
+            "BotSignInInput": {
+                "type": "object",
+                "required": [
+                    "telegramUserId"
+                ],
+                "properties": {
+                    "telegramUserId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "BotSignUpInput": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "phone",
+                    "telegramUserId"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 5
+                    },
+                    "phone": {
+                        "type": "string",
+                        "minLength": 11,
+                        "maxLength": 11
+                    },
+                    "telegramUserId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CreateBodyArtRequest": {
+                "type": "object",
+                "required": [
+                    "bodyArtId"
+                ],
+                "properties": {
+                    "bodyArtId": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "CreatePhotoRequest": {
+                "type": "object",
+                "required": [
+                    "url"
+                ],
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CreateProfileOption": {
+                "type": "object",
+                "required": [
+                    "profileTagId"
+                ],
+                "properties": {
+                    "comment": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "price": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "profileTagId": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "CreateProfileRatingRequest": {
+                "type": "object",
+                "properties": {
+                    "ratedProfileTags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreateRatedProfileTagRequest"
+                        }
+                    },
+                    "review": {
+                        "type": "string"
+                    },
+                    "score": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "CreateProfileRequest": {
+                "type": "object",
+                "required": [
+                    "age",
+                    "bio",
+                    "bust",
+                    "cityId",
+                    "contactPhone",
+                    "contactTG",
+                    "ethnosId",
+                    "height",
+                    "name",
+                    "phone",
+                    "photos",
+                    "profileOptions",
+                    "weight"
+                ],
+                "properties": {
+                    "age": {
+                        "type": "integer"
+                    },
+                    "bio": {
+                        "type": "string"
+                    },
+                    "bodyArts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreateBodyArtRequest"
+                        }
+                    },
+                    "bodyTypeId": {
+                        "type": "integer"
+                    },
+                    "bust": {
+                        "type": "number"
+                    },
+                    "cityId": {
+                        "type": "integer"
+                    },
+                    "contactPhone": {
+                        "type": "string"
+                    },
+                    "contactTG": {
+                        "type": "string"
+                    },
+                    "contactWA": {
+                        "type": "string"
+                    },
+                    "ethnosId": {
+                        "type": "integer"
+                    },
+                    "hairColorId": {
+                        "type": "integer"
+                    },
+                    "height": {
+                        "type": "integer"
+                    },
+                    "intimateHairCutId": {
+                        "type": "integer"
+                    },
+                    "latitude": {
+                        "type": "string"
+                    },
+                    "longitude": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "photos": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreatePhotoRequest"
+                        }
+                    },
+                    "priceCarContact": {
+                        "description": "PriceCarNightRatio     float64 `json:\"priceCarNightRatio,omitempty\"`",
+                        "type": "integer"
+                    },
+                    "priceCarHour": {
+                        "type": "integer"
+                    },
+                    "priceInHouseContact": {
+                        "description": "PriceInHouseNightRatio float64 `json:\"priceInHouseNightRatio,omitempty\"`",
+                        "type": "integer"
+                    },
+                    "priceInHouseHour": {
+                        "type": "integer"
+                    },
+                    "priceSaunaContact": {
+                        "description": "PrinceSaunaNightRatio  float64 `json:\"princeSaunaNightRatio,omitempty\"`",
+                        "type": "integer"
+                    },
+                    "priceSaunaHour": {
+                        "type": "integer"
+                    },
+                    "priceVisitContact": {
+                        "description": "PriceVisitNightRatio   float64 `json:\"priceVisitNightRatio,omitempty\"`",
+                        "type": "integer"
+                    },
+                    "priceVisitHour": {
+                        "type": "integer"
+                    },
+                    "profileOptions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreateProfileOption"
+                        }
+                    },
+                    "weight": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "CreateRatedProfileTagRequest": {
+                "type": "object",
+                "properties": {
+                    "tagId": {
+                        "type": "integer"
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CreateRatedUserTagRequest": {
+                "type": "object",
+                "properties": {
+                    "tagId": {
+                        "type": "integer"
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CreateServiceRequest": {
+                "type": "object",
+                "properties": {
+                    "clientUserLatitude": {
+                        "type": "number"
+                    },
+                    "clientUserLongitude": {
+                        "type": "number"
+                    },
+                    "profileId": {
+                        "type": "string"
+                    },
+                    "profileOwnerId": {
+                        "type": "string"
+                    },
+                    "profileRating": {
+                        "$ref": "#/components/schemas/CreateProfileRatingRequest"
+                    },
+                    "profileUserLatitude": {
+                        "type": "number"
+                    },
+                    "profileUserLongitude": {
+                        "type": "number"
+                    },
+                    "userId": {
+                        "type": "string"
+                    },
+                    "userRating": {
+                        "$ref": "#/components/schemas/CreateUserRatingRequest"
+                    }
+                }
+            },
+            "CreateUserRatingRequest": {
+                "type": "object",
+                "properties": {
+                    "ratedUserTags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreateRatedUserTagRequest"
+                        }
+                    },
+                    "review": {
+                        "type": "string"
+                    },
+                    "score": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "description": "This model is returned when an API call fails due to an error.",
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "description": "Message provides a human-readable description of the error that occurred.\nExample: \"Invalid request payload\"",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "Status represents the status of the response, usually set to \"error\".\nExample: \"error\"",
+                        "type": "string"
+                    }
+                }
+            },
+            "FindProfilesQuery": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "age": {
+                        "type": "integer"
+                    },
+                    "bodyArtIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "bodyTypeId": {
+                        "type": "integer"
+                    },
+                    "bust": {
+                        "type": "number"
+                    },
+                    "cityId": {
+                        "type": "integer"
+                    },
+                    "ethnosId": {
+                        "type": "integer"
+                    },
+                    "hairColorId": {
+                        "type": "integer"
+                    },
+                    "height": {
+                        "type": "integer"
+                    },
+                    "intimateHairCutId": {
+                        "type": "integer"
+                    },
+                    "latitude": {
+                        "type": "string"
+                    },
+                    "longitude": {
+                        "type": "string"
+                    },
+                    "moderated": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "priceCarContactMax": {
+                        "type": "integer"
+                    },
+                    "priceCarContactMin": {
+                        "type": "integer"
+                    },
+                    "priceCarHourMax": {
+                        "type": "integer"
+                    },
+                    "priceCarHourMin": {
+                        "type": "integer"
+                    },
+                    "priceInHouseContactMax": {
+                        "type": "integer"
+                    },
+                    "priceInHouseContactMin": {
+                        "type": "integer"
+                    },
+                    "priceInHouseHourMax": {
+                        "type": "integer"
+                    },
+                    "priceInHouseHourMin": {
+                        "type": "integer"
+                    },
+                    "priceSaunaContactMax": {
+                        "type": "integer"
+                    },
+                    "priceSaunaContactMin": {
+                        "type": "integer"
+                    },
+                    "priceSaunaHourMax": {
+                        "type": "integer"
+                    },
+                    "priceSaunaHourMin": {
+                        "type": "integer"
+                    },
+                    "priceVisitContactMax": {
+                        "type": "integer"
+                    },
+                    "priceVisitContactMin": {
+                        "type": "integer"
+                    },
+                    "priceVisitHourMax": {
+                        "type": "integer"
+                    },
+                    "priceVisitHourMin": {
+                        "type": "integer"
+                    },
+                    "profileTagIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    },
+                    "weight": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "Payment": {
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "type": "number"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "paymentDate": {
+                        "description": "date at which payment is completed",
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "description": "type: subscription, one_hour, three_hours, twelve_hours, two_days, one_week",
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "userID": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Photo": {
+                "type": "object",
+                "properties": {
+                    "approved": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "deleted": {
+                        "type": "boolean"
+                    },
+                    "disabled": {
+                        "type": "boolean"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "profileID": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Profile": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "addressLatitude": {
+                        "type": "string"
+                    },
+                    "addressLongitude": {
+                        "type": "string"
+                    },
+                    "age": {
+                        "type": "integer"
+                    },
+                    "bio": {
+                        "type": "string"
+                    },
+                    "bodyArts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProfileBodyArt"
+                        }
+                    },
+                    "bodyTypeID": {
+                        "type": "integer"
+                    },
+                    "bust": {
+                        "type": "number"
+                    },
+                    "cityID": {
+                        "type": "integer"
+                    },
+                    "contactPhone": {
+                        "type": "string"
+                    },
+                    "contactTG": {
+                        "type": "string"
+                    },
+                    "contactWA": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "ethnosID": {
+                        "type": "integer"
+                    },
+                    "hairColorID": {
+                        "type": "integer"
+                    },
+                    "height": {
+                        "type": "integer"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "intimateHairCutID": {
+                        "type": "integer"
+                    },
+                    "moderated": {
+                        "type": "boolean"
+                    },
+                    "moderatedAt": {
+                        "type": "string"
+                    },
+                    "moderatedBy": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "parsedUrl": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "description": ";index:,unique,composite:idx_single_profile\"",
+                        "type": "string"
+                    },
+                    "photos": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Photo"
+                        }
+                    },
+                    "priceCarContact": {
+                        "type": "integer"
+                    },
+                    "priceCarHour": {
+                        "type": "integer"
+                    },
+                    "priceCarNightRatio": {
+                        "type": "number"
+                    },
+                    "priceInHouseContact": {
+                        "type": "integer"
+                    },
+                    "priceInHouseHour": {
+                        "type": "integer"
+                    },
+                    "priceInHouseNightRatio": {
+                        "type": "number"
+                    },
+                    "priceSaunaContact": {
+                        "type": "integer"
+                    },
+                    "priceSaunaHour": {
+                        "type": "integer"
+                    },
+                    "priceVisitContact": {
+                        "type": "integer"
+                    },
+                    "priceVisitHour": {
+                        "type": "integer"
+                    },
+                    "priceVisitNightRatio": {
+                        "type": "number"
+                    },
+                    "princeSaunaNightRatio": {
+                        "type": "number"
+                    },
+                    "profileOptions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProfileOption"
+                        }
+                    },
+                    "services": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Service"
+                        }
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "updatedBy": {
+                        "type": "string"
+                    },
+                    "userID": {
+                        "type": "string"
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    },
+                    "verifiedAt": {
+                        "type": "string"
+                    },
+                    "verifiedBy": {
+                        "type": "string"
+                    },
+                    "weight": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "ProfileBodyArt": {
+                "type": "object",
+                "properties": {
+                    "bodyArtID": {
+                        "description": "Part of composite primary key, and also a foreign key",
+                        "type": "integer"
+                    },
+                    "profileID": {
+                        "description": "Part of composite primary key",
+                        "type": "string"
+                    }
+                }
+            },
+            "ProfileOption": {
+                "type": "object",
+                "properties": {
+                    "comment": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "integer"
+                    },
+                    "profileID": {
+                        "description": "Part of composite primary key",
+                        "type": "string"
+                    },
+                    "profileTag": {
+                        "$ref": "#/components/schemas/ProfileTag"
+                    },
+                    "profileTagID": {
+                        "description": "Part of composite primary key, and also a foreign key",
+                        "type": "integer"
+                    }
+                }
+            },
+            "ProfileRating": {
+                "type": "object",
+                "properties": {
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "profileID": {
+                        "type": "string"
+                    },
+                    "ratedProfileTags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RatedProfileTag"
+                        }
+                    },
+                    "review": {
+                        "type": "string"
+                    },
+                    "reviewTextVisible": {
+                        "type": "boolean"
+                    },
+                    "score": {
+                        "type": "integer"
+                    },
+                    "serviceID": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "updatedBy": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ProfileTag": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "RatedProfileTag": {
+                "type": "object",
+                "properties": {
+                    "profileTag": {
+                        "$ref": "#/components/schemas/ProfileTag"
+                    },
+                    "profileTagID": {
+                        "type": "integer"
+                    },
+                    "ratingID": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            },
+            "RatedUserTag": {
+                "type": "object",
+                "properties": {
+                    "ratingID": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "userTag": {
+                        "$ref": "#/components/schemas/UserTag"
+                    },
+                    "userTagID": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "Service": {
+                "type": "object",
+                "properties": {
+                    "clientUserID": {
+                        "type": "string"
+                    },
+                    "clientUserLat": {
+                        "type": "string"
+                    },
+                    "clientUserLon": {
+                        "type": "string"
+                    },
+                    "clientUserRating": {
+                        "description": "profile owner's review on client",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/UserRating"
+                            }
+                        ]
+                    },
+                    "clientUserRatingID": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "distanceBetweenUsers": {
+                        "type": "number"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "profileID": {
+                        "type": "string"
+                    },
+                    "profileOwnerID": {
+                        "type": "string"
+                    },
+                    "profileRating": {
+                        "description": "client's review on profile",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ProfileRating"
+                            }
+                        ]
+                    },
+                    "profileRatingID": {
+                        "type": "string"
+                    },
+                    "profileUserLat": {
+                        "type": "string"
+                    },
+                    "profileUserLon": {
+                        "type": "string"
+                    },
+                    "trustedDistance": {
+                        "type": "boolean"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "updatedBy": {
+                        "type": "string"
+                    }
+                }
+            },
+            "SetReviewVisibilityRequest": {
+                "type": "object",
+                "properties": {
+                    "visible": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "SignInInput": {
+                "type": "object",
+                "required": [
+                    "password",
+                    "phone"
+                ],
+                "properties": {
+                    "password": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "phone": {
+                        "type": "string",
+                        "minLength": 11,
+                        "maxLength": 11
+                    }
+                }
+            },
+            "SignUpInput": {
+                "type": "object",
+                "required": [
+                    "password",
+                    "passwordConfirm",
+                    "phone"
+                ],
+                "properties": {
+                    "password": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "passwordConfirm": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "phone": {
+                        "type": "string",
+                        "minLength": 11,
+                        "maxLength": 11
+                    }
+                }
+            },
+            "SuccessResponse": {
+                "description": "This model is returned when an API call succeeds.",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}"
+                    },
+                    "status": {
+                        "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                        "type": "string"
+                    }
+                }
+            },
+            "TokenResponse": {
+                "description": "This model is used to return an access token after a user logs in or when a token is refreshed.",
+                "type": "object",
+                "properties": {
+                    "access_token": {
+                        "description": "AccessToken is the token that allows the user to authenticate subsequent API requests.\nExample: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                        "type": "string"
+                    }
+                }
+            },
+            "UpdateOwnProfileRequest": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "age": {
+                        "type": "integer"
+                    },
+                    "bio": {
+                        "type": "string"
+                    },
+                    "bodyArts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreateBodyArtRequest"
+                        }
+                    },
+                    "bodyTypeId": {
+                        "type": "integer"
+                    },
+                    "bust": {
+                        "type": "number"
+                    },
+                    "cityId": {
+                        "type": "integer"
+                    },
+                    "contactPhone": {
+                        "type": "string"
+                    },
+                    "contactTG": {
+                        "type": "string"
+                    },
+                    "contactWA": {
+                        "type": "string"
+                    },
+                    "ethnosId": {
+                        "type": "integer"
+                    },
+                    "hairColorId": {
+                        "type": "integer"
+                    },
+                    "height": {
+                        "type": "integer"
+                    },
+                    "intimateHairCutId": {
+                        "type": "integer"
+                    },
+                    "latitude": {
+                        "type": "string"
+                    },
+                    "longitude": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "photos": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreatePhotoRequest"
+                        }
+                    },
+                    "priceCarContact": {
+                        "type": "integer"
+                    },
+                    "priceCarHour": {
+                        "type": "integer"
+                    },
+                    "priceCarNightRatio": {
+                        "type": "number"
+                    },
+                    "priceInHouseContact": {
+                        "type": "integer"
+                    },
+                    "priceInHouseHour": {
+                        "type": "integer"
+                    },
+                    "priceInHouseNightRatio": {
+                        "type": "number"
+                    },
+                    "priceSaunaContact": {
+                        "type": "integer"
+                    },
+                    "priceSaunaHour": {
+                        "type": "integer"
+                    },
+                    "priceVisitContact": {
+                        "type": "integer"
+                    },
+                    "priceVisitHour": {
+                        "type": "integer"
+                    },
+                    "priceVisitNightRatio": {
+                        "type": "number"
+                    },
+                    "princeSaunaNightRatio": {
+                        "type": "number"
+                    },
+                    "profileOptions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreateProfileOption"
+                        }
+                    },
+                    "weight": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "UpdateProfileRequest": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "bio": {
+                        "type": "string"
+                    },
+                    "moderated": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "photos": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreatePhotoRequest"
+                        }
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UpdateUser": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 20
+                    },
+                    "phone": {
+                        "type": "string",
+                        "minLength": 11,
+                        "maxLength": 11
+                    },
+                    "photo": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UpdateUserPrivileged": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 20
+                    },
+                    "phone": {
+                        "type": "string",
+                        "minLength": 11,
+                        "maxLength": 11
+                    },
+                    "photo": {
+                        "type": "string"
+                    },
+                    "telegramUserId": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "tier": {
+                        "type": "string",
+                        "enum": [
+                            "basic",
+                            "expert",
+                            "guru"
+                        ]
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "avatar": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "hasProfile": {
+                        "type": "boolean"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "profiles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Profile"
+                        }
+                    },
+                    "role": {
+                        "description": "oneOf: user, moderator, admin",
+                        "type": "string"
+                    },
+                    "services": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Service"
+                        }
+                    },
+                    "telegramUserId": {
+                        "type": "integer"
+                    },
+                    "tier": {
+                        "description": "oneOf: basic, expert, guru",
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UserRating": {
+                "type": "object",
+                "properties": {
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "ratedUserTags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RatedUserTag"
+                        }
+                    },
+                    "review": {
+                        "type": "string"
+                    },
+                    "reviewTextVisible": {
+                        "type": "boolean"
+                    },
+                    "score": {
+                        "type": "integer"
+                    },
+                    "serviceID": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "updatedBy": {
+                        "type": "string"
+                    },
+                    "userID": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UserResponse": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "photo": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string"
+                    },
+                    "telegramUserId": {
+                        "type": "integer"
+                    },
+                    "tier": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": "string"
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UserTag": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
