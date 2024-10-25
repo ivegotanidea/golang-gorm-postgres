@@ -66,6 +66,7 @@ func mapServices(services []Service) []ServiceResponse {
 
 func MapProfile(newProfile *Profile) *ProfileResponse {
 	profileResponse := &ProfileResponse{
+		ID:                     newProfile.ID.String(),
 		UpdatedBy:              &newProfile.UpdatedBy,
 		UserID:                 newProfile.UserID.String(),
 		CityID:                 &newProfile.CityID,

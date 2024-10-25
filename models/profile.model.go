@@ -197,6 +197,7 @@ type FindProfilesQuery struct {
 }
 
 type ProfileResponse struct {
+	ID                     string                   `json:"id"`
 	UserID                 string                   `json:"userId"`
 	Active                 bool                     `json:"active"`
 	Phone                  string                   `json:"phone"`

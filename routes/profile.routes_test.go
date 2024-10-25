@@ -253,6 +253,8 @@ func TestProfileRoutes(t *testing.T) {
 		var profileResponse CreateProfileResponse
 		err = json.Unmarshal(w.Body.Bytes(), &profileResponse)
 
+		assert.Nil(t, err)
+
 		updatePayload := &models.UpdateOwnProfileRequest{
 			Active: boolPtr(false),
 			Name:   fmt.Sprintf("%s-new", payload.Name),
