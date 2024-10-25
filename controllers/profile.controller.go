@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/ivegotanidea/golang-gorm-postgres/utils"
 	"net/http"
 	"strconv"
 	"time"
@@ -189,6 +190,8 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	newProfile.ProfileOptions = options
 
+	profileResponse := utils.MapProfile(&newProfile)
+
 	// Commit the transaction if everything was successful
 	if err := tx.Commit().Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: err.Error()})
@@ -196,7 +199,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	}
 
 	// Return the created profile in the response
-	ctx.JSON(http.StatusCreated, SuccessResponse{Status: "success", Data: newProfile})
+	ctx.JSON(http.StatusCreated, SuccessResponse{Status: "success", Data: profileResponse})
 }
 
 // UpdateOwnProfile godoc

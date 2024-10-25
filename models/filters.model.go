@@ -50,6 +50,11 @@ type IntimateHairCut struct {
 }
 
 type ProfileBodyArtResponse struct {
+	ProfileID string `json:"profileId"`
+	BodyArtID int    `json:"bodyArtId"`
+}
+
+type BodyArtResponse struct {
 	Name    string `json:"name"`
 	AliasRu string `json:"aliasRu"`
 	AliasEn string `json:"aliasEn"`

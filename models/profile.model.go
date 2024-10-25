@@ -197,6 +197,7 @@ type FindProfilesQuery struct {
 }
 
 type ProfileResponse struct {
+	UserID                 string                   `json:"userId"`
 	Active                 bool                     `json:"active"`
 	Phone                  string                   `json:"phone"`
 	Name                   string                   `json:"name"`
@@ -207,6 +208,7 @@ type ProfileResponse struct {
 	Bio                    string                   `json:"bio"`
 	AddressLatitude        string                   `json:"addressLatitude,omitempty"`
 	AddressLongitude       string                   `json:"addressLongitude,omitempty"`
+	CityID                 *int                     `json:"cityId,omitempty"`
 	BodyTypeID             *int                     `json:"bodyTypeId,omitempty"`
 	EthnosID               *int                     `json:"ethnosId,omitempty"`
 	HairColorID            *int                     `json:"hairColorId,omitempty"`
@@ -236,4 +238,5 @@ type ProfileResponse struct {
 	Photos                 []PhotoResponse          `json:"photos,omitempty"`
 	ProfileOptions         []ProfileOptionResponse  `json:"profileOptions,omitempty"`
 	Services               []ServiceResponse        `json:"services,omitempty"`
+	UpdatedBy              *uuid.UUID               `json:"updatedBy,omitempty"`
 }
