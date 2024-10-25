@@ -4,7 +4,7 @@ import (
 	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 )
 
-func mapBodyArts(bodyArts []ProfileBodyArt) []ProfileBodyArtResponse {
+func MapBodyArts(bodyArts []ProfileBodyArt) []ProfileBodyArtResponse {
 	bodyArtResponses := make([]ProfileBodyArtResponse, len(bodyArts))
 	for i, bodyArt := range bodyArts {
 		bodyArtResponses[i] = ProfileBodyArtResponse{
@@ -15,7 +15,7 @@ func mapBodyArts(bodyArts []ProfileBodyArt) []ProfileBodyArtResponse {
 	return bodyArtResponses
 }
 
-func mapPhotos(photos []Photo) []PhotoResponse {
+func MapPhotos(photos []Photo) []PhotoResponse {
 	photoResponses := make([]PhotoResponse, len(photos))
 	for i, photo := range photos {
 		photoResponses[i] = PhotoResponse{
@@ -28,7 +28,7 @@ func mapPhotos(photos []Photo) []PhotoResponse {
 	return photoResponses
 }
 
-func mapProfileOptions(options []ProfileOption) []ProfileOptionResponse {
+func MapProfileOptions(options []ProfileOption) []ProfileOptionResponse {
 	optionResponses := make([]ProfileOptionResponse, len(options))
 	for i, option := range options {
 		optionResponses[i] = ProfileOptionResponse{
@@ -42,24 +42,30 @@ func mapProfileOptions(options []ProfileOption) []ProfileOptionResponse {
 	return optionResponses
 }
 
-func mapServices(services []Service) []ServiceResponse {
+func MapService(service Service) *ServiceResponse {
+	serviceResponse := ServiceResponse{
+		ID:                   service.ID,
+		ClientUserID:         service.ClientUserID,
+		ClientUserRatingID:   service.ClientUserRatingID,
+		ClientUserRating:     MapUserRating(service.ClientUserRating),
+		ProfileID:            service.ProfileID,
+		ProfileOwnerID:       service.ProfileOwnerID,
+		ProfileRatingID:      service.ProfileRatingID,
+		ProfileRating:        MapProfileRating(service.ProfileRating),
+		DistanceBetweenUsers: service.DistanceBetweenUsers,
+		TrustedDistance:      service.TrustedDistance,
+		CreatedAt:            service.CreatedAt,
+		UpdatedAt:            service.UpdatedAt,
+		UpdatedBy:            service.UpdatedBy,
+	}
+
+	return &serviceResponse
+}
+
+func MapServices(services []Service) []ServiceResponse {
 	serviceResponses := make([]ServiceResponse, len(services))
 	for i, service := range services {
-		serviceResponses[i] = ServiceResponse{
-			ID:                   service.ID,
-			ClientUserID:         service.ClientUserID,
-			ClientUserRatingID:   service.ClientUserRatingID,
-			ClientUserRating:     mapUserRating(service.ClientUserRating),
-			ProfileID:            service.ProfileID,
-			ProfileOwnerID:       service.ProfileOwnerID,
-			ProfileRatingID:      service.ProfileRatingID,
-			ProfileRating:        mapProfileRating(service.ProfileRating),
-			DistanceBetweenUsers: service.DistanceBetweenUsers,
-			TrustedDistance:      service.TrustedDistance,
-			CreatedAt:            service.CreatedAt,
-			UpdatedAt:            service.UpdatedAt,
-			UpdatedBy:            service.UpdatedBy,
-		}
+		serviceResponses[i] = *MapService(service)
 	}
 	return serviceResponses
 }
@@ -107,15 +113,15 @@ func MapProfile(newProfile *Profile) *ProfileResponse {
 		CreatedAt:              newProfile.CreatedAt,
 	}
 
-	profileResponse.BodyArts = mapBodyArts(newProfile.BodyArts)
-	profileResponse.Photos = mapPhotos(newProfile.Photos)
-	profileResponse.ProfileOptions = mapProfileOptions(newProfile.ProfileOptions)
-	profileResponse.Services = mapServices(newProfile.Services)
+	profileResponse.BodyArts = MapBodyArts(newProfile.BodyArts)
+	profileResponse.Photos = MapPhotos(newProfile.Photos)
+	profileResponse.ProfileOptions = MapProfileOptions(newProfile.ProfileOptions)
+	profileResponse.Services = MapServices(newProfile.Services)
 
 	return profileResponse
 }
 
-func mapUserRating(userRating *UserRating) *UserRatingResponse {
+func MapUserRating(userRating *UserRating) *UserRatingResponse {
 	if userRating == nil {
 		return nil
 	}
@@ -144,7 +150,7 @@ func mapUserRating(userRating *UserRating) *UserRatingResponse {
 	}
 }
 
-func mapProfileRating(profileRating *ProfileRating) *ProfileRatingResponse {
+func MapProfileRating(profileRating *ProfileRating) *ProfileRatingResponse {
 	if profileRating == nil {
 		return nil
 	}

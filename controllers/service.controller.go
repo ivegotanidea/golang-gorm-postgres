@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/ivegotanidea/golang-gorm-postgres/utils"
 	"math"
 	"net/http"
 	"strconv"
@@ -202,10 +203,12 @@ func (sc *ServiceController) CreateService(ctx *gin.Context) {
 		return
 	}
 
+	serviceResponse := *utils.MapService(newService)
+
 	// Return the created service in the response
-	ctx.JSON(http.StatusCreated, SuccessResponse{
+	ctx.JSON(http.StatusCreated, SuccessResponse[ServiceResponse]{
 		Status: "success",
-		Data:   newService,
+		Data:   serviceResponse,
 	})
 }
 
@@ -214,47 +217,47 @@ func MutateService(tier string, service Service) map[string]interface{} {
 	filteredService := make(map[string]interface{})
 
 	// Common fields that are visible to all
-	filteredService["ID"] = service.ID
-	filteredService["ClientUserID"] = service.ClientUserID
-	filteredService["ClientUserRatingID"] = service.ClientUserRatingID
-	filteredService["ProfileID"] = service.ProfileID
-	filteredService["ProfileOwnerID"] = service.ProfileOwnerID
+	filteredService["id"] = service.ID
+	filteredService["clientUserID"] = service.ClientUserID
+	filteredService["clientUserRatingID"] = service.ClientUserRatingID
+	filteredService["profileID"] = service.ProfileID
+	filteredService["profileOwnerID"] = service.ProfileOwnerID
 
 	if service.ProfileRating != nil {
-		filteredService["ProfileRatingID"] = service.ProfileRating.ID
+		filteredService["profileRatingID"] = service.ProfileRating.ID
 	}
 
-	filteredService["CreatedAt"] = service.CreatedAt
-	filteredService["DistanceBetweenUsers"] = service.DistanceBetweenUsers
-	filteredService["TrustedDistance"] = service.TrustedDistance
+	filteredService["createdAt"] = service.CreatedAt
+	filteredService["distanceBetweenUsers"] = service.DistanceBetweenUsers
+	filteredService["trustedDistance"] = service.TrustedDistance
 
 	// Access control based on user tier
 	if tier == "basic" {
 		// Only expose ProfileRating.Score for basic users, hide UserRating entirely
 		if service.ProfileRating != nil {
-			filteredService["ProfileRating"] = map[string]interface{}{
-				"Score":             service.ProfileRating.Score,
-				"ReviewTextVisible": true,
+			filteredService["profileRating"] = map[string]interface{}{
+				"score":             service.ProfileRating.Score,
+				"reviewTextVisible": true,
 			}
 		}
 	} else if tier == "expert" {
 		// Expert users can see all ProfileRating fields and only Score from UserRating
 		if service.ProfileRating != nil {
-			filteredService["ProfileRating"] = map[string]interface{}{
-				"Review": service.ProfileRating.Review,
-				"Score":  service.ProfileRating.Score,
+			filteredService["profileRating"] = map[string]interface{}{
+				"review": service.ProfileRating.Review,
+				"score":  service.ProfileRating.Score,
 			}
 		}
 		if service.ClientUserRating != nil {
-			filteredService["ClientUserRating"] = map[string]interface{}{
-				"Score":             service.ClientUserRating.Score,
-				"ReviewTextVisible": true,
+			filteredService["clientUserRating"] = map[string]interface{}{
+				"score":             service.ClientUserRating.Score,
+				"reviewTextVisible": true,
 			}
 		}
 	} else if tier == "guru" {
 		// Guru users can see both ProfileRating and UserRating completely
-		filteredService["ProfileRating"] = service.ProfileRating
-		filteredService["ClientUserRating"] = service.ClientUserRating
+		filteredService["profileRating"] = service.ProfileRating
+		filteredService["clientUserRating"] = service.ClientUserRating
 	}
 
 	return filteredService
@@ -296,7 +299,7 @@ func (sc *ServiceController) GetService(ctx *gin.Context) {
 	filteredService := MutateService(currentUser.Tier, service)
 
 	// Return the filtered response
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse[map[string]interface{}]{
 		Status: "success",
 		Data:   filteredService,
 	})
@@ -350,7 +353,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 	}
 
 	// Return the filtered response
-	ctx.JSON(http.StatusOK, SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]map[string]interface{}]{
 		Status:  "success",
 		Results: len(filteredServices),
 		Page:    intPage,
@@ -395,12 +398,14 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, SuccessPageResponse{
+	servicesResponse := utils.MapServices(services)
+
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ServiceResponse]{
 		Status:  "success",
 		Results: len(services),
 		Limit:   intLimit,
 		Page:    intPage,
-		Data:    services,
+		Data:    servicesResponse,
 	})
 }
 
@@ -523,10 +528,12 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 		return
 	}
 
-	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	serviceResponse := *utils.MapService(service)
+
+	// Return the created service in the response
+	ctx.JSON(http.StatusOK, SuccessResponse[ServiceResponse]{
 		Status: "success",
-		Data:   service,
+		Data:   serviceResponse,
 	})
 }
 
@@ -596,10 +603,12 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 		}
 	}
 
-	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	serviceResponse := *utils.MapService(service)
+
+	// Return the created service in the response
+	ctx.JSON(http.StatusOK, SuccessResponse[ServiceResponse]{
 		Status: "success",
-		Data:   service,
+		Data:   serviceResponse,
 	})
 }
 
@@ -719,10 +728,12 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 		return
 	}
 
-	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	serviceResponse := *utils.MapService(service)
+
+	// Return the created service in the response
+	ctx.JSON(http.StatusOK, SuccessResponse[ServiceResponse]{
 		Status: "success",
-		Data:   service,
+		Data:   serviceResponse,
 	})
 }
 
@@ -805,9 +816,11 @@ func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 		}
 	}
 
-	// Return the updated service with the updated review
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	serviceResponse := *utils.MapService(service)
+
+	// Return the created service in the response
+	ctx.JSON(http.StatusOK, SuccessResponse[ServiceResponse]{
 		Status: "success",
-		Data:   service,
+		Data:   serviceResponse,
 	})
 }

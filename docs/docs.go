@@ -323,7 +323,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Start Date in RFC3339 format",
-                        "name": "start_date",
+                        "name": "start",
                         "in": "query",
                         "required": true
                     },

@@ -95,7 +95,8 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 		Tier:           newUser.Tier,
 		Role:           newUser.Role,
 	}
-	ctx.JSON(http.StatusCreated, SuccessResponse{Status: "success", Data: userResponse})
+
+	ctx.JSON(http.StatusCreated, SuccessResponse[*UserResponse]{Status: "success", Data: userResponse})
 }
 
 // SignUpUser godoc
@@ -164,7 +165,7 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		UpdatedAt: newUser.UpdatedAt,
 		Tier:      newUser.Tier,
 	}
-	ctx.JSON(http.StatusCreated, SuccessResponse{Status: "success", Data: userResponse})
+	ctx.JSON(http.StatusCreated, SuccessResponse[*UserResponse]{Status: "success", Data: userResponse})
 }
 
 // BotSignInUser godoc
@@ -325,5 +326,5 @@ func (ac *AuthController) LogoutUser(ctx *gin.Context) {
 	ctx.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "", -1, "/", "localhost", false, false)
 
-	ctx.JSON(http.StatusOK, SuccessResponse{Status: "success"})
+	ctx.JSON(http.StatusOK, SuccessResponse[any]{Status: "success"})
 }

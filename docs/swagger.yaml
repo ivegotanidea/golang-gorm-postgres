@@ -1047,7 +1047,7 @@ paths:
         type: string
       - description: Start Date in RFC3339 format
         in: query
-        name: start_date
+        name: start
         required: true
         type: string
       - description: End Date in RFC3339 format

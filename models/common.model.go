@@ -13,24 +13,24 @@ type ErrorResponse struct {
 
 // SuccessResponse represents a successful response.
 // @Description This model is returned when an API call succeeds.
-type SuccessResponse struct {
+type SuccessResponse[T any] struct {
 	// Status represents the status of the response, typically set to "success".
 	// Example: "success"
 	Status string `json:"status"`
 	// Data contains the result of the successful operation. Can be any type of data.
 	// Example: {"id": 1, "name": "John Doe"}
-	Data any `json:"data"`
+	Data T `json:"data"`
 }
 
 // SuccessPageResponse represents a paginated response.
 // @Description This model is used when paginated data is returned from the API.
-type SuccessPageResponse struct {
+type SuccessPageResponse[T any] struct {
 	// Status represents the status of the response, typically set to "success".
 	// Example: "success"
 	Status string `json:"status"`
 	// Data contains the data payload for the current page. Can be any type of data.
 	// Example: [{"id": 1, "name": "Item 1"}, {"id": 2, "name": "Item 2"}]
-	Data any `json:"data"`
+	Data T `json:"data"`
 	// Results specifies the number of items returned in the current page.
 	// Example: 10
 	Results int `json:"results"`

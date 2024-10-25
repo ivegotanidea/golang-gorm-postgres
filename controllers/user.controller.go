@@ -49,6 +49,7 @@ func checkAvatar(newAvatarUrl string, oldAvatarUrl string) (string, string) {
 }
 
 // GetMe godoc
+//
 //	@Summary		Get current authenticated user
 //	@Description	Retrieves the profile of the currently authenticated user
 //	@Tags			Users
@@ -70,13 +71,14 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 		UpdatedAt: currentUser.UpdatedAt,
 	}
 
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse[*UserResponse]{
 		Status: "success",
 		Data:   userResponse,
 	})
 }
 
 // FindUsers godoc
+//
 //	@Summary		Retrieve users based on the current user's role
 //	@Description	Retrieves a paginated list of users based on the current user's role. Regular users can only see other users, while non-owners can see all users except owners.
 //	@Tags			Users
@@ -116,19 +118,30 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 		return
 	}
 
-	intPage, _ = strconv.Atoi(page)
-	intLimit, _ = strconv.Atoi(limit)
+	userResponses := make([]UserResponse, len(users))
+	for i, user := range users {
+		userResponses[i] = UserResponse{
+			ID:        user.ID,
+			Name:      user.Name,
+			Phone:     user.Phone,
+			Avatar:    user.Avatar,
+			Verified:  user.Verified,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		}
+	}
 
-	ctx.JSON(http.StatusOK, SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]UserResponse]{
 		Status:  "success",
 		Results: len(users),
-		Data:    users,
+		Data:    userResponses,
 		Page:    intPage,
 		Limit:   intLimit,
 	})
 }
 
 // GetUser godoc
+//
 //	@Summary		Get a user by ID, Telegram user ID, or phone
 //	@Description	Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required.
 //	@Tags			Users
@@ -203,13 +216,14 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 		Tier:           user.Tier,
 	}
 
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse[*UserResponse]{
 		Status: "success",
 		Data:   userResponse,
 	})
 }
 
 // DeleteSelf godoc
+//
 //	@Summary		Delete the currently authenticated user
 //	@Description	Allows the current user to delete their own account.
 //	@Tags			Users
@@ -248,6 +262,7 @@ func (uc *UserController) DeleteSelf(ctx *gin.Context) {
 }
 
 // DeleteUser godoc
+//
 //	@Summary		Delete a user by ID
 //	@Description	Allows an authorized user to delete another user by their ID, with role-based restrictions.
 //	@Tags			Users
@@ -313,6 +328,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 }
 
 // UpdateSelf godoc
+//
 //	@Summary		Update the current user's information
 //	@Description	Allows the current user to update their own profile, including name, phone, and avatar.
 //	@Tags			Users
@@ -394,13 +410,14 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 	}
 
 	// Return the updated user data in the response
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse[*UserResponse]{
 		Status: "success",
 		Data:   userResponse,
 	})
 }
 
 // UpdateUser godoc
+//
 //	@Summary		Update a user's information (privileged access)
 //	@Description	Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.
 //	@Tags			Users
@@ -485,14 +502,26 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
+	userResponse := &UserResponse{
+		ID:        updatedUser.ID,
+		Name:      updatedUser.Name,
+		Phone:     updatedUser.Phone,
+		Avatar:    updatedUser.Avatar,
+		Verified:  updatedUser.Verified,
+		CreatedAt: updatedUser.CreatedAt,
+		UpdatedAt: updatedUser.UpdatedAt,
+		Tier:      updatedUser.Tier,
+	}
+
 	// Return the updated user data in the response
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse[*UserResponse]{
 		Status: "success",
-		Data:   updatedUser,
+		Data:   userResponse,
 	})
 }
 
 // AssignRole godoc
+//
 //	@Summary		Assign a role to a user
 //	@Description	Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.
 //	@Tags			Users
@@ -572,9 +601,20 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 		return
 	}
 
+	userResponse := &UserResponse{
+		ID:        targetUser.ID,
+		Name:      targetUser.Name,
+		Phone:     targetUser.Phone,
+		Avatar:    targetUser.Avatar,
+		Verified:  targetUser.Verified,
+		CreatedAt: targetUser.CreatedAt,
+		UpdatedAt: targetUser.UpdatedAt,
+		Tier:      targetUser.Tier,
+	}
+
 	// Return the updated user in the response
-	ctx.JSON(http.StatusOK, SuccessResponse{
+	ctx.JSON(http.StatusOK, SuccessResponse[*UserResponse]{
 		Status: "success",
-		Data:   targetUser,
+		Data:   userResponse,
 	})
 }

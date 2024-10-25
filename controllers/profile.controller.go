@@ -199,7 +199,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	}
 
 	// Return the created profile in the response
-	ctx.JSON(http.StatusCreated, SuccessResponse{Status: "success", Data: profileResponse})
+	ctx.JSON(http.StatusCreated, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
 }
 
 // UpdateOwnProfile godoc
@@ -448,8 +448,10 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 		return
 	}
 
+	profileResponse := utils.MapProfile(&existingProfile)
+
 	// Return the updated profile
-	ctx.JSON(http.StatusOK, SuccessResponse{Status: "success", Data: existingProfile})
+	ctx.JSON(http.StatusOK, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
 }
 
 // UpdateProfile godoc
@@ -560,8 +562,10 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 		return
 	}
 
+	profileResponse := utils.MapProfile(&existingProfile)
+
 	// Return the updated profile
-	ctx.JSON(http.StatusOK, SuccessResponse{Status: "success", Data: existingProfile})
+	ctx.JSON(http.StatusOK, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
 }
 
 // FindProfileByPhone godoc
@@ -589,7 +593,8 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, SuccessResponse{Status: "success", Data: profile})
+	profileResponse := utils.MapProfile(&profile)
+	ctx.JSON(http.StatusOK, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
 }
 
 // ListProfiles godoc
@@ -625,11 +630,17 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, SuccessPageResponse{
+	profileResponses := make([]ProfileResponse, len(profiles))
+	for i, profile := range profiles {
+		profileResponses[i] = *utils.MapProfile(&profile) // Assuming you have the mapProfile function
+	}
+
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ProfileResponse]{
 		Status:  "success",
+		Data:    profileResponses,
 		Results: len(profiles),
 		Page:    intPage,
-		Data:    profiles})
+	})
 }
 
 // todo: ListProfilesNonAuth
@@ -670,11 +681,17 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, SuccessPageResponse{
+	profileResponses := make([]ProfileResponse, len(profiles))
+	for i, profile := range profiles {
+		profileResponses[i] = *utils.MapProfile(&profile) // Assuming you have the mapProfile function
+	}
+
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ProfileResponse]{
 		Status:  "success",
+		Data:    profileResponses,
 		Results: len(profiles),
 		Page:    intPage,
-		Data:    profiles})
+	})
 }
 
 // GetMyProfiles godoc
@@ -712,10 +729,14 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 		return
 	}
 
-	intPage, _ = strconv.Atoi(page)
-	ctx.JSON(http.StatusOK, SuccessPageResponse{
+	profileResponses := make([]ProfileResponse, len(profiles))
+	for i, profile := range profiles {
+		profileResponses[i] = *utils.MapProfile(&profile) // Assuming you have the mapProfile function
+	}
+
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ProfileResponse]{
 		Status:  "success",
-		Data:    profiles,
+		Data:    profileResponses,
 		Results: len(profiles),
 		Page:    intPage,
 	})
@@ -896,12 +917,18 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	}
 
 	intPage, _ = strconv.Atoi(page)
+
+	profileResponses := make([]ProfileResponse, len(profiles))
+	for i, profile := range profiles {
+		profileResponses[i] = *utils.MapProfile(&profile) // Assuming you have the mapProfile function
+	}
+
 	// Return the results in the response
-	ctx.JSON(http.StatusOK, SuccessPageResponse{
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ProfileResponse]{
 		Status:  "success",
 		Results: len(profiles),
 		Page:    intPage,
-		Data:    profiles,
+		Data:    profileResponses,
 	})
 }
 
