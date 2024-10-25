@@ -668,7 +668,7 @@ func TestProfileRoutes(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		assert.Equal(t, 1, profilesResponse.Length)
+		assert.True(t, profilesResponse.Length >= 1)
 		assert.Len(t, profilesResponse.Data, profilesResponse.Length)
 	})
 

@@ -98,7 +98,7 @@ func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T, tier 
 	payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+	req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 	req.Header.Set("Content-Type", "application/json")
 	authRouter.ServeHTTP(w, req)
 
@@ -217,7 +217,7 @@ func loginUserGetAccessToken(t *testing.T, password string, telegramUserId int64
 
 	w := httptest.NewRecorder()
 	payloadLogin := fmt.Sprintf(`{"telegramUserId": "%d", "password": "%s"}`, telegramUserId, password)
-	loginReq, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte(payloadLogin)))
+	loginReq, _ := http.NewRequest("POST", "/api/auth/bot/login", bytes.NewBuffer([]byte(payloadLogin)))
 	loginReq.Header.Set("Content-Type", "application/json")
 	authRouter.ServeHTTP(w, loginReq)
 

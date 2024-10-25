@@ -10,3 +10,8 @@ type RatedUserTag struct {
 	Type      string    `gorm:"type:varchar(10)"`
 	UserTag   UserTag   `gorm:"foreignKey:UserTagID"`
 }
+
+type RatedUserTagResponse struct {
+	Type    string          `json:"type"`
+	UserTag UserTagResponse `json:"userTag"`
+}

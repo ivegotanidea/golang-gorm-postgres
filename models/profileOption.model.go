@@ -17,3 +17,9 @@ type CreateProfileOption struct {
 	Price        int64  `json:"price,omitempty" validate:"min=0"`
 	Comment      string `json:"comment,omitempty" validate:"max=50"`
 }
+
+type ProfileOptionResponse struct {
+	Price      int64              `json:"price"`
+	Comment    string             `json:"comment"`
+	ProfileTag ProfileTagResponse `json:"profileTag"`
+}

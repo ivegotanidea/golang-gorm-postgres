@@ -195,3 +195,45 @@ type FindProfilesQuery struct {
 	PriceCarHourMin        *int     `json:"priceCarHourMin,omitempty"`
 	PriceCarHourMax        *int     `json:"priceCarHourMax,omitempty"`
 }
+
+type ProfileResponse struct {
+	Active                 bool                     `json:"active"`
+	Phone                  string                   `json:"phone"`
+	Name                   string                   `json:"name"`
+	Age                    int                      `json:"age"`
+	Height                 int                      `json:"height"`
+	Weight                 int                      `json:"weight"`
+	Bust                   float64                  `json:"bust"`
+	Bio                    string                   `json:"bio"`
+	AddressLatitude        string                   `json:"addressLatitude,omitempty"`
+	AddressLongitude       string                   `json:"addressLongitude,omitempty"`
+	BodyTypeID             *int                     `json:"bodyTypeId,omitempty"`
+	EthnosID               *int                     `json:"ethnosId,omitempty"`
+	HairColorID            *int                     `json:"hairColorId,omitempty"`
+	IntimateHairCutID      *int                     `json:"intimateHairCutId,omitempty"`
+	PriceInHouseNightRatio float64                  `json:"priceInHouseNightRatio"`
+	PriceInHouseContact    *int                     `json:"priceInHouseContact,omitempty"`
+	PriceInHouseHour       *int                     `json:"priceInHouseHour,omitempty"`
+	PrinceSaunaNightRatio  float64                  `json:"princeSaunaNightRatio"`
+	PriceSaunaContact      *int                     `json:"priceSaunaContact,omitempty"`
+	PriceSaunaHour         *int                     `json:"priceSaunaHour,omitempty"`
+	PriceVisitNightRatio   float64                  `json:"priceVisitNightRatio"`
+	PriceVisitContact      *int                     `json:"priceVisitContact,omitempty"`
+	PriceVisitHour         *int                     `json:"priceVisitHour,omitempty"`
+	PriceCarNightRatio     float64                  `json:"priceCarNightRatio"`
+	PriceCarContact        *int                     `json:"priceCarContact,omitempty"`
+	PriceCarHour           *int                     `json:"priceCarHour,omitempty"`
+	ContactPhone           string                   `json:"contactPhone"`
+	ContactWA              string                   `json:"contactWA,omitempty"`
+	ContactTG              string                   `json:"contactTG,omitempty"`
+	Moderated              bool                     `json:"moderated"`
+	ModeratedAt            *time.Time               `json:"moderatedAt,omitempty"`
+	Verified               bool                     `json:"verified"`
+	VerifiedAt             *time.Time               `json:"verifiedAt,omitempty"`
+	VerifiedBy             *uuid.UUID               `json:"verifiedBy,omitempty"`
+	CreatedAt              time.Time                `json:"createdAt"`
+	BodyArts               []ProfileBodyArtResponse `json:"bodyArts,omitempty"`
+	Photos                 []PhotoResponse          `json:"photos,omitempty"`
+	ProfileOptions         []ProfileOptionResponse  `json:"profileOptions,omitempty"`
+	Services               []ServiceResponse        `json:"services,omitempty"`
+}

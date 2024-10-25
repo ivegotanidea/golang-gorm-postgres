@@ -61,7 +61,7 @@ func TestAuthRoutes(t *testing.T) {
 		//utils.DropAllTables(ac.DB)
 	})
 
-	t.Run("POST /api/auth/register: successful registration OK ", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/signup: successful registration OK ", func(t *testing.T) {
 		name := "testiculous-andrew"
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
 		telegramUserId := fmt.Sprintf("%d", rand.Int64())
@@ -69,7 +69,7 @@ func TestAuthRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
@@ -87,7 +87,7 @@ func TestAuthRoutes(t *testing.T) {
 		assert.Equal(t, phone, user["phone"])
 	})
 
-	t.Run("POST /api/auth/register: empty name registration FAIL ", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/signup: empty name registration FAIL ", func(t *testing.T) {
 		name := ""
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
 
@@ -97,7 +97,7 @@ func TestAuthRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
@@ -113,7 +113,7 @@ func TestAuthRoutes(t *testing.T) {
 		assert.Equal(t, errMessage, message)
 	})
 
-	t.Run("POST /api/auth/register: empty phone registration FAIL ", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/signup: empty phone registration FAIL ", func(t *testing.T) {
 		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 		phone := ""
 
@@ -123,7 +123,7 @@ func TestAuthRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
@@ -139,7 +139,7 @@ func TestAuthRoutes(t *testing.T) {
 		assert.Equal(t, errMessage, message)
 	})
 
-	t.Run("POST /api/auth/register: phone of 10 symbols registration FAIL ", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/signup: phone of 10 symbols registration FAIL ", func(t *testing.T) {
 		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 		phone := utils.GenerateRandomPhoneNumber(random, 10)
 
@@ -149,7 +149,7 @@ func TestAuthRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
@@ -165,7 +165,7 @@ func TestAuthRoutes(t *testing.T) {
 		assert.Equal(t, errMessage, message)
 	})
 
-	t.Run("POST /api/auth/register: phone of 12 symbols registration FAIL ", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/signup: phone of 12 symbols registration FAIL ", func(t *testing.T) {
 		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 		phone := utils.GenerateRandomPhoneNumber(random, 12)
 
@@ -175,7 +175,7 @@ func TestAuthRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
@@ -191,7 +191,7 @@ func TestAuthRoutes(t *testing.T) {
 		assert.Equal(t, errMessage, message)
 	})
 
-	t.Run("POST /api/auth/register: empty telegramId registration FAIL ", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/signup: empty telegramId registration FAIL ", func(t *testing.T) {
 		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
 		telegramUserId := ""
@@ -200,7 +200,7 @@ func TestAuthRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
@@ -216,7 +216,7 @@ func TestAuthRoutes(t *testing.T) {
 		assert.Equal(t, errMessage, message)
 	})
 
-	t.Run("POST /api/auth/register: empty registration data FAIL ", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/signup: empty registration data FAIL ", func(t *testing.T) {
 		name := ""
 		phone := ""
 		telegramUserId := ""
@@ -225,7 +225,7 @@ func TestAuthRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
@@ -241,7 +241,7 @@ func TestAuthRoutes(t *testing.T) {
 		assert.Equal(t, errMessage, message)
 	})
 
-	t.Run("POST /api/auth/login + GET api/auth/refresh + GET api/auth/logout", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/login + GET api/auth/refresh + GET api/auth/logout", func(t *testing.T) {
 		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
 		telegramUserId := fmt.Sprintf("%d", rand.Int64())
@@ -249,7 +249,7 @@ func TestAuthRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
@@ -270,7 +270,7 @@ func TestAuthRoutes(t *testing.T) {
 		w = httptest.NewRecorder()
 		password := user["password"].(string)
 		payloadLogin := fmt.Sprintf(`{"telegramUserId": "%s", "password": "%s"}`, telegramUserId, password)
-		loginReq, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte(payloadLogin)))
+		loginReq, _ := http.NewRequest("POST", "/api/auth/bot/login", bytes.NewBuffer([]byte(payloadLogin)))
 		loginReq.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, loginReq)
 

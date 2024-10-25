@@ -10,3 +10,8 @@ type RatedProfileTag struct {
 	Type         string     `gorm:"type:varchar(10)"`
 	ProfileTag   ProfileTag `gorm:"foreignKey:ProfileTagID"`
 }
+
+type RatedProfileTagResponse struct {
+	Type       string             `json:"type"`
+	ProfileTag ProfileTagResponse `json:"profileTag"`
+}

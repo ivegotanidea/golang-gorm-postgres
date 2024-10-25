@@ -205,7 +205,7 @@ func TestUserRoutes(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		authRouter.ServeHTTP(w, req)
 

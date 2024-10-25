@@ -63,7 +63,7 @@ func TestDbMigrations(t *testing.T) {
 		//utils.DropAllTables(ac.DB)
 	})
 
-	t.Run("POST /api/auth/register: successful registration OK ", func(t *testing.T) {
+	t.Run("POST /api/auth/bot/signup: successful registration OK ", func(t *testing.T) {
 
 		name := "testiculous-andrew"
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
@@ -72,7 +72,7 @@ func TestDbMigrations(t *testing.T) {
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer([]byte(payload)))
+		req, _ := http.NewRequest("POST", "/api/auth/bot/signup", bytes.NewBuffer([]byte(payload)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 

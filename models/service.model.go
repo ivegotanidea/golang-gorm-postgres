@@ -68,3 +68,19 @@ type CreateProfileRatingRequest struct {
 type SetReviewVisibilityRequest struct {
 	Visible *bool `json:"visible"`
 }
+
+type ServiceResponse struct {
+	ID                   uuid.UUID              `json:"id"`
+	ClientUserID         uuid.UUID              `json:"clientUserId"`
+	ClientUserRatingID   *uuid.UUID             `json:"clientUserRatingId,omitempty"`
+	ClientUserRating     *UserRatingResponse    `json:"clientUserRating,omitempty"`
+	ProfileID            uuid.UUID              `json:"profileId"`
+	ProfileOwnerID       uuid.UUID              `json:"profileOwnerId"`
+	ProfileRatingID      *uuid.UUID             `json:"profileRatingId,omitempty"`
+	ProfileRating        *ProfileRatingResponse `json:"profileRating,omitempty"`
+	DistanceBetweenUsers float64                `json:"distanceBetweenUsers"`
+	TrustedDistance      bool                   `json:"trustedDistance"`
+	CreatedAt            time.Time              `json:"createdAt"`
+	UpdatedAt            time.Time              `json:"updatedAt"`
+	UpdatedBy            uuid.UUID              `json:"updatedBy"`
+}

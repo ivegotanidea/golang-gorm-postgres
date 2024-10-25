@@ -18,3 +18,16 @@ type UserRating struct {
 
 	UpdatedBy uuid.UUID `gorm:"type:uuid;not null"`
 }
+
+type UserRatingResponse struct {
+	ID                uuid.UUID              `json:"id"`
+	ServiceID         uuid.UUID              `json:"serviceId"`
+	UserID            uuid.UUID              `json:"userId"`
+	ReviewTextVisible bool                   `json:"reviewTextVisible"`
+	Review            string                 `json:"review"`
+	Score             *int                   `json:"score"`
+	CreatedAt         time.Time              `json:"createdAt"`
+	UpdatedAt         time.Time              `json:"updatedAt"`
+	RatedUserTags     []RatedUserTagResponse `json:"ratedUserTags"`
+	UpdatedBy         uuid.UUID              `json:"updatedBy"`
+}

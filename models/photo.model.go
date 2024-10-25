@@ -18,3 +18,10 @@ type Photo struct {
 type CreatePhotoRequest struct {
 	URL string `json:"url" binding:"required" validate:"required,imageurl"`
 }
+
+type PhotoResponse struct {
+	URL      string `json:"url"`
+	Disabled bool   `json:"disabled"`
+	Approved bool   `json:"approved"`
+	Deleted  bool   `json:"deleted"`
+}
