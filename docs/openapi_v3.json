@@ -1185,7 +1185,7 @@
                 "summary": "Update a client's user review on a profile service",
                 "parameters": [
                     {
-                        "name": "service_id",
+                        "name": "serviceId",
                         "in": "query",
                         "description": "Service ID",
                         "required": true,
@@ -1280,7 +1280,7 @@
                 "summary": "Set visibility of the profile owner's review",
                 "parameters": [
                     {
-                        "name": "service_id",
+                        "name": "serviceId",
                         "in": "query",
                         "description": "Service ID",
                         "required": true,
@@ -1375,7 +1375,7 @@
                 "summary": "Update the profile owner's review on a client user",
                 "parameters": [
                     {
-                        "name": "service_id",
+                        "name": "serviceId",
                         "in": "query",
                         "description": "Service ID",
                         "required": true,
@@ -1470,7 +1470,7 @@
                 "summary": "Set visibility of user's review",
                 "parameters": [
                     {
-                        "name": "service_id",
+                        "name": "serviceId",
                         "in": "query",
                         "description": "Service ID",
                         "required": true,

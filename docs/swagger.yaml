@@ -1512,7 +1512,7 @@ paths:
       parameters:
       - description: Service ID
         in: query
-        name: service_id
+        name: serviceId
         required: true
         type: string
       - description: User Rating Request
@@ -1561,7 +1561,7 @@ paths:
       parameters:
       - description: Service ID
         in: query
-        name: service_id
+        name: serviceId
         required: true
         type: string
       - description: Set Review Visibility Request
@@ -1610,7 +1610,7 @@ paths:
       parameters:
       - description: Service ID
         in: query
-        name: service_id
+        name: serviceId
         required: true
         type: string
       - description: Create Profile Rating Request
@@ -1659,7 +1659,7 @@ paths:
       parameters:
       - description: Service ID
         in: query
-        name: service_id
+        name: serviceId
         required: true
         type: string
       - description: Set Review Visibility Request

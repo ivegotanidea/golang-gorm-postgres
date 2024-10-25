@@ -110,7 +110,7 @@ func TestReviewsRoutes(t *testing.T) {
 
 	// -> profile
 
-	t.Run("PUT /api/reviews/host?service_id=:serviceID: client can't update his review after 48 hours after creation", func(t *testing.T) {
+	t.Run("PUT /api/reviews/host?serviceId=:serviceID: client can't update his review after 48 hours after creation", func(t *testing.T) {
 
 		profileOwner := generateUser(random, authRouter, t, "")
 		clientUser := generateUser(random, authRouter, t, "")
@@ -190,7 +190,7 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/host?service_id=%s", service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/host?serviceId=%s", service.Data[0].ID.String())
 		updateProfileOwnerReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateProfileOwnerReviewReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		updateProfileOwnerReviewReq.Header.Set("Content-Type", "application/json")
@@ -201,7 +201,7 @@ func TestReviewsRoutes(t *testing.T) {
 
 	})
 
-	t.Run("PUT /api/reviews/host?service_id=:serviceID: client can update hist review before 48 hours passed", func(t *testing.T) {
+	t.Run("PUT /api/reviews/host?serviceId=:serviceID: client can update hist review before 48 hours passed", func(t *testing.T) {
 
 		profileOwner := generateUser(random, authRouter, t, "")
 		clientUser := generateUser(random, authRouter, t, "")
@@ -281,7 +281,7 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/host?profile_id=%s&service_id=%s", profile.Data.ID.String(), service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/host?profileId=%s&serviceId=%s", profile.Data.ID.String(), service.Data[0].ID.String())
 		updateProfileOwnerReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateProfileOwnerReviewReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		updateProfileOwnerReviewReq.Header.Set("Content-Type", "application/json")
@@ -377,7 +377,7 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/host/set-visibility?service_id=%s", service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/host/set-visibility?serviceId=%s", service.Data[0].ID.String())
 		updateProfileOwnerReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateProfileOwnerReviewReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		updateProfileOwnerReviewReq.Header.Set("Content-Type", "application/json")
@@ -450,7 +450,7 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/host/set-visibility?service_id=%s", service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/host/set-visibility?serviceId=%s", service.Data[0].ID.String())
 		updateProfileOwnerReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateProfileOwnerReviewReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		updateProfileOwnerReviewReq.Header.Set("Content-Type", "application/json")
@@ -484,7 +484,7 @@ func TestReviewsRoutes(t *testing.T) {
 
 	// -> client
 
-	t.Run("PUT /api/reviews/client?service_id=:serviceID: profile owner can't update hist review after 48 hours passed", func(t *testing.T) {
+	t.Run("PUT /api/reviews/client?serviceId=:serviceID: profile owner can't update hist review after 48 hours passed", func(t *testing.T) {
 
 		profileOwner := generateUser(random, authRouter, t, "")
 		clientUser := generateUser(random, authRouter, t, "")
@@ -567,7 +567,7 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/client?service_id=%s", service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/client?serviceId=%s", service.Data[0].ID.String())
 		updateClientReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateClientReviewReq.AddCookie(&http.Cookie{Name: clientAccessTokenCookie.Name, Value: clientAccessTokenCookie.Value})
 		updateClientReviewReq.Header.Set("Content-Type", "application/json")
@@ -578,7 +578,7 @@ func TestReviewsRoutes(t *testing.T) {
 
 	})
 
-	t.Run("PUT /api/reviews/client?service_id=:serviceID: profile owner can update hist review before 48 hours passed", func(t *testing.T) {
+	t.Run("PUT /api/reviews/client?serviceId=:serviceID: profile owner can update hist review before 48 hours passed", func(t *testing.T) {
 
 		profileOwner := generateUser(random, authRouter, t, "")
 		clientUser := generateUser(random, authRouter, t, "")
@@ -661,7 +661,7 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/client?profile_id=%s&service_id=%s", profile.Data.ID.String(), service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/client?profileId=%s&serviceId=%s", profile.Data.ID.String(), service.Data[0].ID.String())
 		updateClientReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateClientReviewReq.AddCookie(&http.Cookie{Name: clientAccessTokenCookie.Name, Value: clientAccessTokenCookie.Value})
 		updateClientReviewReq.Header.Set("Content-Type", "application/json")
@@ -759,7 +759,7 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/client/set-visibility?service_id=%s", service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/client/set-visibility?serviceId=%s", service.Data[0].ID.String())
 		updateClientReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateClientReviewReq.AddCookie(&http.Cookie{Name: clientAccessTokenCookie.Name, Value: clientAccessTokenCookie.Value})
 		updateClientReviewReq.Header.Set("Content-Type", "application/json")
@@ -834,7 +834,7 @@ func TestReviewsRoutes(t *testing.T) {
 			fmt.Println("Error marshaling payload:", err)
 		}
 
-		updateUri := fmt.Sprintf("/api/reviews/client/set-visibility?service_id=%s", service.Data[0].ID.String())
+		updateUri := fmt.Sprintf("/api/reviews/client/set-visibility?serviceId=%s", service.Data[0].ID.String())
 		updateClientReviewReq, _ := http.NewRequest("PUT", updateUri, bytes.NewBuffer(jsonPayload))
 		updateClientReviewReq.AddCookie(&http.Cookie{Name: clientAccessTokenCookie.Name, Value: clientAccessTokenCookie.Value})
 		updateClientReviewReq.Header.Set("Content-Type", "application/json")

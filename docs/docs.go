@@ -1041,7 +1041,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Service ID",
-                        "name": "service_id",
+                        "name": "serviceId",
                         "in": "query",
                         "required": true
                     },
@@ -1118,7 +1118,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Service ID",
-                        "name": "service_id",
+                        "name": "serviceId",
                         "in": "query",
                         "required": true
                     },
@@ -1195,7 +1195,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Service ID",
-                        "name": "service_id",
+                        "name": "serviceId",
                         "in": "query",
                         "required": true
                     },
@@ -1272,7 +1272,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Service ID",
-                        "name": "service_id",
+                        "name": "serviceId",
                         "in": "query",
                         "required": true
                     },

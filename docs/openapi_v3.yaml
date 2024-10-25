@@ -1563,7 +1563,7 @@ paths:
         - Services
       description: Updates the user review for a service if the current user is authorized to do so and within the allowed time limit.
       parameters:
-        - name: service_id
+        - name: serviceId
           in: query
           description: Service ID
           required: true
@@ -1618,7 +1618,7 @@ paths:
         - Services
       description: Set visibility of the profile owner's review based on the client's request. Only available for non-basic tier users.
       parameters:
-        - name: service_id
+        - name: serviceId
           in: query
           description: Service ID
           required: true
@@ -1673,7 +1673,7 @@ paths:
         - Services
       description: Allows a profile owner to update their review on a client user within the allowed time limit.
       parameters:
-        - name: service_id
+        - name: serviceId
           in: query
           description: Service ID
           required: true
@@ -1728,7 +1728,7 @@ paths:
         - Services
       description: Allows a profile owner to set user's review visibility. Only available for non-basic tier users.
       parameters:
-        - name: service_id
+        - name: serviceId
           in: query
           description: Service ID
           required: true

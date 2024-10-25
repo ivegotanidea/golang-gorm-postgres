@@ -413,7 +413,7 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 //	@Tags			Services
 //	@Accept			json
 //	@Produce		json
-//	@Param			service_id	query		string					true	"Service ID"
+//	@Param			serviceId	query		string					true	"Service ID"
 //	@Param			body		body		CreateUserRatingRequest	true	"User Rating Request"
 //	@Success		200			{object}	SuccessResponse{data=Service}
 //	@Failure		400			{object}	ErrorResponse
@@ -423,7 +423,7 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 //	@Router			/reviews/client/update [put]
 func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
-	serviceID := ctx.Query("service_id")
+	serviceID := ctx.Query("serviceId")
 
 	// Find the service with the associated user review
 	var service Service
@@ -537,7 +537,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 //	@Tags			Services
 //	@Accept			json
 //	@Produce		json
-//	@Param			service_id	query		string						true	"Service ID"
+//	@Param			serviceId	query		string						true	"Service ID"
 //	@Param			body		body		SetReviewVisibilityRequest	true	"Set Review Visibility Request"
 //	@Success		200			{object}	SuccessResponse{data=Service}
 //	@Failure		400			{object}	ErrorResponse
@@ -547,7 +547,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 //	@Router			/reviews/client/visibility [put]
 func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
-	serviceID := ctx.Query("service_id")
+	serviceID := ctx.Query("serviceId")
 
 	// Find the service with the associated user review
 	var service Service
@@ -610,7 +610,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 //	@Tags			Services
 //	@Accept			json
 //	@Produce		json
-//	@Param			service_id	query		string						true	"Service ID"
+//	@Param			serviceId	query		string						true	"Service ID"
 //	@Param			body		body		CreateProfileRatingRequest	true	"Create Profile Rating Request"
 //	@Success		200			{object}	SuccessResponse{data=Service}
 //	@Failure		400			{object}	ErrorResponse
@@ -620,7 +620,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 //	@Router			/reviews/host/update [put]
 func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
-	serviceID := ctx.Query("service_id")
+	serviceID := ctx.Query("serviceId")
 
 	// Find the service with the associated profile review
 	var service Service
@@ -733,7 +733,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 //	@Tags			Services
 //	@Accept			json
 //	@Produce		json
-//	@Param			service_id	query		string						true	"Service ID"
+//	@Param			serviceId	query		string						true	"Service ID"
 //	@Param			body		body		SetReviewVisibilityRequest	true	"Set Review Visibility Request"
 //	@Success		200			{object}	SuccessResponse{data=Service}
 //	@Failure		400			{object}	ErrorResponse
@@ -743,7 +743,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 //	@Router			/reviews/host/visibility [put]
 func (sc *ServiceController) HideUserReview(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
-	serviceID := ctx.Query("service_id")
+	serviceID := ctx.Query("serviceId")
 
 	// Find the service with the associated profile review
 	var service Service
