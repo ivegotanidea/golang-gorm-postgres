@@ -28,7 +28,7 @@ func NewProfileController(DB *gorm.DB) ProfileController {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		CreateProfileRequest	true	"Create Profile Request"
-//	@Success		201		{object}	SuccessResponse
+//	@Success		201		{object}	SuccessResponse[ProfileResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		403		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
@@ -211,7 +211,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			id		path		string					true	"Profile ID"
 //	@Param			body	body		UpdateOwnProfileRequest	true	"Profile Update Payload"
-//	@Success		200		{object}	SuccessResponse
+//	@Success		200		{object}	SuccessResponse[ProfileResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
@@ -463,7 +463,7 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			id		path		string					true	"Profile ID"
 //	@Param			body	body		UpdateProfileRequest	true	"Profile Update Payload"
-//	@Success		200		{object}	SuccessResponse
+//	@Success		200		{object}	SuccessResponse[ProfileResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
@@ -575,7 +575,7 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 //	@Tags			Profiles
 //	@Produce		json
 //	@Param			phone	path		string	true	"Phone Number"
-//	@Success		200		{object}	SuccessResponse
+//	@Success		200		{object}	SuccessResponse[ProfileResponse]
 //	@Failure		404		{object}	ErrorResponse
 //	@Router			/profiles/{phone} [get]
 func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
@@ -605,7 +605,7 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		string	false	"Page number"
 //	@Param			limit	query		string	false	"Items per page"
-//	@Success		200		{object}	SuccessResponse
+//	@Success		200		{object}	SuccessPageResponse[ProfileResponse[]]
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/profiles/all [get]
 func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
@@ -655,7 +655,7 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		string	false	"Page number"
 //	@Param			limit	query		string	false	"Items per page"
-//	@Success		200		{object}	SuccessResponse
+//	@Success		200		{object}	SuccessPageResponse[ProfileResponse[]]
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/profiles/list [get]
 func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
@@ -702,7 +702,7 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		string	false	"Page number"
 //	@Param			limit	query		string	false	"Items per page"
-//	@Success		200		{object}	SuccessResponse
+//	@Success		200		{object}	SuccessPageResponse[ProfileResponse[]]
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/profiles/my [get]
 func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
@@ -750,7 +750,7 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		FindProfilesQuery	true	"Search Filters"
-//	@Success		200		{object}	SuccessResponse
+//	@Success		200		{object}	SuccessPageResponse[ProfileResponse[]]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/profiles/search [post]

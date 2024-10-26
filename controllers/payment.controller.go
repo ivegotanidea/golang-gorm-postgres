@@ -27,7 +27,7 @@ func NewPaymentController(DB *gorm.DB, apiKey string, baseUrl string) PaymentCon
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		Payment							true	"Payment Update"
-//	@Success		200		{object}	SuccessResponse{data=string}	"payment updated"
+//	@Success		200		{object}	SuccessResponse[string]	"payment updated"
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
 //	@Router			/payments/webhook [post]
@@ -69,7 +69,7 @@ func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 //	@Param			userID	path		string	true	"User ID"
 //	@Param			start	query		string	true	"Start Date in RFC3339 format"
 //	@Param			end		query		string	true	"End Date in RFC3339 format"
-//	@Success		200		{object}	SuccessResponse{data=[]Payment}
+//	@Success		200		{object}	SuccessResponse[Payment]
 //	@Failure		500		{object}	ErrorResponse
 //	@Router			/payments/history/{userID} [get]
 func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
@@ -105,7 +105,7 @@ func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		int	false	"Page number"		default(1)
 //	@Param			limit	query		int	false	"Limit per page"	default(10)
-//	@Success		200		{object}	SuccessResponse{data=[]Payment}
+//	@Success		200		{object}	SuccessResponse[Payment]
 //	@Failure		500		{object}	ErrorResponse
 //	@Router			/payments [get]
 func (pc *PaymentController) ListPayments(ctx *gin.Context) {
@@ -148,7 +148,7 @@ func (pc *PaymentController) ListPayments(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		int	false	"Page number"		default(1)
 //	@Param			limit	query		int	false	"Limit per page"	default(10)
-//	@Success		200		{object}	SuccessResponse{data=[]Payment}
+//	@Success		200		{object}	SuccessResponse[Payment]
 //	@Failure		500		{object}	ErrorResponse
 //	@Router			/payments/me [get]
 func (pc *PaymentController) GetMyPayments(ctx *gin.Context) {

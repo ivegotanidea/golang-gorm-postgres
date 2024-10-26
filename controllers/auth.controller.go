@@ -107,7 +107,7 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		SignUpInput	true	"SignUp Input"
-//	@Success		201		{object}	UserResponse
+//	@Success		201		{object}	SuccessResponse[UserResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		409		{object}	ErrorResponse
 //	@Failure		502		{object}	ErrorResponse
@@ -319,7 +319,7 @@ func (ac *AuthController) RefreshAccessToken(ctx *gin.Context) {
 //	@Description	Clears the access and refresh tokens and logs out the user.
 //	@Tags			Auth
 //	@Produce		json
-//	@Success		200	{object}	SuccessResponse
+//	@Success		200	{object}	SuccessResponse[any]
 //	@Router			/auth/logout [post]
 func (ac *AuthController) LogoutUser(ctx *gin.Context) {
 	ctx.SetCookie("access_token", "", -1, "/", "localhost", false, true)

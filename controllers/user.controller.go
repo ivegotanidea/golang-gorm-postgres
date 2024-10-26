@@ -55,7 +55,7 @@ func checkAvatar(newAvatarUrl string, oldAvatarUrl string) (string, string) {
 //	@Tags			Users
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	SuccessResponse{data=UserResponse}
+//	@Success		200	{object}	SuccessResponse[UserResponse]
 //	@Failure		401	{object}	ErrorResponse
 //	@Router			/users/me [get]
 func (uc *UserController) GetMe(ctx *gin.Context) {
@@ -86,7 +86,7 @@ func (uc *UserController) GetMe(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		int	false	"Page number"		default(1)
 //	@Param			limit	query		int	false	"Limit per page"	default(10)
-//	@Success		200		{object}	SuccessResponse{data=[]User}
+//	@Success		200		{object}	SuccessPageResponse[[]UserResponse]
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/users [get]
 func (uc *UserController) FindUsers(ctx *gin.Context) {
@@ -150,7 +150,7 @@ func (uc *UserController) FindUsers(ctx *gin.Context) {
 //	@Param			id				query		string	false	"User ID"
 //	@Param			telegramUserId	query		int		false	"Telegram User ID"
 //	@Param			phone			query		string	false	"Phone number"
-//	@Success		200				{object}	SuccessResponse{data=UserResponse}
+//	@Success		200				{object}	SuccessResponse[UserResponse]
 //	@Failure		400				{object}	ErrorResponse
 //	@Failure		404				{object}	ErrorResponse
 //	@Router			/users [get]
@@ -335,7 +335,7 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		UpdateUser	true	"User Update Payload"
-//	@Success		200		{object}	SuccessResponse{data=UserResponse}
+//	@Success		200		{object}	SuccessResponse[UserResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
 //	@Failure		502		{object}	ErrorResponse
@@ -425,7 +425,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			id		path		string					true	"User ID"
 //	@Param			body	body		UpdateUserPrivileged	true	"User Update Payload"
-//	@Success		200		{object}	SuccessResponse{data=User}
+//	@Success		200		{object}	SuccessResponse[UserResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
 //	@Failure		502		{object}	ErrorResponse
@@ -528,7 +528,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		AssignRole	true	"Role assignment details"
-//	@Success		200		{object}	SuccessResponse{data=User}
+//	@Success		200		{object}	SuccessResponse[UserResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		403		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse

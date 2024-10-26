@@ -155,7 +155,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessResponse-any"
                         }
                     }
                 }
@@ -215,7 +215,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.UserResponse"
+                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
                         }
                     },
                     "400": {
@@ -272,22 +272,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.Payment"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_Payment"
                         }
                     },
                     "500": {
@@ -330,7 +315,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "End Date in RFC3339 format",
-                        "name": "end_date",
+                        "name": "end",
                         "in": "query",
                         "required": true
                     }
@@ -339,22 +324,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.Payment"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_Payment"
                         }
                     },
                     "500": {
@@ -399,22 +369,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.Payment"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_Payment"
                         }
                     },
                     "500": {
@@ -454,19 +409,7 @@ const docTemplate = `{
                     "200": {
                         "description": "payment updated",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-string"
                         }
                     },
                     "400": {
@@ -512,7 +455,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessResponse-models_ProfileResponse"
                         }
                     },
                     "400": {
@@ -564,7 +507,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessPageResponse-models_ProfileResponse"
                         }
                     },
                     "502": {
@@ -604,7 +547,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessPageResponse-models_ProfileResponse"
                         }
                     },
                     "502": {
@@ -644,7 +587,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessPageResponse-models_ProfileResponse"
                         }
                     },
                     "502": {
@@ -691,7 +634,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessResponse-models_ProfileResponse"
                         }
                     },
                     "400": {
@@ -743,7 +686,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessPageResponse-models_ProfileResponse"
                         }
                     },
                     "400": {
@@ -796,7 +739,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessResponse-models_ProfileResponse"
                         }
                     },
                     "400": {
@@ -875,7 +818,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessResponse-models_ProfileResponse"
                         }
                     },
                     "404": {
@@ -927,23 +870,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "additionalProperties": true
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessPageResponse-models_ServiceResponse"
                         }
                     },
                     "404": {
@@ -994,19 +921,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.Service"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_Service"
                         }
                     },
                     "404": {
@@ -1059,19 +974,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.Service"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_ServiceResponse"
                         }
                     },
                     "400": {
@@ -1136,19 +1039,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.Service"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_Service"
                         }
                     },
                     "400": {
@@ -1213,19 +1104,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.Service"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_Service"
                         }
                     },
                     "400": {
@@ -1290,19 +1169,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.Service"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_Service"
                         }
                     },
                     "400": {
@@ -1365,22 +1232,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.Service"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessPageResponse-models_ServiceResponse"
                         }
                     },
                     "502": {
@@ -1418,19 +1270,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.Service"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_ServiceResponse"
                         }
                     },
                     "400": {
@@ -1485,19 +1325,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.UserResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
                         }
                     },
                     "400": {
@@ -1543,19 +1371,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.User"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
                         }
                     },
                     "400": {
@@ -1602,19 +1418,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.UserResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
                         }
                     },
                     "401": {
@@ -1652,19 +1456,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.UserResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
                         }
                     },
                     "400": {
@@ -1752,19 +1544,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.User"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
                         }
                     },
                     "400": {
@@ -2288,14 +2068,11 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Photo": {
+        "models.PhotoResponse": {
             "type": "object",
             "properties": {
                 "approved": {
                     "type": "boolean"
-                },
-                "createdAt": {
-                    "type": "string"
                 },
                 "deleted": {
                     "type": "boolean"
@@ -2303,187 +2080,23 @@ const docTemplate = `{
                 "disabled": {
                     "type": "boolean"
                 },
-                "id": {
-                    "type": "string"
-                },
-                "profileID": {
-                    "type": "string"
-                },
                 "url": {
                     "type": "string"
                 }
             }
         },
-        "models.Profile": {
+        "models.ProfileBodyArtResponse": {
             "type": "object",
             "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "addressLatitude": {
-                    "type": "string"
-                },
-                "addressLongitude": {
-                    "type": "string"
-                },
-                "age": {
+                "bodyArtId": {
                     "type": "integer"
                 },
-                "bio": {
-                    "type": "string"
-                },
-                "bodyArts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ProfileBodyArt"
-                    }
-                },
-                "bodyTypeID": {
-                    "type": "integer"
-                },
-                "bust": {
-                    "type": "number"
-                },
-                "cityID": {
-                    "type": "integer"
-                },
-                "contactPhone": {
-                    "type": "string"
-                },
-                "contactTG": {
-                    "type": "string"
-                },
-                "contactWA": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "ethnosID": {
-                    "type": "integer"
-                },
-                "hairColorID": {
-                    "type": "integer"
-                },
-                "height": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "intimateHairCutID": {
-                    "type": "integer"
-                },
-                "moderated": {
-                    "type": "boolean"
-                },
-                "moderatedAt": {
-                    "type": "string"
-                },
-                "moderatedBy": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "parsedUrl": {
-                    "type": "string"
-                },
-                "phone": {
-                    "description": ";index:,unique,composite:idx_single_profile\"",
-                    "type": "string"
-                },
-                "photos": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Photo"
-                    }
-                },
-                "priceCarContact": {
-                    "type": "integer"
-                },
-                "priceCarHour": {
-                    "type": "integer"
-                },
-                "priceCarNightRatio": {
-                    "type": "number"
-                },
-                "priceInHouseContact": {
-                    "type": "integer"
-                },
-                "priceInHouseHour": {
-                    "type": "integer"
-                },
-                "priceInHouseNightRatio": {
-                    "type": "number"
-                },
-                "priceSaunaContact": {
-                    "type": "integer"
-                },
-                "priceSaunaHour": {
-                    "type": "integer"
-                },
-                "priceVisitContact": {
-                    "type": "integer"
-                },
-                "priceVisitHour": {
-                    "type": "integer"
-                },
-                "priceVisitNightRatio": {
-                    "type": "number"
-                },
-                "princeSaunaNightRatio": {
-                    "type": "number"
-                },
-                "profileOptions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ProfileOption"
-                    }
-                },
-                "services": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Service"
-                    }
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "updatedBy": {
-                    "type": "string"
-                },
-                "userID": {
-                    "type": "string"
-                },
-                "verified": {
-                    "type": "boolean"
-                },
-                "verifiedAt": {
-                    "type": "string"
-                },
-                "verifiedBy": {
-                    "type": "string"
-                },
-                "weight": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.ProfileBodyArt": {
-            "type": "object",
-            "properties": {
-                "bodyArtID": {
-                    "description": "Part of composite primary key, and also a foreign key",
-                    "type": "integer"
-                },
-                "profileID": {
-                    "description": "Part of composite primary key",
+                "profileId": {
                     "type": "string"
                 }
             }
         },
-        "models.ProfileOption": {
+        "models.ProfileOptionResponse": {
             "type": "object",
             "properties": {
                 "comment": {
@@ -2492,16 +2105,8 @@ const docTemplate = `{
                 "price": {
                     "type": "integer"
                 },
-                "profileID": {
-                    "description": "Part of composite primary key",
-                    "type": "string"
-                },
                 "profileTag": {
-                    "$ref": "#/definitions/models.ProfileTag"
-                },
-                "profileTagID": {
-                    "description": "Part of composite primary key, and also a foreign key",
-                    "type": "integer"
+                    "$ref": "#/definitions/models.ProfileTagResponse"
                 }
             }
         },
@@ -2543,12 +2148,207 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ProfileRatingResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "profileId": {
+                    "type": "string"
+                },
+                "ratedProfileTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.RatedProfileTagResponse"
+                    }
+                },
+                "review": {
+                    "type": "string"
+                },
+                "reviewTextVisible": {
+                    "type": "boolean"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "serviceId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "updatedBy": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ProfileResponse": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "addressLatitude": {
+                    "type": "string"
+                },
+                "addressLongitude": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "bodyArts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ProfileBodyArtResponse"
+                    }
+                },
+                "bodyTypeId": {
+                    "type": "integer"
+                },
+                "bust": {
+                    "type": "number"
+                },
+                "cityId": {
+                    "type": "integer"
+                },
+                "contactPhone": {
+                    "type": "string"
+                },
+                "contactTG": {
+                    "type": "string"
+                },
+                "contactWA": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "ethnosId": {
+                    "type": "integer"
+                },
+                "hairColorId": {
+                    "type": "integer"
+                },
+                "height": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "intimateHairCutId": {
+                    "type": "integer"
+                },
+                "moderated": {
+                    "type": "boolean"
+                },
+                "moderatedAt": {
+                    "type": "string"
+                },
+                "moderatedBy": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PhotoResponse"
+                    }
+                },
+                "priceCarContact": {
+                    "type": "integer"
+                },
+                "priceCarHour": {
+                    "type": "integer"
+                },
+                "priceCarNightRatio": {
+                    "type": "number"
+                },
+                "priceInHouseContact": {
+                    "type": "integer"
+                },
+                "priceInHouseHour": {
+                    "type": "integer"
+                },
+                "priceInHouseNightRatio": {
+                    "type": "number"
+                },
+                "priceSaunaContact": {
+                    "type": "integer"
+                },
+                "priceSaunaHour": {
+                    "type": "integer"
+                },
+                "priceVisitContact": {
+                    "type": "integer"
+                },
+                "priceVisitHour": {
+                    "type": "integer"
+                },
+                "priceVisitNightRatio": {
+                    "type": "number"
+                },
+                "princeSaunaNightRatio": {
+                    "type": "number"
+                },
+                "profileOptions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ProfileOptionResponse"
+                    }
+                },
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ServiceResponse"
+                    }
+                },
+                "updatedBy": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "verified": {
+                    "type": "boolean"
+                },
+                "verifiedAt": {
+                    "type": "string"
+                },
+                "verifiedBy": {
+                    "type": "string"
+                },
+                "weight": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.ProfileTag": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
                 },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ProfileTagResponse": {
+            "type": "object",
+            "properties": {
                 "name": {
                     "type": "string"
                 }
@@ -2571,6 +2371,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.RatedProfileTagResponse": {
+            "type": "object",
+            "properties": {
+                "profileTag": {
+                    "$ref": "#/definitions/models.ProfileTagResponse"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "models.RatedUserTag": {
             "type": "object",
             "properties": {
@@ -2585,6 +2396,17 @@ const docTemplate = `{
                 },
                 "userTagID": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.RatedUserTagResponse": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "userTag": {
+                    "$ref": "#/definitions/models.UserTagResponse"
                 }
             }
         },
@@ -2654,6 +2476,50 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ServiceResponse": {
+            "type": "object",
+            "properties": {
+                "clientUserId": {
+                    "type": "string"
+                },
+                "clientUserRating": {
+                    "$ref": "#/definitions/models.UserRatingResponse"
+                },
+                "clientUserRatingId": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "distanceBetweenUsers": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "profileId": {
+                    "type": "string"
+                },
+                "profileOwnerId": {
+                    "type": "string"
+                },
+                "profileRating": {
+                    "$ref": "#/definitions/models.ProfileRatingResponse"
+                },
+                "profileRatingId": {
+                    "type": "string"
+                },
+                "trustedDistance": {
+                    "type": "boolean"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "updatedBy": {
+                    "type": "string"
+                }
+            }
+        },
         "models.SetReviewVisibilityRequest": {
             "type": "object",
             "properties": {
@@ -2703,12 +2569,195 @@ const docTemplate = `{
                 }
             }
         },
-        "models.SuccessResponse": {
-            "description": "This model is returned when an API call succeeds.",
+        "models.SuccessPageResponse-array_models_UserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the data payload for the current page. Can be any type of data.\nExample: [{\"id\": 1, \"name\": \"Item 1\"}, {\"id\": 2, \"name\": \"Item 2\"}]",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserResponse"
+                    }
+                },
+                "limit": {
+                    "description": "Limit specifies the maximum number of items that can be returned in a single page.\nExample: 10",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page specifies the current page number in the paginated result set.\nExample: 1",
+                    "type": "integer"
+                },
+                "results": {
+                    "description": "Results specifies the number of items returned in the current page.\nExample: 10",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessPageResponse-models_ProfileResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the data payload for the current page. Can be any type of data.\nExample: [{\"id\": 1, \"name\": \"Item 1\"}, {\"id\": 2, \"name\": \"Item 2\"}]",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProfileResponse"
+                        }
+                    ]
+                },
+                "limit": {
+                    "description": "Limit specifies the maximum number of items that can be returned in a single page.\nExample: 10",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page specifies the current page number in the paginated result set.\nExample: 1",
+                    "type": "integer"
+                },
+                "results": {
+                    "description": "Results specifies the number of items returned in the current page.\nExample: 10",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessPageResponse-models_ServiceResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the data payload for the current page. Can be any type of data.\nExample: [{\"id\": 1, \"name\": \"Item 1\"}, {\"id\": 2, \"name\": \"Item 2\"}]",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ServiceResponse"
+                        }
+                    ]
+                },
+                "limit": {
+                    "description": "Limit specifies the maximum number of items that can be returned in a single page.\nExample: 10",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page specifies the current page number in the paginated result set.\nExample: 1",
+                    "type": "integer"
+                },
+                "results": {
+                    "description": "Results specifies the number of items returned in the current page.\nExample: 10",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessResponse-any": {
             "type": "object",
             "properties": {
                 "data": {
                     "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}"
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessResponse-models_Payment": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Payment"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessResponse-models_ProfileResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProfileResponse"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessResponse-models_Service": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Service"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessResponse-models_ServiceResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ServiceResponse"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessResponse-models_UserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessResponse-string": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
+                    "type": "string"
                 },
                 "status": {
                     "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
@@ -2923,64 +2972,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "avatar": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "hasProfile": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "profiles": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Profile"
-                    }
-                },
-                "role": {
-                    "description": "oneOf: user, moderator, admin",
-                    "type": "string"
-                },
-                "services": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Service"
-                    }
-                },
-                "telegramUserId": {
-                    "type": "integer"
-                },
-                "tier": {
-                    "description": "oneOf: basic, expert, guru",
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "verified": {
-                    "type": "boolean"
-                }
-            }
-        },
         "models.UserRating": {
             "type": "object",
             "properties": {
@@ -3015,6 +3006,44 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userID": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserRatingResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ratedUserTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.RatedUserTagResponse"
+                    }
+                },
+                "review": {
+                    "type": "string"
+                },
+                "reviewTextVisible": {
+                    "type": "boolean"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "serviceId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "updatedBy": {
+                    "type": "string"
+                },
+                "userId": {
                     "type": "string"
                 }
             }
@@ -3066,6 +3095,14 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserTagResponse": {
+            "type": "object",
+            "properties": {
                 "name": {
                     "type": "string"
                 }

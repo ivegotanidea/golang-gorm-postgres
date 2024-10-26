@@ -53,7 +53,7 @@ func getDistanceBetweenCoordinates(latA, lonA, latB, lonB float32) float64 {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		CreateServiceRequest	true	"Create Service Request"
-//	@Success		201		{object}	SuccessResponse{data=Service}
+//	@Success		201		{object}	SuccessResponse[ServiceResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
 //	@Router			/services [post]
@@ -272,7 +272,7 @@ func MutateService(tier string, service Service) map[string]interface{} {
 //	@Produce		json
 //	@Param			profileID	path		string	true	"Profile ID"
 //	@Param			serviceID	path		string	true	"Service ID"
-//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Success		200			{object}	SuccessResponse[Service]
 //	@Failure		404			{object}	ErrorResponse
 //	@Failure		500			{object}	ErrorResponse
 //	@Router			/profiles/{profileID}/services/{serviceID} [get]
@@ -315,7 +315,7 @@ func (sc *ServiceController) GetService(ctx *gin.Context) {
 //	@Param			profileID	path		string	true	"Profile ID"
 //	@Param			page		query		string	false	"Page number"				default(1)
 //	@Param			limit		query		string	false	"Number of items per page"	default(10)
-//	@Success		200			{object}	SuccessResponse{data=[]map[string]interface{}}
+//	@Success		200			{object}	SuccessPageResponse[ServiceResponse[]]
 //	@Failure		404			{object}	ErrorResponse
 //	@Failure		500			{object}	ErrorResponse
 //	@Router			/profiles/{profileID}/services [get]
@@ -371,7 +371,7 @@ func (sc *ServiceController) GetProfileServices(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		string	false	"Page number"				default(1)
 //	@Param			limit	query		string	false	"Number of items per page"	default(10)
-//	@Success		200		{object}	SuccessResponse{data=[]Service}
+//	@Success		200		{object}	SuccessPageResponse[ServiceResponse[]]
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/services [get]
 func (sc *ServiceController) ListServices(ctx *gin.Context) {
@@ -420,7 +420,7 @@ func (sc *ServiceController) ListServices(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			serviceId	query		string					true	"Service ID"
 //	@Param			body		body		CreateUserRatingRequest	true	"User Rating Request"
-//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Success		200			{object}	SuccessResponse[ServiceResponse]
 //	@Failure		400			{object}	ErrorResponse
 //	@Failure		403			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse
@@ -546,7 +546,7 @@ func (sc *ServiceController) UpdateClientUserReviewOnProfile(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			serviceId	query		string						true	"Service ID"
 //	@Param			body		body		SetReviewVisibilityRequest	true	"Set Review Visibility Request"
-//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Success		200			{object}	SuccessResponse[Service]
 //	@Failure		400			{object}	ErrorResponse
 //	@Failure		403			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse
@@ -621,7 +621,7 @@ func (sc *ServiceController) HideProfileOwnerReview(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			serviceId	query		string						true	"Service ID"
 //	@Param			body		body		CreateProfileRatingRequest	true	"Create Profile Rating Request"
-//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Success		200			{object}	SuccessResponse[Service]
 //	@Failure		400			{object}	ErrorResponse
 //	@Failure		403			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse
@@ -746,7 +746,7 @@ func (sc *ServiceController) UpdateProfileOwnerReviewOnClientUser(ctx *gin.Conte
 //	@Produce		json
 //	@Param			serviceId	query		string						true	"Service ID"
 //	@Param			body		body		SetReviewVisibilityRequest	true	"Set Review Visibility Request"
-//	@Success		200			{object}	SuccessResponse{data=Service}
+//	@Success		200			{object}	SuccessResponse[Service]
 //	@Failure		400			{object}	ErrorResponse
 //	@Failure		403			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse
