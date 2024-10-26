@@ -66,11 +66,11 @@ func (pc *PaymentController) PaymentWebhook(ctx *gin.Context) {
 //	@Tags			Payments
 //	@Accept			json
 //	@Produce		json
-//	@Param			userID		path		string	true	"User ID"
+//	@Param			userID	path		string	true	"User ID"
 //	@Param			start	query		string	true	"Start Date in RFC3339 format"
-//	@Param			end	query		string	true	"End Date in RFC3339 format"
-//	@Success		200			{object}	SuccessResponse{data=[]Payment}
-//	@Failure		500			{object}	ErrorResponse
+//	@Param			end		query		string	true	"End Date in RFC3339 format"
+//	@Success		200		{object}	SuccessResponse{data=[]Payment}
+//	@Failure		500		{object}	ErrorResponse
 //	@Router			/payments/history/{userID} [get]
 func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 	// Get userID from path and date range from query parameters
