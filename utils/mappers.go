@@ -107,6 +107,7 @@ func MapProfile(newProfile *Profile) *ProfileResponse {
 		ContactTG:              newProfile.ContactTG,
 		Moderated:              newProfile.Moderated,
 		ModeratedAt:            &newProfile.ModeratedAt,
+		ModeratedBy:            &newProfile.ModeratedBy,
 		Verified:               newProfile.Verified,
 		VerifiedAt:             &newProfile.VerifiedAt,
 		VerifiedBy:             &newProfile.VerifiedBy,

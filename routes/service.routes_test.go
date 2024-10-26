@@ -879,9 +879,10 @@ func TestServiceRoutes(t *testing.T) {
 		assert.NotNil(t, service)
 
 		basicUser := generateUser(random, authRouter, t, "guru")
+		basicUserPassword := basicUser.Password
 		basicUser = assignRole(initializers.DB, t, authRouter, userRouter, basicUser.ID.String(), "moderator")
 
-		basicUserAccessTokenCookie, _ := loginUserGetAccessToken(t, basicUser.Password, basicUser.TelegramUserID, authRouter)
+		basicUserAccessTokenCookie, _ := loginUserGetAccessToken(t, basicUserPassword, basicUser.TelegramUserID, authRouter)
 
 		w := httptest.NewRecorder()
 		listServicesReq, _ := http.NewRequest("GET", "/api/services/all", nil)

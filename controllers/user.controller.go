@@ -602,14 +602,16 @@ func (uc *UserController) AssignRole(ctx *gin.Context) {
 	}
 
 	userResponse := &UserResponse{
-		ID:        targetUser.ID,
-		Name:      targetUser.Name,
-		Phone:     targetUser.Phone,
-		Avatar:    targetUser.Avatar,
-		Verified:  targetUser.Verified,
-		CreatedAt: targetUser.CreatedAt,
-		UpdatedAt: targetUser.UpdatedAt,
-		Tier:      targetUser.Tier,
+		ID:             targetUser.ID,
+		TelegramUserID: targetUser.TelegramUserId,
+		Name:           targetUser.Name,
+		Phone:          targetUser.Phone,
+		Avatar:         targetUser.Avatar,
+		Verified:       targetUser.Verified,
+		CreatedAt:      targetUser.CreatedAt,
+		UpdatedAt:      targetUser.UpdatedAt,
+		Tier:           targetUser.Tier,
+		Role:           targetUser.Role,
 	}
 
 	// Return the updated user in the response

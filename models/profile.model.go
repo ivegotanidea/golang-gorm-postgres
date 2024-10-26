@@ -231,6 +231,7 @@ type ProfileResponse struct {
 	ContactTG              string                   `json:"contactTG,omitempty"`
 	Moderated              bool                     `json:"moderated"`
 	ModeratedAt            *time.Time               `json:"moderatedAt,omitempty"`
+	ModeratedBy            *uuid.UUID               `json:"moderatedBy,omitempty"`
 	Verified               bool                     `json:"verified"`
 	VerifiedAt             *time.Time               `json:"verifiedAt,omitempty"`
 	VerifiedBy             *uuid.UUID               `json:"verifiedBy,omitempty"`
