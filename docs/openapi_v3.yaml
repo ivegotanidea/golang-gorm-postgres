@@ -188,7 +188,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '500':
           description: "Internal Server Error"
           content:
@@ -226,7 +226,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '500':
           description: "Internal Server Error"
           content:
@@ -260,7 +260,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '500':
           description: "Internal Server Error"
           content:
@@ -318,7 +318,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -378,7 +378,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '404':
           description: "Not Found"
           content:
@@ -418,7 +418,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '404':
           description: "Not Found"
           content:
@@ -494,7 +494,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '502':
           description: "Bad Gateway"
           content:
@@ -526,7 +526,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '502':
           description: "Bad Gateway"
           content:
@@ -558,7 +558,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '502':
           description: "Bad Gateway"
           content:
@@ -591,7 +591,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -629,7 +629,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -668,7 +668,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -918,7 +918,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '502':
           description: "Bad Gateway"
           content:
@@ -943,7 +943,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -987,7 +987,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -1059,7 +1059,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -1097,7 +1097,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -1134,7 +1134,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '401':
           description: "Unauthorized"
           content:
@@ -1159,7 +1159,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessPageResponse'
         '400':
           description: "Bad Request"
           content:
@@ -1885,6 +1885,7 @@ components:
             - $ref: '#/components/schemas/ProfileResponse'
             - $ref: '#/components/schemas/ServiceResponse'
             - $ref: '#/components/schemas/Payment'
+            - type: string
           description: |
             Data contains the result of the successful operation. It can be one of the following types:
             - UserResponse
@@ -1899,6 +1900,52 @@ components:
             Example: "success"
       required:
         - data
+        - status
+
+    SuccessPageResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/UserResponse'
+              - $ref: '#/components/schemas/ProfileResponse'
+              - $ref: '#/components/schemas/ServiceResponse'
+              - $ref: '#/components/schemas/Payment'
+              - type: string
+          description: |
+            Data contains the data payload for the current page. It can be an array of:
+            - UserResponse
+            - ProfileResponse
+            - ServiceResponse
+            - Payment
+            - string
+        limit:
+          type: integer
+          description: |
+            Limit specifies the maximum number of items that can be returned in a single page.
+            Example: 10
+        page:
+          type: integer
+          description: |
+            Page specifies the current page number in the paginated result set.
+            Example: 1
+        results:
+          type: integer
+          description: |
+            Results specifies the number of items returned in the current page.
+            Example: 10
+        status:
+          type: string
+          description: |
+            Status represents the status of the response, typically set to "success".
+            Example: "success"
+      required:
+        - data
+        - limit
+        - page
+        - results
         - status
 
     TokenResponse:
