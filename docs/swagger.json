@@ -1,30 +1,37 @@
 {
     "swagger": "2.0",
     "info": {
+        "title": "Your API Title",
+        "version": "1.0.0",
         "contact": {}
     },
+    "host": "localhost",
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
     "paths": {
         "/auth/bot/login": {
             "post": {
                 "description": "Authenticates a bot user by accepting Telegram User ID.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs in a bot user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Logs in a bot user",
                 "parameters": [
                     {
-                        "description": "Bot SignIn Input",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Bot SignIn Input",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.BotSignInInput"
+                            "$ref": "#/definitions/BotSignInInput"
                         }
                     }
                 ],
@@ -32,13 +39,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TokenResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -47,24 +54,24 @@
         "/auth/bot/signup": {
             "post": {
                 "description": "Registers a new user by accepting Telegram user ID and other basic details. Automatically generates password.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registers a new user via bot",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Registers a new user via bot",
                 "parameters": [
                     {
-                        "description": "Bot Signup Input",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Bot Signup Input",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.BotSignUpInput"
+                            "$ref": "#/definitions/BotSignUpInput"
                         }
                     }
                 ],
@@ -72,19 +79,19 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.UserResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -93,24 +100,24 @@
         "/auth/login": {
             "post": {
                 "description": "Authenticates a user by accepting phone and password.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs in a user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Logs in a user",
                 "parameters": [
                     {
-                        "description": "SignIn Input",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "SignIn Input",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SignInInput"
+                            "$ref": "#/definitions/SignInInput"
                         }
                     }
                 ],
@@ -118,13 +125,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TokenResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -133,18 +140,21 @@
         "/auth/logout": {
             "post": {
                 "description": "Clears the access and refresh tokens and logs out the user.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Logs out a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-any"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     }
                 }
@@ -153,24 +163,27 @@
         "/auth/refresh": {
             "post": {
                 "description": "Refreshes the access token using the refresh token cookie.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Refreshes access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TokenResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -179,24 +192,24 @@
         "/auth/signup": {
             "post": {
                 "description": "Registers a new user by accepting basic details and password confirmation.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registers a new user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Registers a new user",
                 "parameters": [
                     {
-                        "description": "SignUp Input",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "SignUp Input",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SignUpInput"
+                            "$ref": "#/definitions/SignUpInput"
                         }
                     }
                 ],
@@ -204,25 +217,25 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -231,43 +244,45 @@
         "/payments": {
             "get": {
                 "description": "Retrieves all payments, sorted by payment date in descending order with pagination.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "List all payments",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Payments"
-                ],
-                "summary": "List all payments",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
                     },
                     {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Limit per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_Payment"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -276,50 +291,50 @@
         "/payments/history/{userID}": {
             "get": {
                 "description": "Retrieves the payment history for a specified user between two dates.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Get payment history for a user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Payments"
-                ],
-                "summary": "Get payment history for a user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
                         "name": "userID",
                         "in": "path",
-                        "required": true
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "type": "string",
-                        "description": "Start Date in RFC3339 format",
                         "name": "start",
                         "in": "query",
-                        "required": true
+                        "description": "Start Date in RFC3339 format",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "type": "string",
-                        "description": "End Date in RFC3339 format",
                         "name": "end",
                         "in": "query",
-                        "required": true
+                        "description": "End Date in RFC3339 format",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_Payment"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -328,43 +343,45 @@
         "/payments/me": {
             "get": {
                 "description": "Retrieves the payments made by the current user, sorted by payment date in descending order with pagination.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Get current user's payments",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Payments"
-                ],
-                "summary": "Get current user's payments",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
                     },
                     {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Limit per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_Payment"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -373,24 +390,24 @@
         "/payments/webhook": {
             "post": {
                 "description": "Receives payment updates and updates the payment status in the database.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Webhook for payment updates",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Payments"
-                ],
-                "summary": "Webhook for payment updates",
                 "parameters": [
                     {
-                        "description": "Payment Update",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Payment Update",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Payment"
+                            "$ref": "#/definitions/Payment"
                         }
                     }
                 ],
@@ -398,19 +415,19 @@
                     "200": {
                         "description": "payment updated",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-string"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -419,24 +436,24 @@
         "/profiles": {
             "post": {
                 "description": "Creates a new profile for the current user",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Creates a new profile",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Creates a new profile",
                 "parameters": [
                     {
-                        "description": "Create Profile Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Create Profile Request",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateProfileRequest"
+                            "$ref": "#/definitions/CreateProfileRequest"
                         }
                     }
                 ],
@@ -444,309 +461,25 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_ProfileResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/all": {
-            "get": {
-                "description": "Retrieves all profiles, supports pagination",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Lists all profiles with pagination, auth required",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessPageResponse-models_ProfileResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/list": {
-            "get": {
-                "description": "Retrieves all profiles, supports pagination",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Lists all active profiles with pagination, no auth required",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessPageResponse-models_ProfileResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/my": {
-            "get": {
-                "description": "Retrieves the profiles created by the currently authenticated user",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Get current user's profiles",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessPageResponse-models_ProfileResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/my/{id}": {
-            "put": {
-                "description": "User updates his own profile with the provided fields",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "User updates his own profile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Profile ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Profile Update Payload",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UpdateOwnProfileRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_ProfileResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/search": {
-            "post": {
-                "description": "Retrieves profiles based on filters provided in the query",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Search for profiles",
-                "parameters": [
-                    {
-                        "description": "Search Filters",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.FindProfilesQuery"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessPageResponse-models_ProfileResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/update/{id}": {
-            "put": {
-                "description": "Updates the profile with the given ID, allows updating specific fields",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Updates an existing profile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Profile ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Profile Update Payload",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UpdateProfileRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_ProfileResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -755,20 +488,23 @@
         "/profiles/{id}": {
             "delete": {
                 "description": "Deletes the profile with the given ID from the database",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Profiles"
                 ],
                 "summary": "Deletes a profile by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Profile ID",
                         "name": "id",
                         "in": "path",
-                        "required": true
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -778,7 +514,7 @@
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -787,33 +523,36 @@
         "/profiles/{phone}": {
             "get": {
                 "description": "Retrieves a profile based on the phone number provided",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Profiles"
                 ],
                 "summary": "Find a profile by phone number",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Phone Number",
                         "name": "phone",
                         "in": "path",
-                        "required": true
+                        "description": "Phone Number",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_ProfileResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -822,56 +561,58 @@
         "/profiles/{profileID}/services": {
             "get": {
                 "description": "Retrieves all services for a specific profile, with filtered data based on the user's tier.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get all services for a specific profile",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Get all services for a specific profile",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Profile ID",
                         "name": "profileID",
                         "in": "path",
-                        "required": true
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "type": "string",
-                        "default": "1",
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "string",
+                        "default": "1"
                     },
                     {
-                        "type": "string",
-                        "default": "10",
-                        "description": "Number of items per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "type": "string",
+                        "default": "10"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessPageResponse-models_ServiceResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -880,49 +621,348 @@
         "/profiles/{profileID}/services/{serviceID}": {
             "get": {
                 "description": "Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get a specific service by profile and service ID",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Get a specific service by profile and service ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Profile ID",
                         "name": "profileID",
                         "in": "path",
-                        "required": true
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceID",
                         "in": "path",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_Service"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/all": {
+            "get": {
+                "description": "Retrieves all profiles, supports pagination",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Lists all profiles with pagination, auth required",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/list": {
+            "get": {
+                "description": "Retrieves all profiles, supports pagination",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Lists all active profiles with pagination, no auth required",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/my": {
+            "get": {
+                "description": "Retrieves the profiles created by the currently authenticated user",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Get current user's profiles",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/my/{id}": {
+            "put": {
+                "description": "User updates his own profile with the provided fields",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "User updates his own profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Profile Update Payload",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdateOwnProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/search": {
+            "post": {
+                "description": "Retrieves profiles based on filters provided in the query",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Search for profiles",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Search Filters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/FindProfilesQuery"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/update/{id}": {
+            "put": {
+                "description": "Updates the profile with the given ID, allows updating specific fields",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Updates an existing profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Profile Update Payload",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdateProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -931,31 +971,31 @@
         "/reviews/client/update": {
             "put": {
                 "description": "Updates the user review for a service if the current user is authorized to do so and within the allowed time limit.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Update a client's user review on a profile service",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Update a client's user review on a profile service",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceId",
                         "in": "query",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "User Rating Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "User Rating Request",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateUserRatingRequest"
+                            "$ref": "#/definitions/CreateUserRatingRequest"
                         }
                     }
                 ],
@@ -963,31 +1003,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_ServiceResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -996,31 +1036,31 @@
         "/reviews/client/visibility": {
             "put": {
                 "description": "Set visibility of the profile owner's review based on the client's request. Only available for non-basic tier users.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Set visibility of the profile owner's review",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Set visibility of the profile owner's review",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceId",
                         "in": "query",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "Set Review Visibility Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Set Review Visibility Request",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SetReviewVisibilityRequest"
+                            "$ref": "#/definitions/SetReviewVisibilityRequest"
                         }
                     }
                 ],
@@ -1028,31 +1068,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_Service"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1061,31 +1101,31 @@
         "/reviews/host/update": {
             "put": {
                 "description": "Allows a profile owner to update their review on a client user within the allowed time limit.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Update the profile owner's review on a client user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Update the profile owner's review on a client user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceId",
                         "in": "query",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "Create Profile Rating Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Create Profile Rating Request",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateProfileRatingRequest"
+                            "$ref": "#/definitions/CreateProfileRatingRequest"
                         }
                     }
                 ],
@@ -1093,31 +1133,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_Service"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1126,31 +1166,31 @@
         "/reviews/host/visibility": {
             "put": {
                 "description": "Allows a profile owner to set user's review visibility. Only available for non-basic tier users.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Set visibility of user's review",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Set visibility of user's review",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceId",
                         "in": "query",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "Set Review Visibility Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Set Review Visibility Request",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SetReviewVisibilityRequest"
+                            "$ref": "#/definitions/SetReviewVisibilityRequest"
                         }
                     }
                 ],
@@ -1158,31 +1198,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_Service"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1191,67 +1231,69 @@
         "/services": {
             "get": {
                 "description": "Retrieves a paginated list of services with all related information.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get a list of services",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Get a list of services",
                 "parameters": [
                     {
-                        "type": "string",
-                        "default": "1",
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "string",
+                        "default": "1"
                     },
                     {
-                        "type": "string",
-                        "default": "10",
-                        "description": "Number of items per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "type": "string",
+                        "default": "10"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessPageResponse-models_ServiceResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
             },
             "post": {
                 "description": "Creates a new service between a client user and a profile, including optional ratings for both the profile and the user.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Create a new service",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Create a new service",
                 "parameters": [
                     {
-                        "description": "Create Service Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Create Service Request",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateServiceRequest"
+                            "$ref": "#/definitions/CreateServiceRequest"
                         }
                     }
                 ],
@@ -1259,19 +1301,19 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_ServiceResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1280,53 +1322,160 @@
         "/users": {
             "get": {
                 "description": "Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get a user by ID, Telegram user ID, or phone",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get a user by ID, Telegram user ID, or phone",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
                         "name": "id",
-                        "in": "query"
+                        "in": "query",
+                        "description": "User ID",
+                        "required": false,
+                        "type": "string"
                     },
                     {
-                        "type": "integer",
-                        "description": "Telegram User ID",
                         "name": "telegramUserId",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Telegram User ID",
+                        "required": false,
+                        "type": "integer"
                     },
                     {
-                        "type": "string",
-                        "description": "Phone number",
                         "name": "phone",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Phone number",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "delete": {
+                "description": "Allows an authorized user to delete another user by their ID, with role-based restrictions.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update a user's information (privileged access)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User Update Payload",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdateUserPrivileged"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1335,24 +1484,24 @@
         "/users/assign-role": {
             "post": {
                 "description": "Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Assign a role to a user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Assign a role to a user",
                 "parameters": [
                     {
-                        "description": "Role assignment details",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "Role assignment details",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.AssignRole"
+                            "$ref": "#/definitions/AssignRole"
                         }
                     }
                 ],
@@ -1360,31 +1509,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1393,51 +1542,51 @@
         "/users/me": {
             "get": {
                 "description": "Retrieves the profile of the currently authenticated user",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get current authenticated user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get current authenticated user",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
             },
             "put": {
                 "description": "Allows the current user to update their own profile, including name, phone, and avatar.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update the current user's information",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Update the current user's information",
                 "parameters": [
                     {
-                        "description": "User Update Payload",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
+                        "description": "User Update Payload",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateUser"
+                            "$ref": "#/definitions/UpdateUser"
                         }
                     }
                 ],
@@ -1445,25 +1594,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1472,108 +1621,16 @@
         "/users/self": {
             "delete": {
                 "description": "Allows the current user to delete their own account.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Users"
                 ],
                 "summary": "Delete the currently authenticated user",
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/{id}": {
-            "put": {
-                "description": "Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Update a user's information (privileged access)",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "User Update Payload",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UpdateUserPrivileged"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse-models_UserResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Allows an authorized user to delete another user by their ID, with role-based restrictions.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Delete a user by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "204": {
                         "description": "No Content"
@@ -1581,19 +1638,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1601,7 +1652,7 @@
         }
     },
     "definitions": {
-        "models.AssignRole": {
+        "AssignRole": {
             "type": "object",
             "required": [
                 "id",
@@ -1620,7 +1671,7 @@
                 }
             }
         },
-        "models.BotSignInInput": {
+        "BotSignInInput": {
             "type": "object",
             "required": [
                 "telegramUserId"
@@ -1631,7 +1682,7 @@
                 }
             }
         },
-        "models.BotSignUpInput": {
+        "BotSignUpInput": {
             "type": "object",
             "required": [
                 "name",
@@ -1645,15 +1696,15 @@
                 },
                 "phone": {
                     "type": "string",
-                    "maxLength": 11,
-                    "minLength": 11
+                    "minLength": 11,
+                    "maxLength": 11
                 },
                 "telegramUserId": {
                     "type": "string"
                 }
             }
         },
-        "models.CreateBodyArtRequest": {
+        "CreateBodyArtRequest": {
             "type": "object",
             "required": [
                 "bodyArtId"
@@ -1664,7 +1715,7 @@
                 }
             }
         },
-        "models.CreatePhotoRequest": {
+        "CreatePhotoRequest": {
             "type": "object",
             "required": [
                 "url"
@@ -1675,7 +1726,7 @@
                 }
             }
         },
-        "models.CreateProfileOption": {
+        "CreateProfileOption": {
             "type": "object",
             "required": [
                 "profileTagId"
@@ -1694,13 +1745,13 @@
                 }
             }
         },
-        "models.CreateProfileRatingRequest": {
+        "CreateProfileRatingRequest": {
             "type": "object",
             "properties": {
                 "ratedProfileTags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreateRatedProfileTagRequest"
+                        "$ref": "#/definitions/CreateRatedProfileTagRequest"
                     }
                 },
                 "review": {
@@ -1711,7 +1762,7 @@
                 }
             }
         },
-        "models.CreateProfileRequest": {
+        "CreateProfileRequest": {
             "type": "object",
             "required": [
                 "age",
@@ -1738,7 +1789,7 @@
                 "bodyArts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreateBodyArtRequest"
+                        "$ref": "#/definitions/CreateBodyArtRequest"
                     }
                 },
                 "bodyTypeId": {
@@ -1786,33 +1837,33 @@
                 "photos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreatePhotoRequest"
+                        "$ref": "#/definitions/CreatePhotoRequest"
                     }
                 },
                 "priceCarContact": {
-                    "description": "PriceCarNightRatio     float64 `json:\"priceCarNightRatio,omitempty\"`",
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "PriceCarNightRatio float64 `json:\"priceCarNightRatio,omitempty\"`"
                 },
                 "priceCarHour": {
                     "type": "integer"
                 },
                 "priceInHouseContact": {
-                    "description": "PriceInHouseNightRatio float64 `json:\"priceInHouseNightRatio,omitempty\"`",
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "PriceInHouseNightRatio float64 `json:\"priceInHouseNightRatio,omitempty\"`"
                 },
                 "priceInHouseHour": {
                     "type": "integer"
                 },
                 "priceSaunaContact": {
-                    "description": "PrinceSaunaNightRatio  float64 `json:\"princeSaunaNightRatio,omitempty\"`",
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "PrinceSaunaNightRatio float64 `json:\"princeSaunaNightRatio,omitempty\"`"
                 },
                 "priceSaunaHour": {
                     "type": "integer"
                 },
                 "priceVisitContact": {
-                    "description": "PriceVisitNightRatio   float64 `json:\"priceVisitNightRatio,omitempty\"`",
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "PriceVisitNightRatio float64 `json:\"priceVisitNightRatio,omitempty\"`"
                 },
                 "priceVisitHour": {
                     "type": "integer"
@@ -1820,7 +1871,7 @@
                 "profileOptions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreateProfileOption"
+                        "$ref": "#/definitions/CreateProfileOption"
                     }
                 },
                 "weight": {
@@ -1828,7 +1879,7 @@
                 }
             }
         },
-        "models.CreateRatedProfileTagRequest": {
+        "CreateRatedProfileTagRequest": {
             "type": "object",
             "properties": {
                 "tagId": {
@@ -1839,7 +1890,7 @@
                 }
             }
         },
-        "models.CreateRatedUserTagRequest": {
+        "CreateRatedUserTagRequest": {
             "type": "object",
             "properties": {
                 "tagId": {
@@ -1850,7 +1901,7 @@
                 }
             }
         },
-        "models.CreateServiceRequest": {
+        "CreateServiceRequest": {
             "type": "object",
             "properties": {
                 "clientUserLatitude": {
@@ -1866,7 +1917,7 @@
                     "type": "string"
                 },
                 "profileRating": {
-                    "$ref": "#/definitions/models.CreateProfileRatingRequest"
+                    "$ref": "#/definitions/CreateProfileRatingRequest"
                 },
                 "profileUserLatitude": {
                     "type": "number"
@@ -1878,17 +1929,17 @@
                     "type": "string"
                 },
                 "userRating": {
-                    "$ref": "#/definitions/models.CreateUserRatingRequest"
+                    "$ref": "#/definitions/CreateUserRatingRequest"
                 }
             }
         },
-        "models.CreateUserRatingRequest": {
+        "CreateUserRatingRequest": {
             "type": "object",
             "properties": {
                 "ratedUserTags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreateRatedUserTagRequest"
+                        "$ref": "#/definitions/CreateRatedUserTagRequest"
                     }
                 },
                 "review": {
@@ -1899,21 +1950,21 @@
                 }
             }
         },
-        "models.ErrorResponse": {
+        "ErrorResponse": {
             "description": "This model is returned when an API call fails due to an error.",
             "type": "object",
             "properties": {
                 "message": {
-                    "description": "Message provides a human-readable description of the error that occurred.\nExample: \"Invalid request payload\"",
-                    "type": "string"
+                    "type": "string",
+                    "description": "Message provides a human-readable description of the error that occurred. Example: \"Invalid request payload\""
                 },
                 "status": {
-                    "description": "Status represents the status of the response, usually set to \"error\".\nExample: \"error\"",
-                    "type": "string"
+                    "type": "string",
+                    "description": "Status represents the status of the response, usually set to \"error\". Example: \"error\""
                 }
             }
         },
-        "models.FindProfilesQuery": {
+        "FindProfilesQuery": {
             "type": "object",
             "properties": {
                 "active": {
@@ -2026,7 +2077,7 @@
                 }
             }
         },
-        "models.Payment": {
+        "Payment": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -2039,15 +2090,15 @@
                     "type": "string"
                 },
                 "paymentDate": {
-                    "description": "date at which payment is completed",
-                    "type": "string"
+                    "type": "string",
+                    "description": "date at which payment is completed"
                 },
                 "status": {
                     "type": "string"
                 },
                 "type": {
-                    "description": "type: subscription, one_hour, three_hours, twelve_hours, two_days, one_week",
-                    "type": "string"
+                    "type": "string",
+                    "description": "type: subscription, one_hour, three_hours, twelve_hours, two_days, one_week"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -2057,7 +2108,7 @@
                 }
             }
         },
-        "models.PhotoResponse": {
+        "PhotoResponse": {
             "type": "object",
             "properties": {
                 "approved": {
@@ -2074,7 +2125,7 @@
                 }
             }
         },
-        "models.ProfileBodyArtResponse": {
+        "ProfileBodyArtResponse": {
             "type": "object",
             "properties": {
                 "bodyArtId": {
@@ -2085,7 +2136,7 @@
                 }
             }
         },
-        "models.ProfileOptionResponse": {
+        "ProfileOptionResponse": {
             "type": "object",
             "properties": {
                 "comment": {
@@ -2095,11 +2146,11 @@
                     "type": "integer"
                 },
                 "profileTag": {
-                    "$ref": "#/definitions/models.ProfileTagResponse"
+                    "$ref": "#/definitions/ProfileTagResponse"
                 }
             }
         },
-        "models.ProfileRating": {
+        "ProfileRating": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -2114,7 +2165,7 @@
                 "ratedProfileTags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.RatedProfileTag"
+                        "$ref": "#/definitions/RatedProfileTag"
                     }
                 },
                 "review": {
@@ -2137,7 +2188,7 @@
                 }
             }
         },
-        "models.ProfileRatingResponse": {
+        "ProfileRatingResponse": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -2152,7 +2203,7 @@
                 "ratedProfileTags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.RatedProfileTagResponse"
+                        "$ref": "#/definitions/RatedProfileTagResponse"
                     }
                 },
                 "review": {
@@ -2175,7 +2226,7 @@
                 }
             }
         },
-        "models.ProfileResponse": {
+        "ProfileResponse": {
             "type": "object",
             "properties": {
                 "active": {
@@ -2196,7 +2247,7 @@
                 "bodyArts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.ProfileBodyArtResponse"
+                        "$ref": "#/definitions/ProfileBodyArtResponse"
                     }
                 },
                 "bodyTypeId": {
@@ -2253,7 +2304,7 @@
                 "photos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.PhotoResponse"
+                        "$ref": "#/definitions/PhotoResponse"
                     }
                 },
                 "priceCarContact": {
@@ -2295,13 +2346,13 @@
                 "profileOptions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.ProfileOptionResponse"
+                        "$ref": "#/definitions/ProfileOptionResponse"
                     }
                 },
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.ServiceResponse"
+                        "$ref": "#/definitions/ServiceResponse"
                     }
                 },
                 "updatedBy": {
@@ -2324,7 +2375,7 @@
                 }
             }
         },
-        "models.ProfileTag": {
+        "ProfileTag": {
             "type": "object",
             "properties": {
                 "id": {
@@ -2335,7 +2386,7 @@
                 }
             }
         },
-        "models.ProfileTagResponse": {
+        "ProfileTagResponse": {
             "type": "object",
             "properties": {
                 "name": {
@@ -2343,11 +2394,11 @@
                 }
             }
         },
-        "models.RatedProfileTag": {
+        "RatedProfileTag": {
             "type": "object",
             "properties": {
                 "profileTag": {
-                    "$ref": "#/definitions/models.ProfileTag"
+                    "$ref": "#/definitions/ProfileTag"
                 },
                 "profileTagID": {
                     "type": "integer"
@@ -2360,18 +2411,18 @@
                 }
             }
         },
-        "models.RatedProfileTagResponse": {
+        "RatedProfileTagResponse": {
             "type": "object",
             "properties": {
                 "profileTag": {
-                    "$ref": "#/definitions/models.ProfileTagResponse"
+                    "$ref": "#/definitions/ProfileTagResponse"
                 },
                 "type": {
                     "type": "string"
                 }
             }
         },
-        "models.RatedUserTag": {
+        "RatedUserTag": {
             "type": "object",
             "properties": {
                 "ratingID": {
@@ -2381,25 +2432,25 @@
                     "type": "string"
                 },
                 "userTag": {
-                    "$ref": "#/definitions/models.UserTag"
+                    "$ref": "#/definitions/UserTag"
                 },
                 "userTagID": {
                     "type": "integer"
                 }
             }
         },
-        "models.RatedUserTagResponse": {
+        "RatedUserTagResponse": {
             "type": "object",
             "properties": {
                 "type": {
                     "type": "string"
                 },
                 "userTag": {
-                    "$ref": "#/definitions/models.UserTagResponse"
+                    "$ref": "#/definitions/UserTagResponse"
                 }
             }
         },
-        "models.Service": {
+        "Service": {
             "type": "object",
             "properties": {
                 "clientUserID": {
@@ -2412,12 +2463,8 @@
                     "type": "string"
                 },
                 "clientUserRating": {
-                    "description": "profile owner's review on client",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.UserRating"
-                        }
-                    ]
+                    "$ref": "#/definitions/UserRating",
+                    "description": "profile owner's review on client"
                 },
                 "clientUserRatingID": {
                     "type": "string"
@@ -2438,12 +2485,8 @@
                     "type": "string"
                 },
                 "profileRating": {
-                    "description": "client's review on profile",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.ProfileRating"
-                        }
-                    ]
+                    "$ref": "#/definitions/ProfileRating",
+                    "description": "client's review on profile"
                 },
                 "profileRatingID": {
                     "type": "string"
@@ -2465,14 +2508,14 @@
                 }
             }
         },
-        "models.ServiceResponse": {
+        "ServiceResponse": {
             "type": "object",
             "properties": {
                 "clientUserId": {
                     "type": "string"
                 },
                 "clientUserRating": {
-                    "$ref": "#/definitions/models.UserRatingResponse"
+                    "$ref": "#/definitions/UserRatingResponse"
                 },
                 "clientUserRatingId": {
                     "type": "string"
@@ -2493,7 +2536,7 @@
                     "type": "string"
                 },
                 "profileRating": {
-                    "$ref": "#/definitions/models.ProfileRatingResponse"
+                    "$ref": "#/definitions/ProfileRatingResponse"
                 },
                 "profileRatingId": {
                     "type": "string"
@@ -2509,7 +2552,7 @@
                 }
             }
         },
-        "models.SetReviewVisibilityRequest": {
+        "SetReviewVisibilityRequest": {
             "type": "object",
             "properties": {
                 "visible": {
@@ -2517,7 +2560,7 @@
                 }
             }
         },
-        "models.SignInInput": {
+        "SignInInput": {
             "type": "object",
             "required": [
                 "password",
@@ -2530,12 +2573,12 @@
                 },
                 "phone": {
                     "type": "string",
-                    "maxLength": 11,
-                    "minLength": 11
+                    "minLength": 11,
+                    "maxLength": 11
                 }
             }
         },
-        "models.SignUpInput": {
+        "SignUpInput": {
             "type": "object",
             "required": [
                 "password",
@@ -2553,222 +2596,78 @@
                 },
                 "phone": {
                     "type": "string",
-                    "maxLength": 11,
-                    "minLength": 11
+                    "minLength": 11,
+                    "maxLength": 11
                 }
             }
         },
-        "models.SuccessPageResponse-array_models_UserResponse": {
+        "SuccessResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "description": "Data contains the data payload for the current page. Can be any type of data.\nExample: [{\"id\": 1, \"name\": \"Item 1\"}, {\"id\": 2, \"name\": \"Item 2\"}]",
+                    "type": "object",
+                    "description": "Data contains the result of the successful operation. It can be one of the following types:\n- UserResponse\n- ProfileResponse\n- ServiceResponse\n- Payment\n- string"
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\""
+                }
+            },
+            "required": [
+                "data",
+                "status"
+            ]
+        },
+        "SuccessPageResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.UserResponse"
+                        "type": "object",
+                        "description": "Each item in the data array can be one of the following types:\n- UserResponse\n- ProfileResponse\n- ServiceResponse\n- Payment\n- string"
                     }
                 },
                 "limit": {
-                    "description": "Limit specifies the maximum number of items that can be returned in a single page.\nExample: 10",
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Limit specifies the maximum number of items that can be returned in a single page.\nExample: 10"
                 },
                 "page": {
-                    "description": "Page specifies the current page number in the paginated result set.\nExample: 1",
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Page specifies the current page number in the paginated result set.\nExample: 1"
                 },
                 "results": {
-                    "description": "Results specifies the number of items returned in the current page.\nExample: 10",
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Results specifies the number of items returned in the current page.\nExample: 10"
                 },
                 "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
+                    "type": "string",
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\""
                 }
-            }
+            },
+            "required": [
+                "data",
+                "limit",
+                "page",
+                "results",
+                "status"
+            ]
         },
-        "models.SuccessPageResponse-models_ProfileResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the data payload for the current page. Can be any type of data.\nExample: [{\"id\": 1, \"name\": \"Item 1\"}, {\"id\": 2, \"name\": \"Item 2\"}]",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.ProfileResponse"
-                        }
-                    ]
-                },
-                "limit": {
-                    "description": "Limit specifies the maximum number of items that can be returned in a single page.\nExample: 10",
-                    "type": "integer"
-                },
-                "page": {
-                    "description": "Page specifies the current page number in the paginated result set.\nExample: 1",
-                    "type": "integer"
-                },
-                "results": {
-                    "description": "Results specifies the number of items returned in the current page.\nExample: 10",
-                    "type": "integer"
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SuccessPageResponse-models_ServiceResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the data payload for the current page. Can be any type of data.\nExample: [{\"id\": 1, \"name\": \"Item 1\"}, {\"id\": 2, \"name\": \"Item 2\"}]",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.ServiceResponse"
-                        }
-                    ]
-                },
-                "limit": {
-                    "description": "Limit specifies the maximum number of items that can be returned in a single page.\nExample: 10",
-                    "type": "integer"
-                },
-                "page": {
-                    "description": "Page specifies the current page number in the paginated result set.\nExample: 1",
-                    "type": "integer"
-                },
-                "results": {
-                    "description": "Results specifies the number of items returned in the current page.\nExample: 10",
-                    "type": "integer"
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SuccessResponse-any": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}"
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SuccessResponse-models_Payment": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Payment"
-                        }
-                    ]
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SuccessResponse-models_ProfileResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.ProfileResponse"
-                        }
-                    ]
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SuccessResponse-models_Service": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Service"
-                        }
-                    ]
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SuccessResponse-models_ServiceResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.ServiceResponse"
-                        }
-                    ]
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SuccessResponse-models_UserResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.UserResponse"
-                        }
-                    ]
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SuccessResponse-string": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the result of the successful operation. Can be any type of data.\nExample: {\"id\": 1, \"name\": \"John Doe\"}",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
-                }
-            }
-        },
-        "models.TokenResponse": {
+        "TokenResponse": {
             "description": "This model is used to return an access token after a user logs in or when a token is refreshed.",
             "type": "object",
             "properties": {
                 "access_token": {
-                    "description": "AccessToken is the token that allows the user to authenticate subsequent API requests.\nExample: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
-                    "type": "string"
+                    "type": "string",
+                    "description": "AccessToken is the token that allows the user to authenticate subsequent API requests.\nExample: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\""
                 },
                 "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\"",
-                    "type": "string"
+                    "type": "string",
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\""
                 }
             }
         },
-        "models.UpdateOwnProfileRequest": {
+        "UpdateOwnProfileRequest": {
             "type": "object",
             "properties": {
                 "active": {
@@ -2783,7 +2682,7 @@
                 "bodyArts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreateBodyArtRequest"
+                        "$ref": "#/definitions/CreateBodyArtRequest"
                     }
                 },
                 "bodyTypeId": {
@@ -2831,7 +2730,7 @@
                 "photos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreatePhotoRequest"
+                        "$ref": "#/definitions/CreatePhotoRequest"
                     }
                 },
                 "priceCarContact": {
@@ -2873,7 +2772,7 @@
                 "profileOptions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreateProfileOption"
+                        "$ref": "#/definitions/CreateProfileOption"
                     }
                 },
                 "weight": {
@@ -2881,7 +2780,7 @@
                 }
             }
         },
-        "models.UpdateProfileRequest": {
+        "UpdateProfileRequest": {
             "type": "object",
             "properties": {
                 "active": {
@@ -2899,7 +2798,7 @@
                 "photos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.CreatePhotoRequest"
+                        "$ref": "#/definitions/CreatePhotoRequest"
                     }
                 },
                 "verified": {
@@ -2907,25 +2806,25 @@
                 }
             }
         },
-        "models.UpdateUser": {
+        "UpdateUser": {
             "type": "object",
             "properties": {
                 "name": {
                     "type": "string",
-                    "maxLength": 20,
-                    "minLength": 3
+                    "minLength": 3,
+                    "maxLength": 20
                 },
                 "phone": {
                     "type": "string",
-                    "maxLength": 11,
-                    "minLength": 11
+                    "minLength": 11,
+                    "maxLength": 11
                 },
                 "photo": {
                     "type": "string"
                 }
             }
         },
-        "models.UpdateUserPrivileged": {
+        "UpdateUserPrivileged": {
             "type": "object",
             "properties": {
                 "active": {
@@ -2933,13 +2832,13 @@
                 },
                 "name": {
                     "type": "string",
-                    "maxLength": 20,
-                    "minLength": 3
+                    "minLength": 3,
+                    "maxLength": 20
                 },
                 "phone": {
                     "type": "string",
-                    "maxLength": 11,
-                    "minLength": 11
+                    "minLength": 11,
+                    "maxLength": 11
                 },
                 "photo": {
                     "type": "string"
@@ -2961,7 +2860,7 @@
                 }
             }
         },
-        "models.UserRating": {
+        "UserRating": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -2973,7 +2872,7 @@
                 "ratedUserTags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.RatedUserTag"
+                        "$ref": "#/definitions/RatedUserTag"
                     }
                 },
                 "review": {
@@ -2999,7 +2898,7 @@
                 }
             }
         },
-        "models.UserRatingResponse": {
+        "UserRatingResponse": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -3011,7 +2910,7 @@
                 "ratedUserTags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.RatedUserTagResponse"
+                        "$ref": "#/definitions/RatedUserTagResponse"
                     }
                 },
                 "review": {
@@ -3037,7 +2936,7 @@
                 }
             }
         },
-        "models.UserResponse": {
+        "UserResponse": {
             "type": "object",
             "properties": {
                 "active": {
@@ -3078,7 +2977,7 @@
                 }
             }
         },
-        "models.UserTag": {
+        "UserTag": {
             "type": "object",
             "properties": {
                 "id": {
@@ -3089,7 +2988,7 @@
                 }
             }
         },
-        "models.UserTagResponse": {
+        "UserTagResponse": {
             "type": "object",
             "properties": {
                 "name": {

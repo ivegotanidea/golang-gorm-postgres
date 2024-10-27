@@ -1,2135 +1,2075 @@
-definitions:
-  models.AssignRole:
-    properties:
-      id:
-        type: string
-      role:
-        enum:
-        - moderator
-        - admin
-        type: string
-    required:
-    - id
-    - role
-    type: object
-  models.BotSignInInput:
-    properties:
-      telegramUserId:
-        type: string
-    required:
-    - telegramUserId
-    type: object
-  models.BotSignUpInput:
-    properties:
-      name:
-        minLength: 5
-        type: string
-      phone:
-        maxLength: 11
-        minLength: 11
-        type: string
-      telegramUserId:
-        type: string
-    required:
-    - name
-    - phone
-    - telegramUserId
-    type: object
-  models.CreateBodyArtRequest:
-    properties:
-      bodyArtId:
-        type: integer
-    required:
-    - bodyArtId
-    type: object
-  models.CreatePhotoRequest:
-    properties:
-      url:
-        type: string
-    required:
-    - url
-    type: object
-  models.CreateProfileOption:
-    properties:
-      comment:
-        maxLength: 50
-        type: string
-      price:
-        minimum: 0
-        type: integer
-      profileTagId:
-        type: integer
-    required:
-    - profileTagId
-    type: object
-  models.CreateProfileRatingRequest:
-    properties:
-      ratedProfileTags:
-        items:
-          $ref: '#/definitions/models.CreateRatedProfileTagRequest'
-        type: array
-      review:
-        type: string
-      score:
-        type: integer
-    type: object
-  models.CreateProfileRequest:
-    properties:
-      age:
-        type: integer
-      bio:
-        type: string
-      bodyArts:
-        items:
-          $ref: '#/definitions/models.CreateBodyArtRequest'
-        type: array
-      bodyTypeId:
-        type: integer
-      bust:
-        type: number
-      cityId:
-        type: integer
-      contactPhone:
-        type: string
-      contactTG:
-        type: string
-      contactWA:
-        type: string
-      ethnosId:
-        type: integer
-      hairColorId:
-        type: integer
-      height:
-        type: integer
-      intimateHairCutId:
-        type: integer
-      latitude:
-        type: string
-      longitude:
-        type: string
-      name:
-        type: string
-      phone:
-        type: string
-      photos:
-        items:
-          $ref: '#/definitions/models.CreatePhotoRequest'
-        type: array
-      priceCarContact:
-        description: PriceCarNightRatio     float64 `json:"priceCarNightRatio,omitempty"`
-        type: integer
-      priceCarHour:
-        type: integer
-      priceInHouseContact:
-        description: PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
-        type: integer
-      priceInHouseHour:
-        type: integer
-      priceSaunaContact:
-        description: PrinceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
-        type: integer
-      priceSaunaHour:
-        type: integer
-      priceVisitContact:
-        description: PriceVisitNightRatio   float64 `json:"priceVisitNightRatio,omitempty"`
-        type: integer
-      priceVisitHour:
-        type: integer
-      profileOptions:
-        items:
-          $ref: '#/definitions/models.CreateProfileOption'
-        type: array
-      weight:
-        type: integer
-    required:
-    - age
-    - bio
-    - bust
-    - cityId
-    - contactPhone
-    - contactTG
-    - ethnosId
-    - height
-    - name
-    - phone
-    - photos
-    - profileOptions
-    - weight
-    type: object
-  models.CreateRatedProfileTagRequest:
-    properties:
-      tagId:
-        type: integer
-      type:
-        type: string
-    type: object
-  models.CreateRatedUserTagRequest:
-    properties:
-      tagId:
-        type: integer
-      type:
-        type: string
-    type: object
-  models.CreateServiceRequest:
-    properties:
-      clientUserLatitude:
-        type: number
-      clientUserLongitude:
-        type: number
-      profileId:
-        type: string
-      profileOwnerId:
-        type: string
-      profileRating:
-        $ref: '#/definitions/models.CreateProfileRatingRequest'
-      profileUserLatitude:
-        type: number
-      profileUserLongitude:
-        type: number
-      userId:
-        type: string
-      userRating:
-        $ref: '#/definitions/models.CreateUserRatingRequest'
-    type: object
-  models.CreateUserRatingRequest:
-    properties:
-      ratedUserTags:
-        items:
-          $ref: '#/definitions/models.CreateRatedUserTagRequest'
-        type: array
-      review:
-        type: string
-      score:
-        type: integer
-    type: object
-  models.ErrorResponse:
-    description: This model is returned when an API call fails due to an error.
-    properties:
-      message:
-        description: |-
-          Message provides a human-readable description of the error that occurred.
-          Example: "Invalid request payload"
-        type: string
-      status:
-        description: |-
-          Status represents the status of the response, usually set to "error".
-          Example: "error"
-        type: string
-    type: object
-  models.FindProfilesQuery:
-    properties:
-      active:
-        type: boolean
-      age:
-        type: integer
-      bodyArtIds:
-        items:
-          type: integer
-        type: array
-      bodyTypeId:
-        type: integer
-      bust:
-        type: number
-      cityId:
-        type: integer
-      ethnosId:
-        type: integer
-      hairColorId:
-        type: integer
-      height:
-        type: integer
-      intimateHairCutId:
-        type: integer
-      latitude:
-        type: string
-      longitude:
-        type: string
-      moderated:
-        type: boolean
-      name:
-        type: string
-      phone:
-        type: string
-      priceCarContactMax:
-        type: integer
-      priceCarContactMin:
-        type: integer
-      priceCarHourMax:
-        type: integer
-      priceCarHourMin:
-        type: integer
-      priceInHouseContactMax:
-        type: integer
-      priceInHouseContactMin:
-        type: integer
-      priceInHouseHourMax:
-        type: integer
-      priceInHouseHourMin:
-        type: integer
-      priceSaunaContactMax:
-        type: integer
-      priceSaunaContactMin:
-        type: integer
-      priceSaunaHourMax:
-        type: integer
-      priceSaunaHourMin:
-        type: integer
-      priceVisitContactMax:
-        type: integer
-      priceVisitContactMin:
-        type: integer
-      priceVisitHourMax:
-        type: integer
-      priceVisitHourMin:
-        type: integer
-      profileTagIds:
-        items:
-          type: integer
-        type: array
-      verified:
-        type: boolean
-      weight:
-        type: integer
-    type: object
-  models.Payment:
-    properties:
-      amount:
-        type: number
-      createdAt:
-        type: string
-      id:
-        type: string
-      paymentDate:
-        description: date at which payment is completed
-        type: string
-      status:
-        type: string
-      type:
-        description: 'type: subscription, one_hour, three_hours, twelve_hours, two_days,
-          one_week'
-        type: string
-      updatedAt:
-        type: string
-      userID:
-        type: string
-    type: object
-  models.PhotoResponse:
-    properties:
-      approved:
-        type: boolean
-      deleted:
-        type: boolean
-      disabled:
-        type: boolean
-      url:
-        type: string
-    type: object
-  models.ProfileBodyArtResponse:
-    properties:
-      bodyArtId:
-        type: integer
-      profileId:
-        type: string
-    type: object
-  models.ProfileOptionResponse:
-    properties:
-      comment:
-        type: string
-      price:
-        type: integer
-      profileTag:
-        $ref: '#/definitions/models.ProfileTagResponse'
-    type: object
-  models.ProfileRating:
-    properties:
-      createdAt:
-        type: string
-      id:
-        type: string
-      profileID:
-        type: string
-      ratedProfileTags:
-        items:
-          $ref: '#/definitions/models.RatedProfileTag'
-        type: array
-      review:
-        type: string
-      reviewTextVisible:
-        type: boolean
-      score:
-        type: integer
-      serviceID:
-        type: string
-      updatedAt:
-        type: string
-      updatedBy:
-        type: string
-    type: object
-  models.ProfileRatingResponse:
-    properties:
-      createdAt:
-        type: string
-      id:
-        type: string
-      profileId:
-        type: string
-      ratedProfileTags:
-        items:
-          $ref: '#/definitions/models.RatedProfileTagResponse'
-        type: array
-      review:
-        type: string
-      reviewTextVisible:
-        type: boolean
-      score:
-        type: integer
-      serviceId:
-        type: string
-      updatedAt:
-        type: string
-      updatedBy:
-        type: string
-    type: object
-  models.ProfileResponse:
-    properties:
-      active:
-        type: boolean
-      addressLatitude:
-        type: string
-      addressLongitude:
-        type: string
-      age:
-        type: integer
-      bio:
-        type: string
-      bodyArts:
-        items:
-          $ref: '#/definitions/models.ProfileBodyArtResponse'
-        type: array
-      bodyTypeId:
-        type: integer
-      bust:
-        type: number
-      cityId:
-        type: integer
-      contactPhone:
-        type: string
-      contactTG:
-        type: string
-      contactWA:
-        type: string
-      createdAt:
-        type: string
-      ethnosId:
-        type: integer
-      hairColorId:
-        type: integer
-      height:
-        type: integer
-      id:
-        type: string
-      intimateHairCutId:
-        type: integer
-      moderated:
-        type: boolean
-      moderatedAt:
-        type: string
-      moderatedBy:
-        type: string
-      name:
-        type: string
-      phone:
-        type: string
-      photos:
-        items:
-          $ref: '#/definitions/models.PhotoResponse'
-        type: array
-      priceCarContact:
-        type: integer
-      priceCarHour:
-        type: integer
-      priceCarNightRatio:
-        type: number
-      priceInHouseContact:
-        type: integer
-      priceInHouseHour:
-        type: integer
-      priceInHouseNightRatio:
-        type: number
-      priceSaunaContact:
-        type: integer
-      priceSaunaHour:
-        type: integer
-      priceVisitContact:
-        type: integer
-      priceVisitHour:
-        type: integer
-      priceVisitNightRatio:
-        type: number
-      princeSaunaNightRatio:
-        type: number
-      profileOptions:
-        items:
-          $ref: '#/definitions/models.ProfileOptionResponse'
-        type: array
-      services:
-        items:
-          $ref: '#/definitions/models.ServiceResponse'
-        type: array
-      updatedBy:
-        type: string
-      userId:
-        type: string
-      verified:
-        type: boolean
-      verifiedAt:
-        type: string
-      verifiedBy:
-        type: string
-      weight:
-        type: integer
-    type: object
-  models.ProfileTag:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  models.ProfileTagResponse:
-    properties:
-      name:
-        type: string
-    type: object
-  models.RatedProfileTag:
-    properties:
-      profileTag:
-        $ref: '#/definitions/models.ProfileTag'
-      profileTagID:
-        type: integer
-      ratingID:
-        type: string
-      type:
-        type: string
-    type: object
-  models.RatedProfileTagResponse:
-    properties:
-      profileTag:
-        $ref: '#/definitions/models.ProfileTagResponse'
-      type:
-        type: string
-    type: object
-  models.RatedUserTag:
-    properties:
-      ratingID:
-        type: string
-      type:
-        type: string
-      userTag:
-        $ref: '#/definitions/models.UserTag'
-      userTagID:
-        type: integer
-    type: object
-  models.RatedUserTagResponse:
-    properties:
-      type:
-        type: string
-      userTag:
-        $ref: '#/definitions/models.UserTagResponse'
-    type: object
-  models.Service:
-    properties:
-      clientUserID:
-        type: string
-      clientUserLat:
-        type: string
-      clientUserLon:
-        type: string
-      clientUserRating:
-        allOf:
-        - $ref: '#/definitions/models.UserRating'
-        description: profile owner's review on client
-      clientUserRatingID:
-        type: string
-      createdAt:
-        type: string
-      distanceBetweenUsers:
-        type: number
-      id:
-        type: string
-      profileID:
-        type: string
-      profileOwnerID:
-        type: string
-      profileRating:
-        allOf:
-        - $ref: '#/definitions/models.ProfileRating'
-        description: client's review on profile
-      profileRatingID:
-        type: string
-      profileUserLat:
-        type: string
-      profileUserLon:
-        type: string
-      trustedDistance:
-        type: boolean
-      updatedAt:
-        type: string
-      updatedBy:
-        type: string
-    type: object
-  models.ServiceResponse:
-    properties:
-      clientUserId:
-        type: string
-      clientUserRating:
-        $ref: '#/definitions/models.UserRatingResponse'
-      clientUserRatingId:
-        type: string
-      createdAt:
-        type: string
-      distanceBetweenUsers:
-        type: number
-      id:
-        type: string
-      profileId:
-        type: string
-      profileOwnerId:
-        type: string
-      profileRating:
-        $ref: '#/definitions/models.ProfileRatingResponse'
-      profileRatingId:
-        type: string
-      trustedDistance:
-        type: boolean
-      updatedAt:
-        type: string
-      updatedBy:
-        type: string
-    type: object
-  models.SetReviewVisibilityRequest:
-    properties:
-      visible:
-        type: boolean
-    type: object
-  models.SignInInput:
-    properties:
-      password:
-        minLength: 8
-        type: string
-      phone:
-        maxLength: 11
-        minLength: 11
-        type: string
-    required:
-    - password
-    - phone
-    type: object
-  models.SignUpInput:
-    properties:
-      password:
-        minLength: 8
-        type: string
-      passwordConfirm:
-        minLength: 8
-        type: string
-      phone:
-        maxLength: 11
-        minLength: 11
-        type: string
-    required:
-    - password
-    - passwordConfirm
-    - phone
-    type: object
-  models.SuccessPageResponse-array_models_UserResponse:
-    properties:
-      data:
-        description: |-
-          Data contains the data payload for the current page. Can be any type of data.
-          Example: [{"id": 1, "name": "Item 1"}, {"id": 2, "name": "Item 2"}]
-        items:
-          $ref: '#/definitions/models.UserResponse'
-        type: array
-      limit:
-        description: |-
-          Limit specifies the maximum number of items that can be returned in a single page.
-          Example: 10
-        type: integer
-      page:
-        description: |-
-          Page specifies the current page number in the paginated result set.
-          Example: 1
-        type: integer
-      results:
-        description: |-
-          Results specifies the number of items returned in the current page.
-          Example: 10
-        type: integer
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessPageResponse-models_ProfileResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.ProfileResponse'
-        description: |-
-          Data contains the data payload for the current page. Can be any type of data.
-          Example: [{"id": 1, "name": "Item 1"}, {"id": 2, "name": "Item 2"}]
-      limit:
-        description: |-
-          Limit specifies the maximum number of items that can be returned in a single page.
-          Example: 10
-        type: integer
-      page:
-        description: |-
-          Page specifies the current page number in the paginated result set.
-          Example: 1
-        type: integer
-      results:
-        description: |-
-          Results specifies the number of items returned in the current page.
-          Example: 10
-        type: integer
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessPageResponse-models_ServiceResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.ServiceResponse'
-        description: |-
-          Data contains the data payload for the current page. Can be any type of data.
-          Example: [{"id": 1, "name": "Item 1"}, {"id": 2, "name": "Item 2"}]
-      limit:
-        description: |-
-          Limit specifies the maximum number of items that can be returned in a single page.
-          Example: 10
-        type: integer
-      page:
-        description: |-
-          Page specifies the current page number in the paginated result set.
-          Example: 1
-        type: integer
-      results:
-        description: |-
-          Results specifies the number of items returned in the current page.
-          Example: 10
-        type: integer
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessResponse-any:
-    properties:
-      data:
-        description: |-
-          Data contains the result of the successful operation. Can be any type of data.
-          Example: {"id": 1, "name": "John Doe"}
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessResponse-models_Payment:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.Payment'
-        description: |-
-          Data contains the result of the successful operation. Can be any type of data.
-          Example: {"id": 1, "name": "John Doe"}
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessResponse-models_ProfileResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.ProfileResponse'
-        description: |-
-          Data contains the result of the successful operation. Can be any type of data.
-          Example: {"id": 1, "name": "John Doe"}
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessResponse-models_Service:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.Service'
-        description: |-
-          Data contains the result of the successful operation. Can be any type of data.
-          Example: {"id": 1, "name": "John Doe"}
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessResponse-models_ServiceResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.ServiceResponse'
-        description: |-
-          Data contains the result of the successful operation. Can be any type of data.
-          Example: {"id": 1, "name": "John Doe"}
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessResponse-models_UserResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.UserResponse'
-        description: |-
-          Data contains the result of the successful operation. Can be any type of data.
-          Example: {"id": 1, "name": "John Doe"}
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.SuccessResponse-string:
-    properties:
-      data:
-        description: |-
-          Data contains the result of the successful operation. Can be any type of data.
-          Example: {"id": 1, "name": "John Doe"}
-        type: string
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.TokenResponse:
-    description: This model is used to return an access token after a user logs in
-      or when a token is refreshed.
-    properties:
-      access_token:
-        description: |-
-          AccessToken is the token that allows the user to authenticate subsequent API requests.
-          Example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-        type: string
-      status:
-        description: |-
-          Status represents the status of the response, typically set to "success".
-          Example: "success"
-        type: string
-    type: object
-  models.UpdateOwnProfileRequest:
-    properties:
-      active:
-        type: boolean
-      age:
-        type: integer
-      bio:
-        type: string
-      bodyArts:
-        items:
-          $ref: '#/definitions/models.CreateBodyArtRequest'
-        type: array
-      bodyTypeId:
-        type: integer
-      bust:
-        type: number
-      cityId:
-        type: integer
-      contactPhone:
-        type: string
-      contactTG:
-        type: string
-      contactWA:
-        type: string
-      ethnosId:
-        type: integer
-      hairColorId:
-        type: integer
-      height:
-        type: integer
-      intimateHairCutId:
-        type: integer
-      latitude:
-        type: string
-      longitude:
-        type: string
-      name:
-        type: string
-      phone:
-        type: string
-      photos:
-        items:
-          $ref: '#/definitions/models.CreatePhotoRequest'
-        type: array
-      priceCarContact:
-        type: integer
-      priceCarHour:
-        type: integer
-      priceCarNightRatio:
-        type: number
-      priceInHouseContact:
-        type: integer
-      priceInHouseHour:
-        type: integer
-      priceInHouseNightRatio:
-        type: number
-      priceSaunaContact:
-        type: integer
-      priceSaunaHour:
-        type: integer
-      priceVisitContact:
-        type: integer
-      priceVisitHour:
-        type: integer
-      priceVisitNightRatio:
-        type: number
-      princeSaunaNightRatio:
-        type: number
-      profileOptions:
-        items:
-          $ref: '#/definitions/models.CreateProfileOption'
-        type: array
-      weight:
-        type: integer
-    type: object
-  models.UpdateProfileRequest:
-    properties:
-      active:
-        type: boolean
-      bio:
-        type: string
-      moderated:
-        type: boolean
-      name:
-        type: string
-      photos:
-        items:
-          $ref: '#/definitions/models.CreatePhotoRequest'
-        type: array
-      verified:
-        type: boolean
-    type: object
-  models.UpdateUser:
-    properties:
-      name:
-        maxLength: 20
-        minLength: 3
-        type: string
-      phone:
-        maxLength: 11
-        minLength: 11
-        type: string
-      photo:
-        type: string
-    type: object
-  models.UpdateUserPrivileged:
-    properties:
-      active:
-        type: boolean
-      name:
-        maxLength: 20
-        minLength: 3
-        type: string
-      phone:
-        maxLength: 11
-        minLength: 11
-        type: string
-      photo:
-        type: string
-      telegramUserId:
-        minLength: 6
-        type: string
-      tier:
-        enum:
-        - basic
-        - expert
-        - guru
-        type: string
-      verified:
-        type: boolean
-    type: object
-  models.UserRating:
-    properties:
-      createdAt:
-        type: string
-      id:
-        type: string
-      ratedUserTags:
-        items:
-          $ref: '#/definitions/models.RatedUserTag'
-        type: array
-      review:
-        type: string
-      reviewTextVisible:
-        type: boolean
-      score:
-        type: integer
-      serviceID:
-        type: string
-      updatedAt:
-        type: string
-      updatedBy:
-        type: string
-      userID:
-        type: string
-    type: object
-  models.UserRatingResponse:
-    properties:
-      createdAt:
-        type: string
-      id:
-        type: string
-      ratedUserTags:
-        items:
-          $ref: '#/definitions/models.RatedUserTagResponse'
-        type: array
-      review:
-        type: string
-      reviewTextVisible:
-        type: boolean
-      score:
-        type: integer
-      serviceId:
-        type: string
-      updatedAt:
-        type: string
-      updatedBy:
-        type: string
-      userId:
-        type: string
-    type: object
-  models.UserResponse:
-    properties:
-      active:
-        type: boolean
-      created_at:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-      phone:
-        type: string
-      photo:
-        type: string
-      role:
-        type: string
-      telegramUserId:
-        type: integer
-      tier:
-        type: string
-      updated_at:
-        type: string
-      verified:
-        type: boolean
-    type: object
-  models.UserTag:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  models.UserTagResponse:
-    properties:
-      name:
-        type: string
-    type: object
+swagger: "2.0"
 info:
+  title: "Your API Title"
+  version: "1.0.0"
   contact: {}
+host: "localhost"
+basePath: "/"
+schemes:
+  - "http"
 paths:
   /auth/bot/login:
     post:
+      description: "Authenticates a bot user by accepting Telegram User ID."
+      tags:
+        - "Auth"
+      summary: "Logs in a bot user"
       consumes:
-      - application/json
-      description: Authenticates a bot user by accepting Telegram User ID.
-      parameters:
-      - description: Bot SignIn Input
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.BotSignInInput'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Bot SignIn Input"
+          required: true
+          schema:
+            $ref: '#/definitions/BotSignInInput'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.TokenResponse'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Logs in a bot user
-      tags:
-      - Auth
+            $ref: '#/definitions/ErrorResponse'
   /auth/bot/signup:
     post:
+      description: "Registers a new user by accepting Telegram user ID and other basic details. Automatically generates password."
+      tags:
+        - "Auth"
+      summary: "Registers a new user via bot"
       consumes:
-      - application/json
-      description: Registers a new user by accepting Telegram user ID and other basic
-        details. Automatically generates password.
-      parameters:
-      - description: Bot Signup Input
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.BotSignUpInput'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Bot Signup Input"
+          required: true
+          schema:
+            $ref: '#/definitions/BotSignUpInput'
       responses:
         "201":
-          description: Created
+          description: "Created"
           schema:
-            $ref: '#/definitions/models.UserResponse'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Registers a new user via bot
-      tags:
-      - Auth
+            $ref: '#/definitions/ErrorResponse'
   /auth/login:
     post:
+      description: "Authenticates a user by accepting phone and password."
+      tags:
+        - "Auth"
+      summary: "Logs in a user"
       consumes:
-      - application/json
-      description: Authenticates a user by accepting phone and password.
-      parameters:
-      - description: SignIn Input
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.SignInInput'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "SignIn Input"
+          required: true
+          schema:
+            $ref: '#/definitions/SignInInput'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.TokenResponse'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Logs in a user
-      tags:
-      - Auth
+            $ref: '#/definitions/ErrorResponse'
   /auth/logout:
     post:
-      description: Clears the access and refresh tokens and logs out the user.
+      description: "Clears the access and refresh tokens and logs out the user."
+      tags:
+        - "Auth"
+      summary: "Logs out a user"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-any'
-      summary: Logs out a user
-      tags:
-      - Auth
+            $ref: '#/definitions/SuccessResponse'
   /auth/refresh:
     post:
-      description: Refreshes the access token using the refresh token cookie.
+      description: "Refreshes the access token using the refresh token cookie."
+      tags:
+        - "Auth"
+      summary: "Refreshes access token"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.TokenResponse'
+            $ref: '#/definitions/SuccessResponse'
         "403":
-          description: Forbidden
+          description: "Forbidden"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Refreshes access token
-      tags:
-      - Auth
+            $ref: '#/definitions/ErrorResponse'
   /auth/signup:
     post:
+      description: "Registers a new user by accepting basic details and password confirmation."
+      tags:
+        - "Auth"
+      summary: "Registers a new user"
       consumes:
-      - application/json
-      description: Registers a new user by accepting basic details and password confirmation.
-      parameters:
-      - description: SignUp Input
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.SignUpInput'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "SignUp Input"
+          required: true
+          schema:
+            $ref: '#/definitions/SignUpInput'
       responses:
         "201":
-          description: Created
+          description: "Created"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_UserResponse'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "409":
-          description: Conflict
+          description: "Conflict"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Registers a new user
-      tags:
-      - Auth
+            $ref: '#/definitions/ErrorResponse'
   /payments:
     get:
+      description: "Retrieves all payments, sorted by payment date in descending order with pagination."
+      tags:
+        - "Payments"
+      summary: "List all payments"
       consumes:
-      - application/json
-      description: Retrieves all payments, sorted by payment date in descending order
-        with pagination.
-      parameters:
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: Limit per page
-        in: query
-        name: limit
-        type: integer
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          type: "integer"
+          default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          type: "integer"
+          default: 10
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_Payment'
+            $ref: '#/definitions/SuccessPageResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: List all payments
-      tags:
-      - Payments
+            $ref: '#/definitions/ErrorResponse'
   /payments/history/{userID}:
     get:
+      description: "Retrieves the payment history for a specified user between two dates."
+      tags:
+        - "Payments"
+      summary: "Get payment history for a user"
       consumes:
-      - application/json
-      description: Retrieves the payment history for a specified user between two
-        dates.
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      - description: Start Date in RFC3339 format
-        in: query
-        name: start
-        required: true
-        type: string
-      - description: End Date in RFC3339 format
-        in: query
-        name: end
-        required: true
-        type: string
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "userID"
+          in: "path"
+          description: "User ID"
+          required: true
+          type: "string"
+        - name: "start"
+          in: "query"
+          description: "Start Date in RFC3339 format"
+          required: true
+          type: "string"
+        - name: "end"
+          in: "query"
+          description: "End Date in RFC3339 format"
+          required: true
+          type: "string"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_Payment'
+            $ref: '#/definitions/SuccessPageResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get payment history for a user
-      tags:
-      - Payments
+            $ref: '#/definitions/ErrorResponse'
   /payments/me:
     get:
+      description: "Retrieves the payments made by the current user, sorted by payment date in descending order with pagination."
+      tags:
+        - "Payments"
+      summary: "Get current user's payments"
       consumes:
-      - application/json
-      description: Retrieves the payments made by the current user, sorted by payment
-        date in descending order with pagination.
-      parameters:
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: Limit per page
-        in: query
-        name: limit
-        type: integer
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          type: "integer"
+          default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          type: "integer"
+          default: 10
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_Payment'
+            $ref: '#/definitions/SuccessPageResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get current user's payments
-      tags:
-      - Payments
+            $ref: '#/definitions/ErrorResponse'
   /payments/webhook:
     post:
+      description: "Receives payment updates and updates the payment status in the database."
+      tags:
+        - "Payments"
+      summary: "Webhook for payment updates"
       consumes:
-      - application/json
-      description: Receives payment updates and updates the payment status in the
-        database.
-      parameters:
-      - description: Payment Update
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.Payment'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Payment Update"
+          required: true
+          schema:
+            $ref: '#/definitions/Payment'
       responses:
         "200":
-          description: payment updated
+          description: "payment updated"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-string'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Webhook for payment updates
-      tags:
-      - Payments
+            $ref: '#/definitions/ErrorResponse'
   /profiles:
     post:
+      description: "Creates a new profile for the current user"
+      tags:
+        - "Profiles"
+      summary: "Creates a new profile"
       consumes:
-      - application/json
-      description: Creates a new profile for the current user
-      parameters:
-      - description: Create Profile Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreateProfileRequest'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Create Profile Request"
+          required: true
+          schema:
+            $ref: '#/definitions/CreateProfileRequest'
       responses:
         "201":
-          description: Created
+          description: "Created"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_ProfileResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "403":
-          description: Forbidden
+          description: "Forbidden"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Creates a new profile
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /profiles/{id}:
     delete:
-      description: Deletes the profile with the given ID from the database
-      parameters:
-      - description: Profile ID
-        in: path
-        name: id
-        required: true
-        type: string
+      description: "Deletes the profile with the given ID from the database"
+      tags:
+        - "Profiles"
+      summary: "Deletes a profile by ID"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Profile ID"
+          required: true
+          type: "string"
       responses:
         "204":
-          description: No Content
+          description: "No Content"
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Deletes a profile by ID
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /profiles/{phone}:
     get:
-      description: Retrieves a profile based on the phone number provided
-      parameters:
-      - description: Phone Number
-        in: path
-        name: phone
-        required: true
-        type: string
+      description: "Retrieves a profile based on the phone number provided"
+      tags:
+        - "Profiles"
+      summary: "Find a profile by phone number"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "phone"
+          in: "path"
+          description: "Phone Number"
+          required: true
+          type: "string"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_ProfileResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Find a profile by phone number
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /profiles/{profileID}/services:
     get:
+      description: "Retrieves all services for a specific profile, with filtered data based on the user's tier."
+      tags:
+        - "Services"
+      summary: "Get all services for a specific profile"
       consumes:
-      - application/json
-      description: Retrieves all services for a specific profile, with filtered data
-        based on the user's tier.
-      parameters:
-      - description: Profile ID
-        in: path
-        name: profileID
-        required: true
-        type: string
-      - default: "1"
-        description: Page number
-        in: query
-        name: page
-        type: string
-      - default: "10"
-        description: Number of items per page
-        in: query
-        name: limit
-        type: string
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "profileID"
+          in: "path"
+          description: "Profile ID"
+          required: true
+          type: "string"
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          type: "string"
+          default: "1"
+        - name: "limit"
+          in: "query"
+          description: "Number of items per page"
+          required: false
+          type: "string"
+          default: "10"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessPageResponse-models_ServiceResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get all services for a specific profile
-      tags:
-      - Services
+            $ref: '#/definitions/ErrorResponse'
   /profiles/{profileID}/services/{serviceID}:
     get:
+      description: "Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier."
+      tags:
+        - "Services"
+      summary: "Get a specific service by profile and service ID"
       consumes:
-      - application/json
-      description: Retrieves a service based on the profile ID and service ID, with
-        filtered data based on the user's tier.
-      parameters:
-      - description: Profile ID
-        in: path
-        name: profileID
-        required: true
-        type: string
-      - description: Service ID
-        in: path
-        name: serviceID
-        required: true
-        type: string
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "profileID"
+          in: "path"
+          description: "Profile ID"
+          required: true
+          type: "string"
+        - name: "serviceID"
+          in: "path"
+          description: "Service ID"
+          required: true
+          type: "string"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_Service'
+            $ref: '#/definitions/SuccessPageResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a specific service by profile and service ID
-      tags:
-      - Services
+            $ref: '#/definitions/ErrorResponse'
   /profiles/all:
     get:
-      description: Retrieves all profiles, supports pagination
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: string
-      - description: Items per page
-        in: query
-        name: limit
-        type: string
+      description: "Retrieves all profiles, supports pagination"
+      tags:
+        - "Profiles"
+      summary: "Lists all profiles with pagination, auth required"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          type: "string"
+        - name: "limit"
+          in: "query"
+          description: "Items per page"
+          required: false
+          type: "string"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessPageResponse-models_ProfileResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Lists all profiles with pagination, auth required
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /profiles/list:
     get:
-      description: Retrieves all profiles, supports pagination
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: string
-      - description: Items per page
-        in: query
-        name: limit
-        type: string
+      description: "Retrieves all profiles, supports pagination"
+      tags:
+        - "Profiles"
+      summary: "Lists all active profiles with pagination, no auth required"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          type: "string"
+        - name: "limit"
+          in: "query"
+          description: "Items per page"
+          required: false
+          type: "string"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessPageResponse-models_ProfileResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Lists all active profiles with pagination, no auth required
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /profiles/my:
     get:
-      description: Retrieves the profiles created by the currently authenticated user
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: string
-      - description: Items per page
-        in: query
-        name: limit
-        type: string
+      description: "Retrieves the profiles created by the currently authenticated user"
+      tags:
+        - "Profiles"
+      summary: "Get current user's profiles"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          type: "string"
+        - name: "limit"
+          in: "query"
+          description: "Items per page"
+          required: false
+          type: "string"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessPageResponse-models_ProfileResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get current user's profiles
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /profiles/my/{id}:
     put:
+      description: "User updates his own profile with the provided fields"
+      tags:
+        - "Profiles"
+      summary: "User updates his own profile"
       consumes:
-      - application/json
-      description: User updates his own profile with the provided fields
-      parameters:
-      - description: Profile ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Profile Update Payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.UpdateOwnProfileRequest'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Profile ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Profile Update Payload"
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateOwnProfileRequest'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_ProfileResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: User updates his own profile
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /profiles/search:
     post:
+      description: "Retrieves profiles based on filters provided in the query"
+      tags:
+        - "Profiles"
+      summary: "Search for profiles"
       consumes:
-      - application/json
-      description: Retrieves profiles based on filters provided in the query
-      parameters:
-      - description: Search Filters
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.FindProfilesQuery'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Search Filters"
+          required: true
+          schema:
+            $ref: '#/definitions/FindProfilesQuery'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessPageResponse-models_ProfileResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Search for profiles
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /profiles/update/{id}:
     put:
+      description: "Updates the profile with the given ID, allows updating specific fields"
+      tags:
+        - "Profiles"
+      summary: "Updates an existing profile"
       consumes:
-      - application/json
-      description: Updates the profile with the given ID, allows updating specific
-        fields
-      parameters:
-      - description: Profile ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Profile Update Payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.UpdateProfileRequest'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Profile ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Profile Update Payload"
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateProfileRequest'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_ProfileResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Updates an existing profile
-      tags:
-      - Profiles
+            $ref: '#/definitions/ErrorResponse'
   /reviews/client/update:
     put:
+      description: "Updates the user review for a service if the current user is authorized to do so and within the allowed time limit."
+      tags:
+        - "Services"
+      summary: "Update a client's user review on a profile service"
       consumes:
-      - application/json
-      description: Updates the user review for a service if the current user is authorized
-        to do so and within the allowed time limit.
-      parameters:
-      - description: Service ID
-        in: query
-        name: serviceId
-        required: true
-        type: string
-      - description: User Rating Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreateUserRatingRequest'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "serviceId"
+          in: "query"
+          description: "Service ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "User Rating Request"
+          required: true
+          schema:
+            $ref: '#/definitions/CreateUserRatingRequest'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_ServiceResponse'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "403":
-          description: Forbidden
+          description: "Forbidden"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Update a client's user review on a profile service
-      tags:
-      - Services
+            $ref: '#/definitions/ErrorResponse'
   /reviews/client/visibility:
     put:
+      description: "Set visibility of the profile owner's review based on the client's request. Only available for non-basic tier users."
+      tags:
+        - "Services"
+      summary: "Set visibility of the profile owner's review"
       consumes:
-      - application/json
-      description: Set visibility of the profile owner's review based on the client's
-        request. Only available for non-basic tier users.
-      parameters:
-      - description: Service ID
-        in: query
-        name: serviceId
-        required: true
-        type: string
-      - description: Set Review Visibility Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.SetReviewVisibilityRequest'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "serviceId"
+          in: "query"
+          description: "Service ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Set Review Visibility Request"
+          required: true
+          schema:
+            $ref: '#/definitions/SetReviewVisibilityRequest'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_Service'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "403":
-          description: Forbidden
+          description: "Forbidden"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Set visibility of the profile owner's review
-      tags:
-      - Services
+            $ref: '#/definitions/ErrorResponse'
   /reviews/host/update:
     put:
+      description: "Allows a profile owner to update their review on a client user within the allowed time limit."
+      tags:
+        - "Services"
+      summary: "Update the profile owner's review on a client user"
       consumes:
-      - application/json
-      description: Allows a profile owner to update their review on a client user
-        within the allowed time limit.
-      parameters:
-      - description: Service ID
-        in: query
-        name: serviceId
-        required: true
-        type: string
-      - description: Create Profile Rating Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreateProfileRatingRequest'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "serviceId"
+          in: "query"
+          description: "Service ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Create Profile Rating Request"
+          required: true
+          schema:
+            $ref: '#/definitions/CreateProfileRatingRequest'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_Service'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "403":
-          description: Forbidden
+          description: "Forbidden"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Update the profile owner's review on a client user
-      tags:
-      - Services
+            $ref: '#/definitions/ErrorResponse'
   /reviews/host/visibility:
     put:
+      description: "Allows a profile owner to set user's review visibility. Only available for non-basic tier users."
+      tags:
+        - "Services"
+      summary: "Set visibility of user's review"
       consumes:
-      - application/json
-      description: Allows a profile owner to set user's review visibility. Only available
-        for non-basic tier users.
-      parameters:
-      - description: Service ID
-        in: query
-        name: serviceId
-        required: true
-        type: string
-      - description: Set Review Visibility Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.SetReviewVisibilityRequest'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "serviceId"
+          in: "query"
+          description: "Service ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Set Review Visibility Request"
+          required: true
+          schema:
+            $ref: '#/definitions/SetReviewVisibilityRequest'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_Service'
+            $ref: '#/definitions/SuccessResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "403":
-          description: Forbidden
+          description: "Forbidden"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Set visibility of user's review
-      tags:
-      - Services
+            $ref: '#/definitions/ErrorResponse'
   /services:
     get:
+      description: "Retrieves a paginated list of services with all related information."
+      tags:
+        - "Services"
+      summary: "Get a list of services"
       consumes:
-      - application/json
-      description: Retrieves a paginated list of services with all related information.
-      parameters:
-      - default: "1"
-        description: Page number
-        in: query
-        name: page
-        type: string
-      - default: "10"
-        description: Number of items per page
-        in: query
-        name: limit
-        type: string
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          type: "string"
+          default: "1"
+        - name: "limit"
+          in: "query"
+          description: "Number of items per page"
+          required: false
+          type: "string"
+          default: "10"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessPageResponse-models_ServiceResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a list of services
-      tags:
-      - Services
+            $ref: '#/definitions/ErrorResponse'
     post:
+      description: "Creates a new service between a client user and a profile, including optional ratings for both the profile and the user."
+      tags:
+        - "Services"
+      summary: "Create a new service"
       consumes:
-      - application/json
-      description: Creates a new service between a client user and a profile, including
-        optional ratings for both the profile and the user.
-      parameters:
-      - description: Create Service Request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreateServiceRequest'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Create Service Request"
+          required: true
+          schema:
+            $ref: '#/definitions/CreateServiceRequest'
       responses:
         "201":
-          description: Created
+          description: "Created"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_ServiceResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Create a new service
-      tags:
-      - Services
+            $ref: '#/definitions/ErrorResponse'
   /users:
     get:
+      description: "Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required."
+      tags:
+        - "Users"
+      summary: "Get a user by ID, Telegram user ID, or phone"
       consumes:
-      - application/json
-      description: Retrieve a user by providing their user ID, Telegram user ID, or
-        phone number. At least one of these fields is required.
-      parameters:
-      - description: User ID
-        in: query
-        name: id
-        type: string
-      - description: Telegram User ID
-        in: query
-        name: telegramUserId
-        type: integer
-      - description: Phone number
-        in: query
-        name: phone
-        type: string
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "query"
+          description: "User ID"
+          required: false
+          type: "string"
+        - name: "telegramUserId"
+          in: "query"
+          description: "Telegram User ID"
+          required: false
+          type: "integer"
+        - name: "phone"
+          in: "query"
+          description: "Phone number"
+          required: false
+          type: "string"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_UserResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a user by ID, Telegram user ID, or phone
-      tags:
-      - Users
+            $ref: '#/definitions/ErrorResponse'
   /users/{id}:
     delete:
-      description: Allows an authorized user to delete another user by their ID, with
-        role-based restrictions.
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
+      description: "Allows an authorized user to delete another user by their ID, with role-based restrictions."
+      tags:
+        - "Users"
+      summary: "Delete a user by ID"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "User ID"
+          required: true
+          type: "string"
       responses:
         "204":
-          description: No Content
+          description: "No Content"
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "403":
-          description: Forbidden
+          description: "Forbidden"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Delete a user by ID
-      tags:
-      - Users
+            $ref: '#/definitions/ErrorResponse'
     put:
+      description: "Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status."
+      tags:
+        - "Users"
+      summary: "Update a user's information (privileged access)"
       consumes:
-      - application/json
-      description: Allows privileged users to update user details, including Telegram
-        ID, verification status, tier, and active status.
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: User Update Payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.UpdateUserPrivileged'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "User ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "User Update Payload"
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateUserPrivileged'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_UserResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Update a user's information (privileged access)
-      tags:
-      - Users
+            $ref: '#/definitions/ErrorResponse'
   /users/assign-role:
     post:
+      description: "Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners."
+      tags:
+        - "Users"
+      summary: "Assign a role to a user"
       consumes:
-      - application/json
-      description: Allows admins to assign roles to users. Only admin can assign roles,
-        and cannot assign roles to other admins or owners.
-      parameters:
-      - description: Role assignment details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.AssignRole'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Role assignment details"
+          required: true
+          schema:
+            $ref: '#/definitions/AssignRole'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_UserResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "403":
-          description: Forbidden
+          description: "Forbidden"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Assign a role to a user
-      tags:
-      - Users
+            $ref: '#/definitions/ErrorResponse'
   /users/me:
     get:
+      description: "Retrieves the profile of the currently authenticated user"
+      tags:
+        - "Users"
+      summary: "Get current authenticated user"
       consumes:
-      - application/json
-      description: Retrieves the profile of the currently authenticated user
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_UserResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "401":
-          description: Unauthorized
+          description: "Unauthorized"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get current authenticated user
-      tags:
-      - Users
+            $ref: '#/definitions/ErrorResponse'
     put:
+      description: "Allows the current user to update their own profile, including name, phone, and avatar."
+      tags:
+        - "Users"
+      summary: "Update the current user's information"
       consumes:
-      - application/json
-      description: Allows the current user to update their own profile, including
-        name, phone, and avatar.
-      parameters:
-      - description: User Update Payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.UpdateUser'
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "User Update Payload"
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateUser'
       responses:
         "200":
-          description: OK
+          description: "OK"
           schema:
-            $ref: '#/definitions/models.SuccessResponse-models_UserResponse'
+            $ref: '#/definitions/SuccessPageResponse'
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "502":
-          description: Bad Gateway
+          description: "Bad Gateway"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Update the current user's information
-      tags:
-      - Users
+            $ref: '#/definitions/ErrorResponse'
   /users/self:
     delete:
-      description: Allows the current user to delete their own account.
+      description: "Allows the current user to delete their own account."
+      tags:
+        - "Users"
+      summary: "Delete the currently authenticated user"
+      consumes:
+        - "application/json"
       produces:
-      - application/json
+        - "application/json"
       responses:
         "204":
-          description: No Content
+          description: "No Content"
         "400":
-          description: Bad Request
+          description: "Bad Request"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/ErrorResponse'
         "404":
-          description: Not Found
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Delete the currently authenticated user
-      tags:
-      - Users
-swagger: "2.0"
+            $ref: '#/definitions/ErrorResponse'
+
+definitions:
+  AssignRole:
+    type: "object"
+    required:
+      - "id"
+      - "role"
+    properties:
+      id:
+        type: "string"
+      role:
+        type: "string"
+        enum:
+          - "moderator"
+          - "admin"
+
+  BotSignInInput:
+    type: "object"
+    required:
+      - "telegramUserId"
+    properties:
+      telegramUserId:
+        type: "string"
+
+  BotSignUpInput:
+    type: "object"
+    required:
+      - "name"
+      - "phone"
+      - "telegramUserId"
+    properties:
+      name:
+        type: "string"
+        minLength: 5
+      phone:
+        type: "string"
+        minLength: 11
+        maxLength: 11
+      telegramUserId:
+        type: "string"
+
+  CreateBodyArtRequest:
+    type: "object"
+    required:
+      - "bodyArtId"
+    properties:
+      bodyArtId:
+        type: "integer"
+
+  CreatePhotoRequest:
+    type: "object"
+    required:
+      - "url"
+    properties:
+      url:
+        type: "string"
+
+  CreateProfileOption:
+    type: "object"
+    required:
+      - "profileTagId"
+    properties:
+      comment:
+        type: "string"
+        maxLength: 50
+      price:
+        type: "integer"
+        minimum: 0
+      profileTagId:
+        type: "integer"
+
+  CreateProfileRatingRequest:
+    type: "object"
+    properties:
+      ratedProfileTags:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreateRatedProfileTagRequest'
+      review:
+        type: "string"
+      score:
+        type: "integer"
+
+  CreateProfileRequest:
+    type: "object"
+    required:
+      - "age"
+      - "bio"
+      - "bust"
+      - "cityId"
+      - "contactPhone"
+      - "contactTG"
+      - "ethnosId"
+      - "height"
+      - "name"
+      - "phone"
+      - "photos"
+      - "profileOptions"
+      - "weight"
+    properties:
+      age:
+        type: "integer"
+      bio:
+        type: "string"
+      bodyArts:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreateBodyArtRequest'
+      bodyTypeId:
+        type: "integer"
+      bust:
+        type: "number"
+      cityId:
+        type: "integer"
+      contactPhone:
+        type: "string"
+      contactTG:
+        type: "string"
+      contactWA:
+        type: "string"
+      ethnosId:
+        type: "integer"
+      hairColorId:
+        type: "integer"
+      height:
+        type: "integer"
+      intimateHairCutId:
+        type: "integer"
+      latitude:
+        type: "string"
+      longitude:
+        type: "string"
+      name:
+        type: "string"
+      phone:
+        type: "string"
+      photos:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreatePhotoRequest'
+      priceCarContact:
+        type: "integer"
+        description: "PriceCarNightRatio float64 `json:\"priceCarNightRatio,omitempty\"`"
+      priceCarHour:
+        type: "integer"
+      priceInHouseContact:
+        type: "integer"
+        description: "PriceInHouseNightRatio float64 `json:\"priceInHouseNightRatio,omitempty\"`"
+      priceInHouseHour:
+        type: "integer"
+      priceSaunaContact:
+        type: "integer"
+        description: "PrinceSaunaNightRatio float64 `json:\"princeSaunaNightRatio,omitempty\"`"
+      priceSaunaHour:
+        type: "integer"
+      priceVisitContact:
+        type: "integer"
+        description: "PriceVisitNightRatio float64 `json:\"priceVisitNightRatio,omitempty\"`"
+      priceVisitHour:
+        type: "integer"
+      profileOptions:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreateProfileOption'
+      weight:
+        type: "integer"
+
+  CreateRatedProfileTagRequest:
+    type: "object"
+    properties:
+      tagId:
+        type: "integer"
+      type:
+        type: "string"
+
+  CreateRatedUserTagRequest:
+    type: "object"
+    properties:
+      tagId:
+        type: "integer"
+      type:
+        type: "string"
+
+  CreateServiceRequest:
+    type: "object"
+    properties:
+      clientUserLatitude:
+        type: "number"
+      clientUserLongitude:
+        type: "number"
+      profileId:
+        type: "string"
+      profileOwnerId:
+        type: "string"
+      profileRating:
+        $ref: '#/definitions/CreateProfileRatingRequest'
+      profileUserLatitude:
+        type: "number"
+      profileUserLongitude:
+        type: "number"
+      userId:
+        type: "string"
+      userRating:
+        $ref: '#/definitions/CreateUserRatingRequest'
+
+  CreateUserRatingRequest:
+    type: "object"
+    properties:
+      ratedUserTags:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreateRatedUserTagRequest'
+      review:
+        type: "string"
+      score:
+        type: "integer"
+
+  ErrorResponse:
+    description: "This model is returned when an API call fails due to an error."
+    type: "object"
+    properties:
+      message:
+        type: "string"
+        description: |
+          Message provides a human-readable description of the error that occurred.
+          Example: "Invalid request payload"
+      status:
+        type: "string"
+        description: |
+          Status represents the status of the response, usually set to "error".
+          Example: "error"
+
+  FindProfilesQuery:
+    type: "object"
+    properties:
+      active:
+        type: "boolean"
+      age:
+        type: "integer"
+      bodyArtIds:
+        type: "array"
+        items:
+          type: "integer"
+      bodyTypeId:
+        type: "integer"
+      bust:
+        type: "number"
+      cityId:
+        type: "integer"
+      ethnosId:
+        type: "integer"
+      hairColorId:
+        type: "integer"
+      height:
+        type: "integer"
+      intimateHairCutId:
+        type: "integer"
+      latitude:
+        type: "string"
+      longitude:
+        type: "string"
+      moderated:
+        type: "boolean"
+      name:
+        type: "string"
+      phone:
+        type: "string"
+      priceCarContactMax:
+        type: "integer"
+      priceCarContactMin:
+        type: "integer"
+      priceCarHourMax:
+        type: "integer"
+      priceCarHourMin:
+        type: "integer"
+      priceInHouseContactMax:
+        type: "integer"
+      priceInHouseContactMin:
+        type: "integer"
+      priceInHouseHourMax:
+        type: "integer"
+      priceInHouseHourMin:
+        type: "integer"
+      priceSaunaContactMax:
+        type: "integer"
+      priceSaunaContactMin:
+        type: "integer"
+      priceSaunaHourMax:
+        type: "integer"
+      priceSaunaHourMin:
+        type: "integer"
+      priceVisitContactMax:
+        type: "integer"
+      priceVisitContactMin:
+        type: "integer"
+      priceVisitHourMax:
+        type: "integer"
+      priceVisitHourMin:
+        type: "integer"
+      profileTagIds:
+        type: "array"
+        items:
+          type: "integer"
+      verified:
+        type: "boolean"
+      weight:
+        type: "integer"
+
+  Payment:
+    type: "object"
+    properties:
+      amount:
+        type: "number"
+      createdAt:
+        type: "string"
+      id:
+        type: "string"
+      paymentDate:
+        type: "string"
+        description: "date at which payment is completed"
+      status:
+        type: "string"
+      type:
+        type: "string"
+        description: "type: subscription, one_hour, three_hours, twelve_hours, two_days, one_week"
+      updatedAt:
+        type: "string"
+      userID:
+        type: "string"
+
+  PhotoResponse:
+    type: "object"
+    properties:
+      approved:
+        type: "boolean"
+      deleted:
+        type: "boolean"
+      disabled:
+        type: "boolean"
+      url:
+        type: "string"
+
+  ProfileBodyArtResponse:
+    type: "object"
+    properties:
+      bodyArtId:
+        type: "integer"
+      profileId:
+        type: "string"
+
+  ProfileOptionResponse:
+    type: "object"
+    properties:
+      comment:
+        type: "string"
+      price:
+        type: "integer"
+      profileTag:
+        $ref: '#/definitions/ProfileTagResponse'
+
+  ProfileRating:
+    type: "object"
+    properties:
+      createdAt:
+        type: "string"
+      id:
+        type: "string"
+      profileID:
+        type: "string"
+      ratedProfileTags:
+        type: "array"
+        items:
+          $ref: '#/definitions/RatedProfileTag'
+      review:
+        type: "string"
+      reviewTextVisible:
+        type: "boolean"
+      score:
+        type: "integer"
+      serviceID:
+        type: "string"
+      updatedAt:
+        type: "string"
+      updatedBy:
+        type: "string"
+
+  ProfileRatingResponse:
+    type: "object"
+    properties:
+      createdAt:
+        type: "string"
+      id:
+        type: "string"
+      profileId:
+        type: "string"
+      ratedProfileTags:
+        type: "array"
+        items:
+          $ref: '#/definitions/RatedProfileTagResponse'
+      review:
+        type: "string"
+      reviewTextVisible:
+        type: "boolean"
+      score:
+        type: "integer"
+      serviceId:
+        type: "string"
+      updatedAt:
+        type: "string"
+      updatedBy:
+        type: "string"
+
+  ProfileResponse:
+    type: "object"
+    properties:
+      active:
+        type: "boolean"
+      addressLatitude:
+        type: "string"
+      addressLongitude:
+        type: "string"
+      age:
+        type: "integer"
+      bio:
+        type: "string"
+      bodyArts:
+        type: "array"
+        items:
+          $ref: '#/definitions/ProfileBodyArtResponse'
+      bodyTypeId:
+        type: "integer"
+      bust:
+        type: "number"
+      cityId:
+        type: "integer"
+      contactPhone:
+        type: "string"
+      contactTG:
+        type: "string"
+      contactWA:
+        type: "string"
+      createdAt:
+        type: "string"
+      ethnosId:
+        type: "integer"
+      hairColorId:
+        type: "integer"
+      height:
+        type: "integer"
+      id:
+        type: "string"
+      intimateHairCutId:
+        type: "integer"
+      moderated:
+        type: "boolean"
+      moderatedAt:
+        type: "string"
+      moderatedBy:
+        type: "string"
+      name:
+        type: "string"
+      phone:
+        type: "string"
+      photos:
+        type: "array"
+        items:
+          $ref: '#/definitions/PhotoResponse'
+      priceCarContact:
+        type: "integer"
+      priceCarHour:
+        type: "integer"
+      priceCarNightRatio:
+        type: "number"
+      priceInHouseContact:
+        type: "integer"
+      priceInHouseHour:
+        type: "integer"
+      priceInHouseNightRatio:
+        type: "number"
+      priceSaunaContact:
+        type: "integer"
+      priceSaunaHour:
+        type: "integer"
+      priceVisitContact:
+        type: "integer"
+      priceVisitHour:
+        type: "integer"
+      priceVisitNightRatio:
+        type: "number"
+      princeSaunaNightRatio:
+        type: "number"
+      profileOptions:
+        type: "array"
+        items:
+          $ref: '#/definitions/ProfileOptionResponse'
+      services:
+        type: "array"
+        items:
+          $ref: '#/definitions/ServiceResponse'
+      updatedBy:
+        type: "string"
+      userId:
+        type: "string"
+      verified:
+        type: "boolean"
+      verifiedAt:
+        type: "string"
+      verifiedBy:
+        type: "string"
+      weight:
+        type: "integer"
+
+  ProfileTag:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+
+  ProfileTagResponse:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+
+  RatedProfileTag:
+    type: "object"
+    properties:
+      profileTag:
+        $ref: '#/definitions/ProfileTag'
+      profileTagID:
+        type: "integer"
+      ratingID:
+        type: "string"
+      type:
+        type: "string"
+
+  RatedProfileTagResponse:
+    type: "object"
+    properties:
+      profileTag:
+        $ref: '#/definitions/ProfileTagResponse'
+      type:
+        type: "string"
+
+  RatedUserTag:
+    type: "object"
+    properties:
+      ratingID:
+        type: "string"
+      type:
+        type: "string"
+      userTag:
+        $ref: '#/definitions/UserTag'
+      userTagID:
+        type: "integer"
+
+  RatedUserTagResponse:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      userTag:
+        $ref: '#/definitions/UserTagResponse'
+
+  Service:
+    type: "object"
+    properties:
+      clientUserID:
+        type: "string"
+      clientUserLat:
+        type: "string"
+      clientUserLon:
+        type: "string"
+      clientUserRating:
+        $ref: '#/definitions/UserRating'
+        description: "profile owner's review on client"
+      clientUserRatingID:
+        type: "string"
+      createdAt:
+        type: "string"
+      distanceBetweenUsers:
+        type: "number"
+      id:
+        type: "string"
+      profileID:
+        type: "string"
+      profileOwnerID:
+        type: "string"
+      profileRating:
+        $ref: '#/definitions/ProfileRating'
+        description: "client's review on profile"
+      profileRatingID:
+        type: "string"
+      profileUserLat:
+        type: "string"
+      profileUserLon:
+        type: "string"
+      trustedDistance:
+        type: "boolean"
+      updatedAt:
+        type: "string"
+      updatedBy:
+        type: "string"
+
+  ServiceResponse:
+    type: "object"
+    properties:
+      clientUserId:
+        type: "string"
+      clientUserRating:
+        $ref: '#/definitions/UserRatingResponse'
+      clientUserRatingId:
+        type: "string"
+      createdAt:
+        type: "string"
+      distanceBetweenUsers:
+        type: "number"
+      id:
+        type: "string"
+      profileId:
+        type: "string"
+      profileOwnerId:
+        type: "string"
+      profileRating:
+        $ref: '#/definitions/ProfileRatingResponse'
+      profileRatingId:
+        type: "string"
+      trustedDistance:
+        type: "boolean"
+      updatedAt:
+        type: "string"
+      updatedBy:
+        type: "string"
+
+  SetReviewVisibilityRequest:
+    type: "object"
+    properties:
+      visible:
+        type: "boolean"
+
+  SignInInput:
+    type: "object"
+    required:
+      - "password"
+      - "phone"
+    properties:
+      password:
+        type: "string"
+        minLength: 8
+      phone:
+        type: "string"
+        minLength: 11
+        maxLength: 11
+
+  SignUpInput:
+    type: "object"
+    required:
+      - "password"
+      - "passwordConfirm"
+      - "phone"
+    properties:
+      password:
+        type: "string"
+        minLength: 8
+      passwordConfirm:
+        type: "string"
+        minLength: 8
+      phone:
+        type: "string"
+        minLength: 11
+        maxLength: 11
+
+  SuccessResponse:
+    type: "object"
+    properties:
+      data:
+        type: "object"
+        description: |
+          Data contains the result of the successful operation. It can be one of the following types:
+          - UserResponse
+          - ProfileResponse
+          - ServiceResponse
+          - Payment
+          - string
+      status:
+        type: "string"
+        description: |
+          Status represents the status of the response, typically set to "success".
+          Example: "success"
+    required:
+      - "data"
+      - "status"
+
+  SuccessPageResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          type: "object"
+          description: |
+            Each item in the data array can be one of the following types:
+            - UserResponse
+            - ProfileResponse
+            - ServiceResponse
+            - Payment
+            - string
+      limit:
+        type: "integer"
+        description: |
+          Limit specifies the maximum number of items that can be returned in a single page.
+          Example: 10
+      page:
+        type: "integer"
+        description: |
+          Page specifies the current page number in the paginated result set.
+          Example: 1
+      results:
+        type: "integer"
+        description: |
+          Results specifies the number of items returned in the current page.
+          Example: 10
+      status:
+        type: "string"
+        description: |
+          Status represents the status of the response, typically set to "success".
+          Example: "success"
+    required:
+      - "data"
+      - "limit"
+      - "page"
+      - "results"
+      - "status"
+
+  TokenResponse:
+    description: "This model is used to return an access token after a user logs in or when a token is refreshed."
+    type: "object"
+    properties:
+      access_token:
+        type: "string"
+        description: |
+          AccessToken is the token that allows the user to authenticate subsequent API requests.
+          Example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      status:
+        type: "string"
+        description: |
+          Status represents the status of the response, typically set to "success".
+          Example: "success"
+
+  UpdateOwnProfileRequest:
+    type: "object"
+    properties:
+      active:
+        type: "boolean"
+      age:
+        type: "integer"
+      bio:
+        type: "string"
+      bodyArts:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreateBodyArtRequest'
+      bodyTypeId:
+        type: "integer"
+      bust:
+        type: "number"
+      cityId:
+        type: "integer"
+      contactPhone:
+        type: "string"
+      contactTG:
+        type: "string"
+      contactWA:
+        type: "string"
+      ethnosId:
+        type: "integer"
+      hairColorId:
+        type: "integer"
+      height:
+        type: "integer"
+      intimateHairCutId:
+        type: "integer"
+      latitude:
+        type: "string"
+      longitude:
+        type: "string"
+      name:
+        type: "string"
+      phone:
+        type: "string"
+      photos:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreatePhotoRequest'
+      priceCarContact:
+        type: "integer"
+      priceCarHour:
+        type: "integer"
+      priceCarNightRatio:
+        type: "number"
+      priceInHouseContact:
+        type: "integer"
+      priceInHouseHour:
+        type: "integer"
+      priceInHouseNightRatio:
+        type: "number"
+      priceSaunaContact:
+        type: "integer"
+      priceSaunaHour:
+        type: "integer"
+      priceVisitContact:
+        type: "integer"
+      priceVisitHour:
+        type: "integer"
+      priceVisitNightRatio:
+        type: "number"
+      princeSaunaNightRatio:
+        type: "number"
+      profileOptions:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreateProfileOption'
+      weight:
+        type: "integer"
+
+  UpdateProfileRequest:
+    type: "object"
+    properties:
+      active:
+        type: "boolean"
+      bio:
+        type: "string"
+      moderated:
+        type: "boolean"
+      name:
+        type: "string"
+      photos:
+        type: "array"
+        items:
+          $ref: '#/definitions/CreatePhotoRequest'
+      verified:
+        type: "boolean"
+
+  UpdateUser:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        minLength: 3
+        maxLength: 20
+      phone:
+        type: "string"
+        minLength: 11
+        maxLength: 11
+      photo:
+        type: "string"
+
+  UpdateUserPrivileged:
+    type: "object"
+    properties:
+      active:
+        type: "boolean"
+      name:
+        type: "string"
+        minLength: 3
+        maxLength: 20
+      phone:
+        type: "string"
+        minLength: 11
+        maxLength: 11
+      photo:
+        type: "string"
+      telegramUserId:
+        type: "string"
+        minLength: 6
+      tier:
+        type: "string"
+        enum:
+          - "basic"
+          - "expert"
+          - "guru"
+      verified:
+        type: "boolean"
+
+  UserRating:
+    type: "object"
+    properties:
+      createdAt:
+        type: "string"
+      id:
+        type: "string"
+      ratedUserTags:
+        type: "array"
+        items:
+          $ref: '#/definitions/RatedUserTag'
+      review:
+        type: "string"
+      reviewTextVisible:
+        type: "boolean"
+      score:
+        type: "integer"
+      serviceID:
+        type: "string"
+      updatedAt:
+        type: "string"
+      updatedBy:
+        type: "string"
+      userID:
+        type: "string"
+
+  UserRatingResponse:
+    type: "object"
+    properties:
+      createdAt:
+        type: "string"
+      id:
+        type: "string"
+      ratedUserTags:
+        type: "array"
+        items:
+          $ref: '#/definitions/RatedUserTagResponse'
+      review:
+        type: "string"
+      reviewTextVisible:
+        type: "boolean"
+      score:
+        type: "integer"
+      serviceId:
+        type: "string"
+      updatedAt:
+        type: "string"
+      updatedBy:
+        type: "string"
+      userId:
+        type: "string"
+
+  UserResponse:
+    type: "object"
+    properties:
+      active:
+        type: "boolean"
+      created_at:
+        type: "string"
+      id:
+        type: "string"
+      name:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "string"
+      photo:
+        type: "string"
+      role:
+        type: "string"
+      telegramUserId:
+        type: "integer"
+      tier:
+        type: "string"
+      updated_at:
+        type: "string"
+      verified:
+        type: "boolean"
+
+  UserTag:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+
+  UserTagResponse:
+    type: "object"
+    properties:
+      name:
+        type: "string"
