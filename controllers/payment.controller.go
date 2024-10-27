@@ -105,7 +105,7 @@ func (pc *PaymentController) GetPaymentHistory(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		int	false	"Page number"		default(1)
 //	@Param			limit	query		int	false	"Limit per page"	default(10)
-//	@Success		200		{object}	SuccessResponse[Payment]
+//	@Success		200		{object}	SuccessResponse[Payment[]]
 //	@Failure		500		{object}	ErrorResponse
 //	@Router			/payments [get]
 func (pc *PaymentController) ListPayments(ctx *gin.Context) {
