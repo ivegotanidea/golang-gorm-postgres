@@ -568,6 +568,35 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
 }
 
+// FindProfileByID godoc
+//
+//	@Summary		Find a profile by ID
+//	@Description	Retrieves a profile based on the id
+//	@Tags			Profiles
+//	@Produce		json
+//	@Param			id	path		string	true	"Profile ID"
+//	@Success		200		{object}	SuccessResponse[ProfileResponse]
+//	@Failure		404		{object}	ErrorResponse
+//	@Router			/profiles/{id} [get]
+func (pc *ProfileController) FindProfileByID(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	var profile Profile
+
+	result := pc.DB.Preload("Photos").
+		Preload("BodyArts").
+		Preload("ProfileOptions.ProfileTag").
+		First(&profile, "id = ?", id)
+
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "No profile with that title exists"})
+		return
+	}
+
+	profileResponse := utils.MapProfile(&profile)
+	ctx.JSON(http.StatusOK, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
+}
+
 // FindProfileByPhone godoc
 //
 //	@Summary		Find a profile by phone number

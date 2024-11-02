@@ -36,5 +36,7 @@ func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 	// todo: should have rate limiter set
 	router.GET("/:phone", middleware.DeserializeUser(), pc.profileController.FindProfileByPhone)
 
+	router.GET("/:id", middleware.DeserializeUser(), pc.profileController.FindProfileByID)
+
 	router.DELETE("/:id", middleware.DeserializeUser(), pc.profileController.DeleteProfile)
 }

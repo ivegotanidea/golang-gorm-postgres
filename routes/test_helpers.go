@@ -20,6 +20,14 @@ import (
 	"testing"
 )
 
+var randomPhotos = []string{
+	"https://w0.peakpx.com/wallpaper/268/995/HD-wallpaper-nice-girl-beauty-brown-hair-cute-denim-girl-jeans-pretty.jpg",
+	"https://cdn2.stylecraze.com/wp-content/uploads/2013/10/Most-Beautiful-Indian-Girls.jpg",
+	"https://cdn2.stylecraze.com/wp-content/uploads/2013/10/3.-Manushi-Chhillar.jpg",
+	"https://www.caravan.kz/wp-content/uploads/images/635838.jpg",
+	"https://www.m24.ru/b/d/nBkSUhL2hFYhm8yyJr6BrNOp2Z3z8Zj21iDEh_fH_nKUPXuaDyXTjHou4MVO6BCVoZKf9GqVe5Q_CPawk214LyWK9G1N5ho=rX-X0R4iFr289CvBvD6lVQ.jpg",
+}
+
 type UserResponse struct {
 	Status string              `json:"status"`
 	Data   models.UserResponse `json:"data"`
@@ -132,7 +140,7 @@ func generateCreateProfileRequest(
 	bio := "Hey :wave: My name is Lola and I'm 18 years old. I read a lot and like cooking."
 
 	photosPayload := []models.CreatePhotoRequest{
-		{URL: "https://w0.peakpx.com/wallpaper/268/995/HD-wallpaper-nice-girl-beauty-brown-hair-cute-denim-girl-jeans-pretty.jpg"},
+		{URL: randomPhotos[random.IntN(len(randomPhotos))]},
 	}
 
 	optionsPayload := []models.CreateProfileOption{
