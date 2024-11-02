@@ -10,4 +10,6 @@ applied. If it's not ok for you, you need to:
 
 > docker volume rm golang-gorm-postgres_postgres
 
-The command clears docker volume, then you can apply db migrations.
+The command clears docker volume, then you can apply db migrations.<br>
+And this is how you make a dump:
+> pg_dump -h localhost -p 6500 -U postgres -f data_backup.sql golang-gorm
