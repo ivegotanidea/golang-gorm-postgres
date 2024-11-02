@@ -384,32 +384,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /profiles/{phone}:
-    get:
-      description: "Retrieves a profile based on the phone number provided"
-      tags:
-        - "Profiles"
-      summary: "Find a profile by phone number"
-      parameters:
-        - name: "phone"
-          in: "path"
-          description: "Phone Number"
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
-        '404':
-          description: "Not Found"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /profiles/{profileID}/services:
     get:
       description: "Retrieves all services for a specific profile, with filtered data based on the user's tier."
