@@ -519,6 +519,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: "sex"
+          in: "query"
+          description: "Sex"
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: "OK"

@@ -690,6 +690,7 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
+	var sex = ctx.DefaultQuery("sex", "female")
 
 	intPage, _ := strconv.Atoi(page)
 	intLimit, _ := strconv.Atoi(limit)
@@ -701,6 +702,7 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		Preload("BodyArts").
 		Preload("ProfileOptions.ProfileTag").
 		Where("active = ?", true).
+		Where("sex = ?", sex).
 		Limit(intLimit).Offset(offset)
 
 	results := dbQuery.Find(&profiles)

@@ -11,7 +11,7 @@ const docTemplate = `{
         "version": "1.0.0",
         "contact": {}
     },
-    "host": "api.yourdomain.com",
+    "host": "localhost",
     "basePath": "/v1",
     "schemes": [
         "https"

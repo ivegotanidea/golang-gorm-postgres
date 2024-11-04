@@ -2,6 +2,7 @@ package utils
 
 import (
 	. "github.com/ivegotanidea/golang-gorm-postgres/models"
+	"strings"
 )
 
 func MapBodyArts(bodyArts []ProfileBodyArt) []ProfileBodyArtResponse {
@@ -16,10 +17,20 @@ func MapBodyArts(bodyArts []ProfileBodyArt) []ProfileBodyArtResponse {
 }
 
 func MapPhotos(photos []Photo) []PhotoResponse {
+
+	baseUrl := "http://fmnow-qiz8dar.com"
+
 	photoResponses := make([]PhotoResponse, len(photos))
 	for i, photo := range photos {
+
+		photoUrl := photo.URL
+
+		if strings.HasPrefix(photo.URL, "/") {
+			photoUrl = baseUrl + photo.URL
+		}
+
 		photoResponses[i] = PhotoResponse{
-			URL:      photo.URL,
+			URL:      photoUrl,
 			Disabled: photo.Disabled,
 			Approved: photo.Approved,
 			Deleted:  photo.Deleted,
