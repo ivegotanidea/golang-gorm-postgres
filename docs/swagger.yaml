@@ -940,7 +940,7 @@ paths:
           description: "User Update Payload"
           required: true
           schema:
-            $ref: '#/definitions/UpdateUserPrivileged'
+            $ref: '#/definitions/UpdateUserPrivilegedRequest'
       responses:
         "200":
           description: "OK"
@@ -1928,7 +1928,7 @@ definitions:
       photo:
         type: "string"
 
-  UpdateUserPrivileged:
+  UpdateUserPrivilegedRequest:
     type: "object"
     properties:
       active:

@@ -424,7 +424,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		string					true	"User ID"
-//	@Param			body	body		UpdateUserPrivileged	true	"User Update Payload"
+//	@Param			body	body		UpdateUserPrivilegedRequest	true	"User Update Payload"
 //	@Success		200		{object}	SuccessResponse[UserResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
@@ -434,7 +434,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 
 	// Parse and bind the payload from the request
-	var payload *UpdateUserPrivileged
+	var payload *UpdateUserPrivilegedRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, ErrorResponse{
 			Status:  "error",

@@ -1449,7 +1449,7 @@
                         "description": "User Update Payload",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UpdateUserPrivileged"
+                            "$ref": "#/definitions/UpdateUserPrivilegedRequest"
                         }
                     }
                 ],
@@ -2824,7 +2824,7 @@
                 }
             }
         },
-        "UpdateUserPrivileged": {
+        "UpdateUserPrivilegedRequest": {
             "type": "object",
             "properties": {
                 "active": {

@@ -1538,7 +1538,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UpdateUserPrivileged"
+                            "$ref": "#/definitions/UpdateUserPrivilegedRequest"
                         }
                     }
                 ],
@@ -2953,7 +2953,7 @@ const docTemplate = `{
                 }
             }
         },
-        "UpdateUserPrivileged": {
+        "UpdateUserPrivilegedRequest": {
             "type": "object",
             "properties": {
                 "active": {

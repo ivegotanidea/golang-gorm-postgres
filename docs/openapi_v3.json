@@ -2023,7 +2023,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateUserPrivileged"
+                                "$ref": "#/components/schemas/UpdateUserPrivilegedRequest"
                             }
                         }
                     }
@@ -3195,7 +3195,7 @@
                     }
                 }
             },
-            "UpdateUserPrivileged": {
+            "UpdateUserPrivilegedRequest": {
                 "type": "object",
                 "properties": {
                     "active": {

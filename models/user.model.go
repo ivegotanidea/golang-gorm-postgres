@@ -66,7 +66,7 @@ type UserResponse struct {
 	UpdatedAt      time.Time `json:"updated_at"`
 }
 
-type UpdateUserPrivileged struct {
+type UpdateUserPrivilegedRequest struct {
 	Name           string `json:"name,omitempty" validate:"omitempty,min=3,max=20"`
 	Phone          string `json:"phone,omitempty" validate:"omitempty,min=11,max=11"`
 	TelegramUserId string `json:"telegramUserId,omitempty" validate:"omitempty,min=6"`

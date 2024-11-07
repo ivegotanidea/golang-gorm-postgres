@@ -1057,7 +1057,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateUserPrivileged'
+              $ref: '#/components/schemas/UpdateUserPrivilegedRequest'
       responses:
         '200':
           description: "OK"
@@ -2076,7 +2076,7 @@ components:
         photo:
           type: string
 
-    UpdateUserPrivileged:
+    UpdateUserPrivilegedRequest:
       type: object
       properties:
         active:

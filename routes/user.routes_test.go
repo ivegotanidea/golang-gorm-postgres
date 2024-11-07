@@ -853,7 +853,7 @@ func TestUserRoutes(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		payload := &models.UpdateUserPrivileged{
+		payload := &models.UpdateUserPrivilegedRequest{
 			Avatar: "https://jollycontrarian.com/images/6/6c/Rickroll.jpg",
 		}
 
@@ -886,7 +886,7 @@ func TestUserRoutes(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		payload := &models.UpdateUserPrivileged{
+		payload := &models.UpdateUserPrivilegedRequest{
 			Avatar: "https://jollycontrarian.com/images/6/6c/Rickroll.jpg",
 		}
 
@@ -919,7 +919,7 @@ func TestUserRoutes(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		payload := &models.UpdateUserPrivileged{
+		payload := &models.UpdateUserPrivilegedRequest{
 			Active: false,
 		}
 
@@ -966,7 +966,7 @@ func TestUserRoutes(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		payload := &models.UpdateUserPrivileged{
+		payload := &models.UpdateUserPrivilegedRequest{
 			Verified: true,
 		}
 
@@ -1013,7 +1013,7 @@ func TestUserRoutes(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		payload := &models.UpdateUserPrivileged{
+		payload := &models.UpdateUserPrivilegedRequest{
 			Tier: "expert",
 		}
 
@@ -1080,7 +1080,7 @@ func TestUserRoutes(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		payload := &models.UpdateUserPrivileged{
+		payload := &models.UpdateUserPrivilegedRequest{
 			Tier: "guru",
 		}
 
