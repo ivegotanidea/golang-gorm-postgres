@@ -214,12 +214,14 @@ paths:
           required: true
           schema:
             type: string
+            format: date-time
         - name: "end"
           in: "query"
           description: "End Date in RFC3339 format"
           required: true
           schema:
             type: string
+            format: date-time
       responses:
         '200':
           description: "OK"
@@ -282,7 +284,7 @@ paths:
               $ref: '#/components/schemas/Payment'
       responses:
         '200':
-          description: "payment updated"
+          description: "Payment updated"
           content:
             application/json:
               schema:
@@ -318,7 +320,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '400':
           description: "Bad Request"
           content:
@@ -377,7 +379,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '404':
           description: "Not Found"
           content:
@@ -402,15 +404,15 @@ paths:
           description: "Page number"
           required: false
           schema:
-            type: string
-            default: "1"
+            type: integer
+            default: 1
         - name: "limit"
           in: "query"
           description: "Number of items per page"
           required: false
           schema:
-            type: string
-            default: "10"
+            type: integer
+            default: 10
       responses:
         '200':
           description: "OK"
@@ -480,13 +482,15 @@ paths:
           description: "Page number"
           required: false
           schema:
-            type: string
+            type: integer
+            default: 1
         - name: "limit"
           in: "query"
           description: "Items per page"
           required: false
           schema:
-            type: string
+            type: integer
+            default: 10
       responses:
         '200':
           description: "OK"
@@ -512,13 +516,15 @@ paths:
           description: "Page number"
           required: false
           schema:
-            type: string
+            type: integer
+            default: 1
         - name: "limit"
           in: "query"
           description: "Items per page"
           required: false
           schema:
-            type: string
+            type: integer
+            default: 10
         - name: "sex"
           in: "query"
           description: "Sex"
@@ -550,13 +556,15 @@ paths:
           description: "Page number"
           required: false
           schema:
-            type: string
+            type: integer
+            default: 1
         - name: "limit"
           in: "query"
           description: "Items per page"
           required: false
           schema:
-            type: string
+            type: integer
+            default: 10
       responses:
         '200':
           description: "OK"
@@ -596,7 +604,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '400':
           description: "Bad Request"
           content:
@@ -908,15 +916,15 @@ paths:
           description: "Page number"
           required: false
           schema:
-            type: string
-            default: "1"
+            type: integer
+            default: 1
         - name: "limit"
           in: "query"
           description: "Number of items per page"
           required: false
           schema:
-            type: string
-            default: "10"
+            type: integer
+            default: 10
       responses:
         '200':
           description: "OK"
@@ -948,7 +956,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '400':
           description: "Bad Request"
           content:
@@ -992,7 +1000,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '400':
           description: "Bad Request"
           content:
@@ -1064,7 +1072,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '400':
           description: "Bad Request"
           content:
@@ -1102,7 +1110,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '400':
           description: "Bad Request"
           content:
@@ -1139,7 +1147,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '401':
           description: "Unauthorized"
           content:
@@ -1164,7 +1172,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessPageResponse'
+                $ref: '#/components/schemas/SuccessResponse'
         '400':
           description: "Bad Request"
           content:
@@ -1206,6 +1214,11 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     AssignRole:
       type: object
@@ -1245,6 +1258,27 @@ components:
           maxLength: 11
         telegramUserId:
           type: string
+
+    ContactResponse:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+
+    PriceResponse:
+      type: object
+      properties:
+        timeRange:
+          type: string
+        setting:
+          type: string
+        value:
+          type: integer
+          nullable: true
+        nightRatio:
+          type: number
 
     CreateBodyArtRequest:
       type: object
@@ -1347,30 +1381,44 @@ components:
             $ref: '#/components/schemas/CreatePhotoRequest'
         priceCarContact:
           type: integer
-          description: "PriceCarNightRatio float64 `json:\"priceCarNightRatio,omitempty\"`"
         priceCarHour:
           type: integer
+        priceCarNightRatio:
+          type: number
         priceInHouseContact:
           type: integer
-          description: "PriceInHouseNightRatio float64 `json:\"priceInHouseNightRatio,omitempty\"`"
         priceInHouseHour:
           type: integer
+        priceInHouseNightRatio:
+          type: number
         priceSaunaContact:
           type: integer
-          description: "PrinceSaunaNightRatio float64 `json:\"princeSaunaNightRatio,omitempty\"`"
         priceSaunaHour:
           type: integer
         priceVisitContact:
           type: integer
-          description: "PriceVisitNightRatio float64 `json:\"priceVisitNightRatio,omitempty\"`"
         priceVisitHour:
           type: integer
+        priceVisitNightRatio:
+          type: number
+        princeSaunaNightRatio:
+          type: number
         profileOptions:
           type: array
           items:
             $ref: '#/components/schemas/CreateProfileOption'
         weight:
           type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactResponse'
+          nullable: true
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceResponse'
+          nullable: true
 
     CreateRatedProfileTagRequest:
       type: object
@@ -1520,18 +1568,21 @@ components:
           type: number
         createdAt:
           type: string
+          format: date-time
         id:
           type: string
         paymentDate:
           type: string
-          description: "date at which payment is completed"
+          format: date-time
+          description: "Date at which payment is completed"
         status:
           type: string
         type:
           type: string
-          description: "type: subscription, one_hour, three_hours, twelve_hours, two_days, one_week"
+          description: "Type: subscription, one_hour, three_hours, twelve_hours, two_days, one_week"
         updatedAt:
           type: string
+          format: date-time
         userID:
           type: string
 
@@ -1570,6 +1621,7 @@ components:
       properties:
         createdAt:
           type: string
+          format: date-time
         id:
           type: string
         profileID:
@@ -1588,6 +1640,7 @@ components:
           type: string
         updatedAt:
           type: string
+          format: date-time
         updatedBy:
           type: string
 
@@ -1596,6 +1649,7 @@ components:
       properties:
         createdAt:
           type: string
+          format: date-time
         id:
           type: string
         profileId:
@@ -1614,108 +1668,167 @@ components:
           type: string
         updatedAt:
           type: string
+          format: date-time
         updatedBy:
           type: string
 
     ProfileResponse:
       type: object
       properties:
+        id:
+          type: string
+        userId:
+          type: string
         active:
           type: boolean
-        addressLatitude:
+        phone:
           type: string
-        addressLongitude:
+        name:
           type: string
         age:
           type: integer
-        bio:
-          type: string
-        bodyArts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProfileBodyArtResponse'
-        bodyTypeId:
+        height:
+          type: integer
+        weight:
           type: integer
         bust:
           type: number
+        bio:
+          type: string
+        addressLatitude:
+          type: string
+          nullable: true
+        addressLongitude:
+          type: string
+          nullable: true
         cityId:
           type: integer
+          nullable: true
+        bodyTypeId:
+          type: integer
+          nullable: true
+        ethnosId:
+          type: integer
+          nullable: true
+        hairColorId:
+          type: integer
+          nullable: true
+        intimateHairCutId:
+          type: integer
+          nullable: true
+        priceInHouseNightRatio:
+          type: number
+        priceInHouseContact:
+          type: integer
+          nullable: true
+        priceInHouseHour:
+          type: integer
+          nullable: true
+        priceSaunaNightRatio:
+          type: number
+        priceSaunaContact:
+          type: integer
+          nullable: true
+        priceSaunaHour:
+          type: integer
+          nullable: true
+        priceVisitNightRatio:
+          type: number
+        priceVisitContact:
+          type: integer
+          nullable: true
+        priceVisitHour:
+          type: integer
+          nullable: true
+        priceCarNightRatio:
+          type: number
+        priceCarContact:
+          type: integer
+          nullable: true
+        priceCarHour:
+          type: integer
+          nullable: true
         contactPhone:
-          type: string
-        contactTG:
           type: string
         contactWA:
           type: string
-        createdAt:
+          nullable: true
+        contactTG:
           type: string
-        ethnosId:
-          type: integer
-        hairColorId:
-          type: integer
-        height:
-          type: integer
-        id:
-          type: string
-        intimateHairCutId:
-          type: integer
+          nullable: true
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactResponse'
+          nullable: true
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceResponse'
+          nullable: true
         moderated:
           type: boolean
         moderatedAt:
           type: string
+          format: date-time
+          nullable: true
         moderatedBy:
           type: string
-        name:
-          type: string
-        phone:
-          type: string
-        photos:
-          type: array
-          items:
-            $ref: '#/components/schemas/PhotoResponse'
-        priceCarContact:
-          type: integer
-        priceCarHour:
-          type: integer
-        priceCarNightRatio:
-          type: number
-        priceInHouseContact:
-          type: integer
-        priceInHouseHour:
-          type: integer
-        priceInHouseNightRatio:
-          type: number
-        priceSaunaContact:
-          type: integer
-        priceSaunaHour:
-          type: integer
-        priceVisitContact:
-          type: integer
-        priceVisitHour:
-          type: integer
-        priceVisitNightRatio:
-          type: number
-        princeSaunaNightRatio:
-          type: number
-        profileOptions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProfileOptionResponse'
-        services:
-          type: array
-          items:
-            $ref: '#/components/schemas/ServiceResponse'
-        updatedBy:
-          type: string
-        userId:
-          type: string
+          nullable: true
         verified:
           type: boolean
         verifiedAt:
           type: string
+          format: date-time
+          nullable: true
         verifiedBy:
           type: string
-        weight:
-          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        bodyArts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileBodyArtResponse'
+          nullable: true
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhotoResponse'
+          nullable: true
+        profileOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileOptionResponse'
+          nullable: true
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceResponse'
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+      required:
+        - id
+        - userId
+        - active
+        - phone
+        - name
+        - age
+        - height
+        - weight
+        - bust
+        - bio
+        - priceInHouseNightRatio
+        - priceSaunaNightRatio
+        - priceVisitNightRatio
+        - priceCarNightRatio
+        - contactPhone
+        - moderated
+        - verified
+        - createdAt
 
     ProfileTag:
       type: object
@@ -1781,13 +1894,12 @@ components:
         clientUserLon:
           type: string
         clientUserRating:
-          allOf:
-            - $ref: '#/components/schemas/UserRating'
-          description: "profile owner's review on client"
+          $ref: '#/components/schemas/UserRating'
         clientUserRatingID:
           type: string
         createdAt:
           type: string
+          format: date-time
         distanceBetweenUsers:
           type: number
         id:
@@ -1797,9 +1909,7 @@ components:
         profileOwnerID:
           type: string
         profileRating:
-          allOf:
-            - $ref: '#/components/schemas/ProfileRating'
-          description: "client's review on profile"
+          $ref: '#/components/schemas/ProfileRating'
         profileRatingID:
           type: string
         profileUserLat:
@@ -1810,6 +1920,7 @@ components:
           type: boolean
         updatedAt:
           type: string
+          format: date-time
         updatedBy:
           type: string
 
@@ -1824,6 +1935,7 @@ components:
           type: string
         createdAt:
           type: string
+          format: date-time
         distanceBetweenUsers:
           type: number
         id:
@@ -1840,6 +1952,7 @@ components:
           type: boolean
         updatedAt:
           type: string
+          format: date-time
         updatedBy:
           type: string
 
@@ -1967,6 +2080,9 @@ components:
           description: |
             Status represents the status of the response, typically set to "success".
             Example: "success"
+      required:
+        - access_token
+        - status
 
     UpdateOwnProfileRequest:
       type: object
@@ -2043,6 +2159,16 @@ components:
             $ref: '#/components/schemas/CreateProfileOption'
         weight:
           type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactResponse'
+          nullable: true
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceResponse'
+          nullable: true
 
     UpdateProfileRequest:
       type: object
@@ -2108,6 +2234,7 @@ components:
       properties:
         createdAt:
           type: string
+          format: date-time
         id:
           type: string
         ratedUserTags:
@@ -2124,6 +2251,7 @@ components:
           type: string
         updatedAt:
           type: string
+          format: date-time
         updatedBy:
           type: string
         userID:
@@ -2134,6 +2262,7 @@ components:
       properties:
         createdAt:
           type: string
+          format: date-time
         id:
           type: string
         ratedUserTags:
@@ -2150,6 +2279,7 @@ components:
           type: string
         updatedAt:
           type: string
+          format: date-time
         updatedBy:
           type: string
         userId:
@@ -2162,6 +2292,7 @@ components:
           type: boolean
         created_at:
           type: string
+          format: date-time
         id:
           type: string
         name:
@@ -2180,6 +2311,7 @@ components:
           type: string
         updated_at:
           type: string
+          format: date-time
         verified:
           type: boolean
 
@@ -2196,3 +2328,5 @@ components:
       properties:
         name:
           type: string
+security:
+  - BearerAuth: []
