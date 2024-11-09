@@ -104,9 +104,9 @@ type CreateProfileRequest struct {
 	ContactTG    string `json:"contactTG" binding:"required" validate:"min=4"`
 	ContactWA    string `json:"contactWA,omitempty" validate:"e164"`
 
-	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty,dive"`
-	Photos   []CreatePhotoRequest   `json:"photos" binding:"required,dive"`
-	Options  []CreateProfileOption  `json:"profileOptions" binding:"required,dive"`
+	BodyArts []CreateBodyArtRequest       `json:"bodyArts" binding:"omitempty,dive"`
+	Photos   []CreatePhotoRequest         `json:"photos" binding:"required,dive"`
+	Options  []CreateProfileOptionRequest `json:"profileOptions" binding:"required,dive"`
 }
 
 type UpdateOwnProfileRequest struct {
@@ -146,9 +146,9 @@ type UpdateOwnProfileRequest struct {
 	ContactTG    string `json:"contactTG" binding:"omitempty" validate:"min=4"`
 	ContactWA    string `json:"contactWA,omitempty" validate:"e164"`
 
-	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty,dive"`
-	Photos   []CreatePhotoRequest   `json:"photos" binding:"omitempty,dive"`
-	Options  []CreateProfileOption  `json:"profileOptions" binding:"omitempty,dive"`
+	BodyArts []CreateBodyArtRequest       `json:"bodyArts" binding:"omitempty,dive"`
+	Photos   []CreatePhotoRequest         `json:"photos" binding:"omitempty,dive"`
+	Options  []CreateProfileOptionRequest `json:"profileOptions" binding:"omitempty,dive"`
 }
 
 type UpdateProfileRequest struct {

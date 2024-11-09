@@ -12,8 +12,8 @@ type ProfileOption struct {
 	ProfileTag   ProfileTag `gorm:"foreignKey:ProfileTagID;references:ID"`
 }
 
-type CreateProfileOption struct {
-	ProfileTagID int    `json:"profileTagId" binding:"required" validate:"required,int"`
+type CreateProfileOptionRequest struct {
+	ProfileTagID int    `json:"profileTagId" binding:"required" validate:"required,int,gte=0"`
 	Price        int64  `json:"price,omitempty" validate:"min=0"`
 	Comment      string `json:"comment,omitempty" validate:"max=50"`
 }

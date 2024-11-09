@@ -153,7 +153,7 @@ func generateCreateProfileRequest(
 		{URL: randomPhotos[random.IntN(len(randomPhotos))]},
 	}
 
-	optionsPayload := []models.CreateProfileOption{
+	optionsPayload := []models.CreateProfileOptionRequest{
 		{ProfileTagID: profileTags[0].ID, Price: 5000, Comment: "This is my favourite!"},
 		{ProfileTagID: profileTags[1].ID, Price: 50000, Comment: "I hate this!"},
 	}
