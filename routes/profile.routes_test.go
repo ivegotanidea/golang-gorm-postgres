@@ -915,7 +915,7 @@ func TestProfileRoutes(t *testing.T) {
 		assert.JSONEq(t, "{\"message\":\"You are not logged in\",\"status\":\"error\"}", w.Body.String())
 	})
 
-	t.Run("GET /api/profiles/phoneId: success for logged user", func(t *testing.T) {
+	t.Run("GET /api/profiles/id: success for logged user", func(t *testing.T) {
 		user := generateUser(random, authRouter, t, "")
 		secondUser := generateUser(random, authRouter, t, "")
 
@@ -943,7 +943,7 @@ func TestProfileRoutes(t *testing.T) {
 
 		findProfileByPhoneReq, _ := http.NewRequest(
 			"GET",
-			fmt.Sprintf("/api/profiles/%s", payload.Phone),
+			fmt.Sprintf("/api/profiles/%s", profileResponse.Data.ID),
 			nil)
 
 		findProfileByPhoneReq.AddCookie(
@@ -994,7 +994,7 @@ func TestProfileRoutes(t *testing.T) {
 
 		findProfileByPhoneReq, _ := http.NewRequest(
 			"GET",
-			fmt.Sprintf("/api/profiles/%s", payload.Phone),
+			fmt.Sprintf("/api/profiles/%s", profileResponse.Data.ID),
 			nil)
 
 		findProfileByPhoneReq.AddCookie(
@@ -1073,7 +1073,7 @@ func TestProfileRoutes(t *testing.T) {
 
 		findProfileByPhoneReq, _ := http.NewRequest(
 			"GET",
-			fmt.Sprintf("/api/profiles/%s", payload.Phone),
+			fmt.Sprintf("/api/profiles/%s", profileResponse.Data.ID),
 			nil)
 
 		findProfileByPhoneReq.AddCookie(

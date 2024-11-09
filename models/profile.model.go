@@ -24,6 +24,7 @@ type Profile struct {
 	Weight           int       `gorm:"type:int;not null"`
 	Bust             float64   `gorm:"type:float"`
 	Bio              string    `gorm:"type:varchar(2000)"`
+	Sex              string    `gorm:"type:varchar(10)"`
 	AddressLatitude  string    `gorm:"type:varchar(10)"`
 	AddressLongitude string    `gorm:"type:varchar(10)"`
 
