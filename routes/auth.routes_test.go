@@ -92,7 +92,7 @@ func TestAuthRoutes(t *testing.T) {
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
 
 		telegramUserId := fmt.Sprintf("%d", rand.Int64())
-		errMessage := "Key: 'BotSignUpInput.Name' Error:Field validation for 'Name' failed on the 'required' tag"
+		errMessage := "Key: 'BotSignUpRequest.Name' Error:Field validation for 'Name' failed on the 'required' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
@@ -118,7 +118,7 @@ func TestAuthRoutes(t *testing.T) {
 		phone := ""
 
 		telegramUserId := fmt.Sprintf("%d", rand.Int64())
-		errMessage := "Key: 'BotSignUpInput.Phone' Error:Field validation for 'Phone' failed on the 'required' tag"
+		errMessage := "Key: 'BotSignUpRequest.Phone' Error:Field validation for 'Phone' failed on the 'required' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
@@ -144,7 +144,7 @@ func TestAuthRoutes(t *testing.T) {
 		phone := utils.GenerateRandomPhoneNumber(random, 10)
 
 		telegramUserId := fmt.Sprintf("%d", rand.Int64())
-		errMessage := "Key: 'BotSignUpInput.Phone' Error:Field validation for 'Phone' failed on the 'min' tag"
+		errMessage := "Key: 'BotSignUpRequest.Phone' Error:Field validation for 'Phone' failed on the 'min' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
@@ -170,7 +170,7 @@ func TestAuthRoutes(t *testing.T) {
 		phone := utils.GenerateRandomPhoneNumber(random, 12)
 
 		telegramUserId := fmt.Sprintf("%d", rand.Int64())
-		errMessage := "Key: 'BotSignUpInput.Phone' Error:Field validation for 'Phone' failed on the 'max' tag"
+		errMessage := "Key: 'BotSignUpRequest.Phone' Error:Field validation for 'Phone' failed on the 'max' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
@@ -195,7 +195,7 @@ func TestAuthRoutes(t *testing.T) {
 		name := utils.GenerateRandomStringWithPrefix(random, 10, "test-")
 		phone := utils.GenerateRandomPhoneNumber(random, 0)
 		telegramUserId := ""
-		errMessage := "Key: 'BotSignUpInput.TelegramUserId' Error:Field validation for 'TelegramUserId' failed on the 'required' tag"
+		errMessage := "Key: 'BotSignUpRequest.TelegramUserId' Error:Field validation for 'TelegramUserId' failed on the 'required' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 
@@ -220,7 +220,7 @@ func TestAuthRoutes(t *testing.T) {
 		name := ""
 		phone := ""
 		telegramUserId := ""
-		errMessage := "Key: 'BotSignUpInput.Name' Error:Field validation for 'Name' failed on the 'required' tag\nKey: 'BotSignUpInput.Phone' Error:Field validation for 'Phone' failed on the 'required' tag\nKey: 'BotSignUpInput.TelegramUserId' Error:Field validation for 'TelegramUserId' failed on the 'required' tag"
+		errMessage := "Key: 'BotSignUpRequest.Name' Error:Field validation for 'Name' failed on the 'required' tag\nKey: 'BotSignUpRequest.Phone' Error:Field validation for 'Phone' failed on the 'required' tag\nKey: 'BotSignUpRequest.TelegramUserId' Error:Field validation for 'TelegramUserId' failed on the 'required' tag"
 
 		payload := fmt.Sprintf(`{"name": "%s", "phone": "%s", "telegramUserId": "%s"}`, name, phone, telegramUserId)
 

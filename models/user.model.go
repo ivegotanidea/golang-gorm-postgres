@@ -24,24 +24,24 @@ type User struct {
 	Role           string    `gorm:"type:varchar(50);not null;default:user"`  // oneOf: user, moderator, admin
 }
 
-type SignUpInput struct {
+type SignUpRequest struct {
 	Phone           string `json:"phone" binding:"required,min=11,max=11"`
 	Password        string `json:"password" binding:"required,min=8"`
 	PasswordConfirm string `json:"passwordConfirm" binding:"required,min=8"`
 }
 
-type SignInInput struct {
+type SignInRequest struct {
 	Phone    string `json:"phone" binding:"required,min=11,max=11"`
 	Password string `json:"password" binding:"required,min=8"`
 }
 
-type BotSignUpInput struct {
+type BotSignUpRequest struct {
 	Name           string `json:"name" binding:"required,min=5"`
 	Phone          string `json:"phone" binding:"required,min=11,max=11"`
 	TelegramUserId string `json:"telegramUserId" binding:"required"`
 }
 
-type BotSignInInput struct {
+type BotSignInRequest struct {
 	TelegramUserId string `json:"telegramUserId"  binding:"required"`
 }
 

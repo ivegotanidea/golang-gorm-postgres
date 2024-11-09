@@ -24,7 +24,7 @@ paths:
           description: "Bot SignIn Input"
           required: true
           schema:
-            $ref: '#/definitions/BotSignInInput'
+            $ref: '#/definitions/BotSignInRequest'
       responses:
         "200":
           description: "OK"
@@ -50,7 +50,7 @@ paths:
           description: "Bot Signup Input"
           required: true
           schema:
-            $ref: '#/definitions/BotSignUpInput'
+            $ref: '#/definitions/BotSignUpRequest'
       responses:
         "201":
           description: "Created"
@@ -80,7 +80,7 @@ paths:
           description: "SignIn Input"
           required: true
           schema:
-            $ref: '#/definitions/SignInInput'
+            $ref: '#/definitions/SignInRequest'
       responses:
         "200":
           description: "OK"
@@ -140,7 +140,7 @@ paths:
           description: "SignUp Input"
           required: true
           schema:
-            $ref: '#/definitions/SignUpInput'
+            $ref: '#/definitions/SignUpRequest'
       responses:
         "201":
           description: "Created"
@@ -1085,7 +1085,7 @@ definitions:
           - "moderator"
           - "admin"
 
-  BotSignInInput:
+  BotSignInRequest:
     type: "object"
     required:
       - "telegramUserId"
@@ -1093,7 +1093,7 @@ definitions:
       telegramUserId:
         type: "string"
 
-  BotSignUpInput:
+  BotSignUpRequest:
     type: "object"
     required:
       - "name"
@@ -1711,7 +1711,7 @@ definitions:
       visible:
         type: "boolean"
 
-  SignInInput:
+  SignInRequest:
     type: "object"
     required:
       - "password"
@@ -1725,7 +1725,7 @@ definitions:
         minLength: 11
         maxLength: 11
 
-  SignUpInput:
+  SignUpRequest:
     type: "object"
     required:
       - "password"

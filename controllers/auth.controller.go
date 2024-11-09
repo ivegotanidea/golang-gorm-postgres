@@ -32,13 +32,13 @@ const defaultUserAvatar = ""
 //	@Tags			Auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		BotSignUpInput	true	"Bot Signup Input"
+//	@Param			body	body		BotSignUpRequest	true	"Bot Signup Input"
 //	@Success		201		{object}	UserResponse
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/auth/bot/signup [post]
 func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
-	var payload *BotSignUpInput
+	var payload *BotSignUpRequest
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: err.Error()})
@@ -106,14 +106,14 @@ func (ac *AuthController) BotSignUpUser(ctx *gin.Context) {
 //	@Tags			Auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		SignUpInput	true	"SignUp Input"
+//	@Param			body	body		SignUpRequest	true	"SignUp Input"
 //	@Success		201		{object}	SuccessResponse[UserResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		409		{object}	ErrorResponse
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/auth/signup [post]
 func (ac *AuthController) SignUpUser(ctx *gin.Context) {
-	var payload *SignUpInput
+	var payload *SignUpRequest
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: err.Error()})
@@ -175,12 +175,12 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 //	@Tags			Auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		BotSignInInput	true	"Bot SignIn Input"
+//	@Param			body	body		BotSignInRequest	true	"Bot SignIn Input"
 //	@Success		200		{object}	TokenResponse
 //	@Failure		400		{object}	ErrorResponse
 //	@Router			/auth/bot/login [post]
 func (ac *AuthController) BotSignInUser(ctx *gin.Context) {
-	var payload *BotSignInInput
+	var payload *BotSignInRequest
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: err.Error()})
@@ -222,12 +222,12 @@ func (ac *AuthController) BotSignInUser(ctx *gin.Context) {
 //	@Tags			Auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		SignInInput	true	"SignIn Input"
+//	@Param			body	body		SignInRequest	true	"SignIn Input"
 //	@Success		200		{object}	TokenResponse
 //	@Failure		400		{object}	ErrorResponse
 //	@Router			/auth/login [post]
 func (ac *AuthController) SignInUser(ctx *gin.Context) {
-	var payload *SignInInput
+	var payload *SignInRequest
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: err.Error()})

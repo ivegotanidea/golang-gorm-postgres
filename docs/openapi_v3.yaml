@@ -19,7 +19,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BotSignInInput'
+              $ref: '#/components/schemas/BotSignInRequest'
       responses:
         '200':
           description: "OK"
@@ -45,7 +45,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BotSignUpInput'
+              $ref: '#/components/schemas/BotSignUpRequest'
       responses:
         '201':
           description: "Created"
@@ -77,7 +77,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignInInput'
+              $ref: '#/components/schemas/SignInRequest'
       responses:
         '200':
           description: "OK"
@@ -135,7 +135,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignUpInput'
+              $ref: '#/components/schemas/SignUpRequest'
       responses:
         '201':
           description: "Created"
@@ -1221,7 +1221,7 @@ components:
             - moderator
             - admin
 
-    BotSignInInput:
+    BotSignInRequest:
       type: object
       required:
         - telegramUserId
@@ -1229,7 +1229,7 @@ components:
         telegramUserId:
           type: string
 
-    BotSignUpInput:
+    BotSignUpRequest:
       type: object
       required:
         - name
@@ -1849,7 +1849,7 @@ components:
         visible:
           type: boolean
 
-    SignInInput:
+    SignInRequest:
       type: object
       required:
         - password
@@ -1863,7 +1863,7 @@ components:
           minLength: 11
           maxLength: 11
 
-    SignUpInput:
+    SignUpRequest:
       type: object
       required:
         - password

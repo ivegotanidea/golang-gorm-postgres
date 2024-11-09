@@ -37,7 +37,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/BotSignInInput"
+                            "$ref": "#/definitions/BotSignInRequest"
                         }
                     }
                 ],
@@ -77,7 +77,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/BotSignUpInput"
+                            "$ref": "#/definitions/BotSignUpRequest"
                         }
                     }
                 ],
@@ -123,7 +123,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/SignInInput"
+                            "$ref": "#/definitions/SignInRequest"
                         }
                     }
                 ],
@@ -209,7 +209,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/SignUpInput"
+                            "$ref": "#/definitions/SignUpRequest"
                         }
                     }
                 ],
@@ -1633,7 +1633,7 @@ const docTemplate = `{
                 }
             }
         },
-        "BotSignInInput": {
+        "BotSignInRequest": {
             "type": "object",
             "required": [
                 "telegramUserId"
@@ -1644,7 +1644,7 @@ const docTemplate = `{
                 }
             }
         },
-        "BotSignUpInput": {
+        "BotSignUpRequest": {
             "type": "object",
             "required": [
                 "name",
@@ -2520,7 +2520,7 @@ const docTemplate = `{
                 }
             }
         },
-        "SignInInput": {
+        "SignInRequest": {
             "type": "object",
             "required": [
                 "password",
@@ -2538,7 +2538,7 @@ const docTemplate = `{
                 }
             }
         },
-        "SignUpInput": {
+        "SignUpRequest": {
             "type": "object",
             "required": [
                 "password",

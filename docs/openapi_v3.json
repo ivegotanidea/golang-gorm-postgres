@@ -25,7 +25,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/BotSignInInput"
+                                "$ref": "#/components/schemas/BotSignInRequest"
                             }
                         }
                     }
@@ -67,7 +67,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/BotSignUpInput"
+                                "$ref": "#/components/schemas/BotSignUpRequest"
                             }
                         }
                     }
@@ -171,7 +171,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/SignInInput"
+                                "$ref": "#/components/schemas/SignInRequest"
                             }
                         }
                     }
@@ -213,7 +213,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/SignUpInput"
+                                "$ref": "#/components/schemas/SignUpRequest"
                             }
                         }
                     }
@@ -2159,7 +2159,7 @@
                     }
                 }
             },
-            "BotSignInInput": {
+            "BotSignInRequest": {
                 "type": "object",
                 "required": [
                     "telegramUserId"
@@ -2170,7 +2170,7 @@
                     }
                 }
             },
-            "BotSignUpInput": {
+            "BotSignUpRequest": {
                 "type": "object",
                 "required": [
                     "name",
@@ -2970,7 +2970,7 @@
                     }
                 }
             },
-            "SignInInput": {
+            "SignInRequest": {
                 "type": "object",
                 "required": [
                     "password",
@@ -2988,7 +2988,7 @@
                     }
                 }
             },
-            "SignUpInput": {
+            "SignUpRequest": {
                 "type": "object",
                 "required": [
                     "password",
