@@ -32,7 +32,7 @@ type ProfileBodyArt struct {
 }
 
 type CreateBodyArtRequest struct {
-	ID int `json:"bodyArtId" binding:"required"`
+	ID int `json:"bodyArtId" binding:"required" validate:"gte=0"`
 }
 
 type HairColor struct {

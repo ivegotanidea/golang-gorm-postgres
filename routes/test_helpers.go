@@ -127,6 +127,16 @@ func generateUser(random *rand.Rand, authRouter *gin.Engine, t *testing.T, tier 
 	return user
 }
 
+func filterEthnosBySex(ethnos []models.Ethnos, targetSex string) []models.Ethnos {
+	var filtered []models.Ethnos
+	for _, e := range ethnos {
+		if e.Sex == targetSex {
+			filtered = append(filtered, e)
+		}
+	}
+	return filtered
+}
+
 func generateCreateProfileRequest(
 	random *rand.Rand,
 	cities []models.City,
@@ -153,6 +163,8 @@ func generateCreateProfileRequest(
 		{ID: bodyArts[1].ID},
 	}
 
+	ethnosSet := &ethnos[random.IntN(len(ethnos))]
+
 	payload := models.CreateProfileRequest{
 		Phone:               utils.GenerateRandomPhoneNumber(random, 10),
 		Name:                utils.GenerateRandomStringWithPrefix(random, 15, "Alice"),
@@ -161,8 +173,9 @@ func generateCreateProfileRequest(
 		Weight:              57,
 		CityID:              cities[random.IntN(len(cities))].ID,
 		Bust:                2.5,
+		Sex:                 ethnosSet.Sex,
 		BodyTypeID:          &bodyTypes[random.IntN(len(bodyTypes))].ID,
-		EthnosID:            &ethnos[random.IntN(len(ethnos))].ID,
+		EthnosID:            &ethnosSet.ID,
 		HairColorID:         &hairColors[random.IntN(len(hairColors))].ID,
 		IntimateHairCutID:   &intimateHairCuts[random.IntN(len(intimateHairCuts))].ID,
 		Bio:                 bio,

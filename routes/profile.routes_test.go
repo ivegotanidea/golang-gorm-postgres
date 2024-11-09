@@ -1116,13 +1116,14 @@ func TestProfileRoutes(t *testing.T) {
 
 		_ = assignRole(initializers.DB, t, authRouter, userRouter, secondUser.ID.String(), "moderator")
 
+		ethnosFemale := filterEthnosBySex(ethnos, "female")
 		accessTokenCookie, _ := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)
 		secondUserAccessTokenCookie, _ := loginUserGetAccessToken(t, secondUser.Password, secondUser.TelegramUserID, authRouter)
 
 		for i := 0; i < 3; i++ {
 			w := httptest.NewRecorder()
 
-			payload := generateCreateProfileRequest(random, cities, ethnos, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
+			payload := generateCreateProfileRequest(random, cities, ethnosFemale, profileTags, bodyArts, bodyTypes, hairColors, intimateHairCuts)
 
 			jsonPayload, err := json.Marshal(payload)
 			if err != nil {

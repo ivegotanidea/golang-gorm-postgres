@@ -62,8 +62,9 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		UpdatedBy:    currentUser.ID,
 		CityID:       payload.CityID, // required, no need to check
 		Active:       true,
-		Phone:        payload.Phone,        // required, no need to check
-		Name:         payload.Name,         // required, no need to check
+		Phone:        payload.Phone, // required, no need to check
+		Name:         payload.Name,  // required, no need to check
+		Sex:          payload.Sex,
 		Age:          payload.Age,          // required, no need to check
 		Height:       payload.Height,       // required, no need to check
 		Weight:       payload.Weight,       // required, no need to check

@@ -68,40 +68,41 @@ type Profile struct {
 }
 
 type CreateProfileRequest struct {
-	Phone  string  `json:"phone"  binding:"required"`
-	Name   string  `json:"name"  binding:"required"`
-	Age    int     `json:"age"  binding:"required"`
-	CityID int     `json:"cityId"  binding:"required"`
-	Height int     `json:"height"  binding:"required"`
-	Weight int     `json:"weight"  binding:"required"`
-	Bust   float64 `json:"bust"  binding:"required"`
+	Phone  string  `json:"phone"  binding:"required" validate:"e164"`
+	Name   string  `json:"name"  binding:"required" validate:"min=3,max=20"`
+	Sex    string  `json:"sex" binding:"required" validate:"min=3,max=10"`
+	Age    int     `json:"age"  binding:"required" validate:"gte=18,lte=80"`
+	CityID int     `json:"cityId"  binding:"required" validate:"gte=0"`
+	Height int     `json:"height"  binding:"required" validate:"gte=0"`
+	Weight int     `json:"weight"  binding:"required" validate:"gte=0,lte=150"`
+	Bust   float64 `json:"bust"  binding:"required" validate:"gte=0,lte=10"`
 
-	EthnosID          *int `json:"ethnosId"  binding:"required"`
-	HairColorID       *int `json:"hairColorId"  binding:"omitempty"`
-	BodyTypeID        *int `json:"bodyTypeId"  binding:"omitempty"`
-	IntimateHairCutID *int `json:"intimateHairCutId"  binding:"omitempty"`
+	EthnosID          *int `json:"ethnosId"  binding:"required" validate:"gte=0"`
+	HairColorID       *int `json:"hairColorId"  binding:"omitempty" validate:"gte=0"`
+	BodyTypeID        *int `json:"bodyTypeId"  binding:"omitempty" validate:"gte=0"`
+	IntimateHairCutID *int `json:"intimateHairCutId"  binding:"omitempty" validate:"gte=0"`
 
-	Bio string `json:"bio"  binding:"required"`
+	Bio string `json:"bio"  binding:"required" validate:"min=100,max=2000"`
 
-	AddressLatitude  string `json:"latitude,omitempty"`
-	AddressLongitude string `json:"longitude,omitempty"`
+	AddressLatitude  string `json:"latitude,omitempty" validate:"latitude"`
+	AddressLongitude string `json:"longitude,omitempty" validate:"longitude"`
 
 	//PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
-	PriceInHouseContact *int `json:"priceInHouseContact,omitempty"`
-	PriceInHouseHour    *int `json:"priceInHouseHour,omitempty"`
+	PriceInHouseContact *int `json:"priceInHouseContact,omitempty" validate:"gte=0"`
+	PriceInHouseHour    *int `json:"priceInHouseHour,omitempty" validate:"gte=0"`
 	//PrinceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
-	PriceSaunaContact *int `json:"priceSaunaContact,omitempty"`
-	PriceSaunaHour    *int `json:"priceSaunaHour,omitempty"`
+	PriceSaunaContact *int `json:"priceSaunaContact,omitempty" validate:"gte=0"`
+	PriceSaunaHour    *int `json:"priceSaunaHour,omitempty" validate:"gte=0"`
 	//PriceVisitNightRatio   float64 `json:"priceVisitNightRatio,omitempty"`
-	PriceVisitContact *int `json:"priceVisitContact,omitempty"`
-	PriceVisitHour    *int `json:"priceVisitHour,omitempty"`
+	PriceVisitContact *int `json:"priceVisitContact,omitempty" validate:"gte=0"`
+	PriceVisitHour    *int `json:"priceVisitHour,omitempty" validate:"gte=0"`
 	//PriceCarNightRatio     float64 `json:"priceCarNightRatio,omitempty"`
-	PriceCarContact *int `json:"priceCarContact,omitempty"`
-	PriceCarHour    *int `json:"priceCarHour,omitempty"`
+	PriceCarContact *int `json:"priceCarContact,omitempty" validate:"gte=0"`
+	PriceCarHour    *int `json:"priceCarHour,omitempty" validate:"gte=0"`
 
-	ContactPhone string `json:"contactPhone" binding:"required"`
-	ContactTG    string `json:"contactTG" binding:"required"`
-	ContactWA    string `json:"contactWA,omitempty"`
+	ContactPhone string `json:"contactPhone" binding:"required" validate:"e164"`
+	ContactTG    string `json:"contactTG" binding:"required" validate:"min=4"`
+	ContactWA    string `json:"contactWA,omitempty" validate:"e164"`
 
 	BodyArts []CreateBodyArtRequest `json:"bodyArts" binding:"omitempty,dive"`
 	Photos   []CreatePhotoRequest   `json:"photos" binding:"required,dive"`
