@@ -30,43 +30,43 @@ type Service struct {
 }
 
 type CreateServiceRequest struct {
-	ClientUserID        uuid.UUID `json:"userId"`
-	ClientUserLatitude  *float32  `json:"clientUserLatitude"`
-	ClientUserLongitude *float32  `json:"clientUserLongitude"`
+	ClientUserID        uuid.UUID `json:"userId" validate:"gte=0"`
+	ClientUserLatitude  *float32  `json:"clientUserLatitude" validate:"latitude"`
+	ClientUserLongitude *float32  `json:"clientUserLongitude" validate:"longitude"`
 
-	ProfileID            uuid.UUID `json:"profileId"`
-	ProfileOwnerID       uuid.UUID `json:"profileOwnerId"`
-	ProfileUserLatitude  *float32  `json:"profileUserLatitude"`
-	ProfileUserLongitude *float32  `json:"profileUserLongitude"`
+	ProfileID            uuid.UUID `json:"profileId" validate:"gte=0"`
+	ProfileOwnerID       uuid.UUID `json:"profileOwnerId" validate:"gte=0"`
+	ProfileUserLatitude  *float32  `json:"profileUserLatitude" validate:"latitude"`
+	ProfileUserLongitude *float32  `json:"profileUserLongitude" validate:"longitude"`
 
 	UserRating    *CreateUserRatingRequest    `json:"userRating" binding:"omitempty"`
 	ProfileRating *CreateProfileRatingRequest `json:"profileRating" binding:"omitempty"`
 }
 
 type CreateRatedUserTagRequest struct {
-	Type  string `json:"type"`
-	TagID int    `json:"tagId"`
+	Type  string `json:"type" validate:"required,oneOf=like dislike"`
+	TagID int    `json:"tagId" validate:"required,gte=0"`
 }
 
 type CreateUserRatingRequest struct {
-	Review        string                      `json:"review" binding:"omitempty"`
-	Score         *int                        `json:"score" binding:"omitempty"`
+	Review        string                      `json:"review" binding:"omitempty" validate:"max=2000"`
+	Score         *int                        `json:"score" binding:"omitempty" validate:"min=0,max=5"`
 	RatedUserTags []CreateRatedUserTagRequest `json:"ratedUserTags" binding:"omitempty,dive"`
 }
 
 type CreateRatedProfileTagRequest struct {
-	Type  string `json:"type"`
-	TagID int    `json:"tagId"`
+	Type  string `json:"type" validate:"required,oneOf=like dislike"`
+	TagID int    `json:"tagId" validate:"required,gte=0"`
 }
 
 type CreateProfileRatingRequest struct {
-	Review           string                         `json:"review" binding:"omitempty"`
-	Score            *int                           `json:"score" binding:"omitempty"`
+	Review           string                         `json:"review" binding:"omitempty" validate:"max=2000"`
+	Score            *int                           `json:"score" binding:"omitempty" validate:"min=0,max=5"`
 	RatedProfileTags []CreateRatedProfileTagRequest `json:"ratedProfileTags" binding:"omitempty,dive"`
 }
 
 type SetReviewVisibilityRequest struct {
-	Visible *bool `json:"visible"`
+	Visible *bool `json:"visible" validate:"boolean"`
 }
 
 type ServiceResponse struct {
