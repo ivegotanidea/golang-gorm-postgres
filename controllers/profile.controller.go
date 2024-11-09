@@ -176,7 +176,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		for _, optionReq := range payload.Options {
 			option := ProfileOption{
 				ProfileID:    newProfile.ID,
-				ProfileTagID: int(optionReq.ProfileTagID),
+				ProfileTagID: optionReq.ProfileTagID,
 				Price:        optionReq.Price,
 				Comment:      optionReq.Comment,
 			}
@@ -185,6 +185,12 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		if err := tx.Create(&options).Error; err != nil {
 			tx.Rollback()
 			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to create profile options: %s", err.Error())})
+			return
+		}
+
+		if err := tx.Preload("ProfileTag").Where("profile_id = ?", newProfile.ID).Find(&options).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to load profile options with tags: %s", err.Error())})
 			return
 		}
 	}
@@ -316,8 +322,8 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 		updateFields["PriceInHouseHour"] = payload.PriceInHouseHour
 	}
 
-	if payload.PrinceSaunaNightRatio != nil && *payload.PrinceSaunaNightRatio != existingProfile.PrinceSaunaNightRatio {
-		updateFields["PrinceSaunaNightRatio"] = *payload.PrinceSaunaNightRatio
+	if payload.PrinceSaunaNightRatio != nil && *payload.PrinceSaunaNightRatio != existingProfile.PriceSaunaNightRatio {
+		updateFields["PriceSaunaNightRatio"] = *payload.PrinceSaunaNightRatio
 	}
 
 	if payload.PriceSaunaContact != nil && payload.PriceSaunaContact != existingProfile.PriceSaunaContact {

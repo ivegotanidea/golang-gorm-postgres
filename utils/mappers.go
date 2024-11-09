@@ -40,7 +40,9 @@ func MapPhotos(photos []Photo) []PhotoResponse {
 }
 
 func MapProfileOptions(options []ProfileOption) []ProfileOptionResponse {
+
 	optionResponses := make([]ProfileOptionResponse, len(options))
+
 	for i, option := range options {
 		optionResponses[i] = ProfileOptionResponse{
 			Price:   option.Price,
@@ -101,7 +103,7 @@ func MapProfile(newProfile *Profile) *ProfileResponse {
 		EthnosID:               newProfile.EthnosID,
 		HairColorID:            newProfile.HairColorID,
 		IntimateHairCutID:      newProfile.IntimateHairCutID,
-		PrinceSaunaNightRatio:  newProfile.PrinceSaunaNightRatio,
+		PriceSaunaNightRatio:   newProfile.PriceSaunaNightRatio,
 		PriceCarNightRatio:     newProfile.PriceCarNightRatio,
 		PriceVisitNightRatio:   newProfile.PriceVisitNightRatio,
 		PriceInHouseNightRatio: newProfile.PriceInHouseNightRatio,
@@ -129,6 +131,72 @@ func MapProfile(newProfile *Profile) *ProfileResponse {
 	profileResponse.Photos = MapPhotos(newProfile.Photos)
 	profileResponse.ProfileOptions = MapProfileOptions(newProfile.ProfileOptions)
 	profileResponse.Services = MapServices(newProfile.Services)
+
+	profileResponse.Contacts = []ContactResponse{
+		{
+			ContactType: "phone",
+			Value:       newProfile.ContactPhone,
+		},
+		{
+			ContactType: "telegram",
+			Value:       newProfile.ContactTG,
+		},
+		{
+			ContactType: "whatsapp",
+			Value:       newProfile.ContactWA,
+		},
+	}
+
+	profileResponse.Prices = []PriceResponse{
+		{
+			Setting:    "call",
+			Value:      newProfile.PriceInHouseContact,
+			TimeRange:  "contact",
+			NightRatio: newProfile.PriceInHouseNightRatio,
+		},
+		{
+			Setting:    "call",
+			Value:      newProfile.PriceInHouseHour,
+			TimeRange:  "hour",
+			NightRatio: newProfile.PriceInHouseNightRatio,
+		},
+		{
+			Setting:    "visit",
+			Value:      newProfile.PriceVisitContact,
+			TimeRange:  "contact",
+			NightRatio: newProfile.PriceVisitNightRatio,
+		},
+		{
+			Setting:    "visit",
+			Value:      newProfile.PriceVisitHour,
+			TimeRange:  "hour",
+			NightRatio: newProfile.PriceVisitNightRatio,
+		},
+		{
+			Setting:    "car",
+			Value:      newProfile.PriceCarContact,
+			TimeRange:  "contact",
+			NightRatio: newProfile.PriceCarNightRatio,
+		},
+		{
+			Setting:    "car",
+			Value:      newProfile.PriceCarHour,
+			TimeRange:  "hour",
+			NightRatio: newProfile.PriceCarNightRatio,
+		},
+		{
+			Setting:    "sauna",
+			Value:      newProfile.PriceSaunaContact,
+			TimeRange:  "contact",
+			NightRatio: newProfile.PriceSaunaNightRatio,
+		},
+		{
+			Setting:    "sauna",
+			Value:      newProfile.PriceSaunaHour,
+			TimeRange:  "hour",
+			NightRatio: newProfile.PriceSaunaNightRatio,
+		},
+	}
 
 	return profileResponse
 }

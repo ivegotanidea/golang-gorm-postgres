@@ -32,9 +32,9 @@ type Profile struct {
 	PriceInHouseContact    *int    `gorm:"type:int;default:null"`
 	PriceInHouseHour       *int    `gorm:"type:int;default:null"`
 
-	PrinceSaunaNightRatio float64 `gorm:"type:float;not null;default:1"`
-	PriceSaunaContact     *int    `gorm:"type:int;default:null"`
-	PriceSaunaHour        *int    `gorm:"type:int;default:null"`
+	PriceSaunaNightRatio float64 `gorm:"type:float;not null;default:1"`
+	PriceSaunaContact    *int    `gorm:"type:int;default:null"`
+	PriceSaunaHour       *int    `gorm:"type:int;default:null"`
 
 	PriceVisitNightRatio float64 `gorm:"type:float;not null;default:1"`
 	PriceVisitContact    *int    `gorm:"type:int;default:null"`
@@ -90,7 +90,7 @@ type CreateProfileRequest struct {
 	//PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
 	PriceInHouseContact *int `json:"priceInHouseContact,omitempty" validate:"gte=0"`
 	PriceInHouseHour    *int `json:"priceInHouseHour,omitempty" validate:"gte=0"`
-	//PrinceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
+	//PriceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
 	PriceSaunaContact *int `json:"priceSaunaContact,omitempty" validate:"gte=0"`
 	PriceSaunaHour    *int `json:"priceSaunaHour,omitempty" validate:"gte=0"`
 	//PriceVisitNightRatio   float64 `json:"priceVisitNightRatio,omitempty"`
@@ -219,7 +219,7 @@ type ProfileResponse struct {
 	PriceInHouseNightRatio float64                  `json:"priceInHouseNightRatio"`
 	PriceInHouseContact    *int                     `json:"priceInHouseContact,omitempty"`
 	PriceInHouseHour       *int                     `json:"priceInHouseHour,omitempty"`
-	PrinceSaunaNightRatio  float64                  `json:"princeSaunaNightRatio"`
+	PriceSaunaNightRatio   float64                  `json:"priceSaunaNightRatio"`
 	PriceSaunaContact      *int                     `json:"priceSaunaContact,omitempty"`
 	PriceSaunaHour         *int                     `json:"priceSaunaHour,omitempty"`
 	PriceVisitNightRatio   float64                  `json:"priceVisitNightRatio"`
@@ -231,6 +231,8 @@ type ProfileResponse struct {
 	ContactPhone           string                   `json:"contactPhone"`
 	ContactWA              string                   `json:"contactWA,omitempty"`
 	ContactTG              string                   `json:"contactTG,omitempty"`
+	Contacts               []ContactResponse        `json:"contacts,omitempty"`
+	Prices                 []PriceResponse          `json:"prices,omitempty"`
 	Moderated              bool                     `json:"moderated"`
 	ModeratedAt            *time.Time               `json:"moderatedAt,omitempty"`
 	ModeratedBy            *uuid.UUID               `json:"moderatedBy,omitempty"`
@@ -243,4 +245,16 @@ type ProfileResponse struct {
 	ProfileOptions         []ProfileOptionResponse  `json:"profileOptions,omitempty"`
 	Services               []ServiceResponse        `json:"services,omitempty"`
 	UpdatedBy              *uuid.UUID               `json:"updatedBy,omitempty"`
+}
+
+type ContactResponse struct {
+	ContactType string `json:"type"`
+	Value       string `json:"value"`
+}
+
+type PriceResponse struct {
+	TimeRange  string  `json:"timeRange"`
+	Setting    string  `json:"setting"`
+	Value      *int    `json:"value"`
+	NightRatio float64 `json:"nightRatio"`
 }
