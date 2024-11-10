@@ -243,6 +243,73 @@ func MapCity(city *City) *CityResponse {
 	}
 }
 
+func MapEthnos(ethnos *Ethnos) *EthnosResponse {
+	if ethnos == nil {
+		return nil
+	}
+
+	return &EthnosResponse{
+		ID:      ethnos.ID,
+		Name:    ethnos.Name,
+		AliasRu: ethnos.AliasRu,
+		AliasEn: ethnos.AliasEn,
+		Sex:     ethnos.Sex,
+	}
+}
+
+func MapBodyType(bodyType *BodyType) *BodyTypeResponse {
+	if bodyType == nil {
+		return nil
+	}
+
+	return &BodyTypeResponse{
+		ID:      bodyType.ID,
+		Name:    bodyType.Name,
+		AliasRu: bodyType.AliasRu,
+		AliasEn: bodyType.AliasEn,
+	}
+}
+
+// MapBodyArt maps a BodyArt entity to BodyArtResponse
+func MapBodyArt(bodyArt *BodyArt) *BodyArtResponse {
+	if bodyArt == nil {
+		return nil
+	}
+
+	return &BodyArtResponse{
+		ID:      bodyArt.ID,
+		Name:    bodyArt.Name,
+		AliasRu: bodyArt.AliasRu,
+		AliasEn: bodyArt.AliasEn,
+	}
+}
+
+func MapHairColor(hairColor *HairColor) *HairColorResponse {
+	if hairColor == nil {
+		return nil
+	}
+
+	return &HairColorResponse{
+		ID:      hairColor.ID,
+		Name:    hairColor.Name,
+		AliasRu: hairColor.AliasRu,
+		AliasEn: hairColor.AliasEn,
+	}
+}
+
+func MapIntimateHairCut(hairCut *IntimateHairCut) *IntimateHairCutResponse {
+	if hairCut == nil {
+		return nil
+	}
+
+	return &IntimateHairCutResponse{
+		ID:      hairCut.ID,
+		Name:    hairCut.Name,
+		AliasRu: hairCut.AliasRu,
+		AliasEn: hairCut.AliasEn,
+	}
+}
+
 func MapProfileRating(profileRating *ProfileRating) *ProfileRatingResponse {
 	if profileRating == nil {
 		return nil

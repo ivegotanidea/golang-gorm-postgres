@@ -12,6 +12,14 @@ type Ethnos struct {
 	Sex     string `gorm:"size:10;not null"`
 }
 
+type EthnosResponse struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	AliasRu string `json:"aliasRu"`
+	AliasEn string `json:"aliasEn"`
+	Sex     string `json:"sex"`
+}
+
 type BodyType struct {
 	ID      int    `gorm:"primaryKey"`
 	Name    string `gorm:"size:30;not null;unique"`
@@ -19,11 +27,25 @@ type BodyType struct {
 	AliasEn string `gorm:"size:30;not null"`
 }
 
+type BodyTypeResponse struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	AliasRu string `json:"aliasRu"`
+	AliasEn string `json:"aliasEn"`
+}
+
 type BodyArt struct {
 	ID      int    `gorm:"primaryKey"`
 	Name    string `gorm:"size:100;not null;unique"`
 	AliasRu string `gorm:"size:100;not null"`
 	AliasEn string `gorm:"size:100;not null"`
+}
+
+type BodyArtResponse struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	AliasRu string `json:"aliasRu"`
+	AliasEn string `json:"aliasEn"`
 }
 
 type ProfileBodyArt struct {
@@ -42,6 +64,14 @@ type HairColor struct {
 	AliasEn string `gorm:"size:30;not null"`
 }
 
+// HairColorResponse represents the JSON response for hair color data
+type HairColorResponse struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	AliasRu string `json:"aliasRu"`
+	AliasEn string `json:"aliasEn"`
+}
+
 type IntimateHairCut struct {
 	ID      int    `gorm:"primaryKey"`
 	Name    string `gorm:"size:30;not null;unique"`
@@ -49,13 +79,15 @@ type IntimateHairCut struct {
 	AliasEn string `gorm:"size:30;not null"`
 }
 
-type ProfileBodyArtResponse struct {
-	ProfileID string `json:"profileId"`
-	BodyArtID int    `json:"bodyArtId"`
-}
-
-type BodyArtResponse struct {
+// IntimateHairCutResponse represents the JSON response for intimate hair cut data
+type IntimateHairCutResponse struct {
+	ID      int    `json:"id"`
 	Name    string `json:"name"`
 	AliasRu string `json:"aliasRu"`
 	AliasEn string `json:"aliasEn"`
+}
+
+type ProfileBodyArtResponse struct {
+	ProfileID string `json:"profileId"`
+	BodyArtID int    `json:"bodyArtId"`
 }
