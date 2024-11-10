@@ -75,6 +75,7 @@ func (pc *DictionaryController) ListCities(ctx *gin.Context) {
 func (pc *DictionaryController) ListEthnos(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
+	var sex = ctx.DefaultQuery("sex", "female")
 
 	intPage, _ := strconv.Atoi(page)
 	intLimit, _ := strconv.Atoi(limit)
@@ -83,6 +84,7 @@ func (pc *DictionaryController) ListEthnos(ctx *gin.Context) {
 	var ethnosList []Ethnos
 
 	dbQuery := pc.DB.
+		Where("sex = ?", sex).
 		Limit(intLimit).Offset(offset)
 
 	results := dbQuery.Find(&ethnosList)
