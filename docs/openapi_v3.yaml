@@ -1987,18 +1987,28 @@ components:
         cityId:
           type: integer
           nullable: true
+        city:
+          $ref: '#/components/schemas/CityResponse'
         bodyTypeId:
           type: integer
           nullable: true
+        bodyType:
+          $ref: '#/components/schemas/BodyTypeResponse'
         ethnosId:
           type: integer
           nullable: true
+        ethnos:
+          $ref: '#/components/schemas/EthnosResponse'
         hairColorId:
           type: integer
           nullable: true
+        hairColor:
+          $ref: '#/components/schemas/HairColorResponse'
         intimateHairCutId:
           type: integer
           nullable: true
+        intimateHairCut:
+          $ref: '#/components/schemas/IntimateHairCutResponse'
         priceInHouseNightRatio:
           type: number
         priceInHouseContact:
