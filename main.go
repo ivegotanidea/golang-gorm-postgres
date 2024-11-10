@@ -28,6 +28,9 @@ var (
 	ServiceRouteController routes.ServiceRouteController
 
 	ReviewsRouteController routes.ReviewsRouteController
+
+	DictionaryController      controllers.DictionaryController
+	DictionaryRouteController routes.DictionaryRouteController
 )
 
 func init() {
@@ -51,6 +54,9 @@ func init() {
 	ServiceRouteController = routes.NewRouteServiceController(ServiceController)
 
 	ReviewsRouteController = routes.NewRouteReviewController(ServiceController)
+
+	DictionaryController = controllers.NewDictionaryController(initializers.DB)
+	DictionaryRouteController = routes.NewRouteDictionaryController(DictionaryController)
 
 	server = gin.Default()
 }
@@ -85,6 +91,7 @@ func main() {
 	ProfileRouteController.ProfileRoute(router)
 	ServiceRouteController.ServiceRoute(router)
 	ReviewsRouteController.ReviewsRoute(router)
+	DictionaryRouteController.DictionaryRoute(router)
 
 	log.Fatal(server.Run(":" + config.ServerPort))
 }

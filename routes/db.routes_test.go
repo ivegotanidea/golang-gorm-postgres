@@ -42,6 +42,7 @@ func SetupDB() controllers.AuthController {
 		&models.Profile{},
 		&models.Service{},
 		&models.Photo{},
+		&models.Profile{},
 		&models.ProfileOption{},
 		&models.UserRating{},
 		&models.ProfileRating{},
@@ -59,7 +60,7 @@ func TestDbMigrations(t *testing.T) {
 	random := rand.New(rand.NewPCG(1, uint64(time.Now().Nanosecond())))
 
 	t.Cleanup(func() {
-		utils.CleanupTestUsers(ac.DB)
+		//utils.CleanupTestUsers(ac.DB)
 		//utils.DropAllTables(ac.DB)
 	})
 
@@ -88,5 +89,12 @@ func TestDbMigrations(t *testing.T) {
 		// Check name and phone
 		assert.Equal(t, name, user["name"])
 		assert.Equal(t, phone, user["phone"])
+	})
+
+	t.Run("test sex column", func(t *testing.T) {
+
+		var test []models.Profile
+		result := ac.DB.Table("profiles").Select("sex").Limit(1).Find(&test)
+		fmt.Println(result.Error)
 	})
 }

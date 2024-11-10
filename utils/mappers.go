@@ -230,6 +230,19 @@ func MapUserRating(userRating *UserRating) *UserRatingResponse {
 	}
 }
 
+func MapCity(city *City) *CityResponse {
+	if city == nil {
+		return nil
+	}
+
+	return &CityResponse{
+		ID:      city.ID,
+		Name:    city.Name,
+		AliasRu: city.AliasRu,
+		AliasEn: city.AliasEn,
+	}
+}
+
 func MapProfileRating(profileRating *ProfileRating) *ProfileRatingResponse {
 	if profileRating == nil {
 		return nil

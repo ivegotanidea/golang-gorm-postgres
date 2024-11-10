@@ -37,12 +37,6 @@ services:
              /app/main"
     env_file:
       - ./app.env
-    environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: golang-gorm
-      POSTGRES_PORT: 5432
     depends_on:
       - postgres
     networks:

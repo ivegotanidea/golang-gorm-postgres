@@ -8,7 +8,6 @@ import (
 	"github.com/ivegotanidea/golang-gorm-postgres/controllers"
 	"github.com/ivegotanidea/golang-gorm-postgres/initializers"
 	"github.com/ivegotanidea/golang-gorm-postgres/models"
-	"github.com/ivegotanidea/golang-gorm-postgres/utils"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"math/rand/v2"
@@ -104,8 +103,8 @@ func TestReviewsRoutes(t *testing.T) {
 	random := rand.New(rand.NewPCG(1, uint64(time.Now().Nanosecond())))
 
 	t.Cleanup(func() {
-		utils.CleanupTestUsers(pc.DB)
-		utils.DropAllTables(pc.DB)
+		//utils.CleanupTestUsers(pc.DB)
+		//utils.DropAllTables(pc.DB)
 	})
 
 	// -> profile

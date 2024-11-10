@@ -57,7 +57,7 @@ func TestAuthRoutes(t *testing.T) {
 	random := rand.New(rand.NewPCG(1, uint64(time.Now().Nanosecond())))
 
 	t.Cleanup(func() {
-		utils.CleanupTestUsers(ac.DB)
+		//utils.CleanupTestUsers(ac.DB)
 		//utils.DropAllTables(ac.DB)
 	})
 

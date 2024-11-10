@@ -64,8 +64,8 @@ func TestUserRoutes(t *testing.T) {
 	random := rand.New(rand.NewPCG(1, uint64(time.Now().Nanosecond())))
 
 	t.Cleanup(func() {
-		utils.CleanupTestUsers(uc.DB)
-		utils.DropAllTables(uc.DB)
+		//utils.CleanupTestUsers(uc.DB)
+		//utils.DropAllTables(uc.DB)
 	})
 
 	t.Run("GET /api/user/me: fail without access token ", func(t *testing.T) {
