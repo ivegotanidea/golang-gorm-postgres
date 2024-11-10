@@ -69,6 +69,7 @@ func (pc *DictionaryController) ListCities(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		string	false	"Page number"
 //	@Param			limit	query		string	false	"Items per page"
+//	@Param			sex		query		string	female	"Sex"
 //	@Success		200		{object}	SuccessPageResponse[EthnosResponse[]]
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/dict/ethnos [get]

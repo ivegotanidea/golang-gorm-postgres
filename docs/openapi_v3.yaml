@@ -161,6 +161,217 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /dict/cities:
+    get:
+      description: "Retrieves all cities, supports pagination."
+      tags:
+        - "Cities"
+      summary: "Lists all cities with pagination, auth required"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dict/ethnos:
+    get:
+      description: "Retrieves all cities, supports pagination."
+      tags:
+        - "Ethnos"
+      summary: "Lists all cities with pagination, auth required"
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: "sex"
+          in: "query"
+          description: "Sex"
+          required: false
+          schema:
+            type: string
+            default: "female"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dict/bodies:
+    get:
+      description: "Retrieves all body types, supports pagination."
+      tags:
+        - "Body Types"
+      summary: "Lists all body types with pagination, auth required."
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dict/arts:
+    get:
+      description: "Retrieves all body arts, supports pagination."
+      tags:
+        - "Body Arts"
+      summary: "Lists all body arts with pagination, auth required."
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dict/colors:
+    get:
+      description: "Retrieves all hair colors, supports pagination."
+      tags:
+        - "Hair Colors"
+      summary: "Lists all hair colors with pagination, auth required."
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dict/cuts:
+    get:
+      description: "Retrieves all intimate hair cuts, supports pagination."
+      tags:
+        - "Intimate Hair Cuts"
+      summary: "Lists all intimate hair cuts with pagination, auth required."
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /payments:
     get:
       description: "Retrieves all payments, sorted by payment date in descending order with pagination."
@@ -1561,6 +1772,78 @@ components:
         weight:
           type: integer
 
+    CityResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+
+    EthnosResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+
+    BodyTypeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+
+    BodyArtResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+
+    HairColorResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+
+    IntimateHairCutResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+
     Payment:
       type: object
       properties:
@@ -2031,6 +2314,12 @@ components:
               - $ref: '#/components/schemas/ProfileResponse'
               - $ref: '#/components/schemas/ServiceResponse'
               - $ref: '#/components/schemas/Payment'
+              - $ref: '#/components/schemas/CityResponse'
+              - $ref: '#/components/schemas/EthnosResponse'
+              - $ref: '#/components/schemas/BodyTypeResponse'
+              - $ref: '#/components/schemas/BodyArtResponse'
+              - $ref: '#/components/schemas/HairColorResponse'
+              - $ref: '#/components/schemas/IntimateHairCutResponse'
               - type: string
           description: |
             Data contains the data payload for the current page. It can be an array of:
