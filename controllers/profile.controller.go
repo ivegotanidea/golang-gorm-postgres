@@ -197,13 +197,21 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	newProfile.ProfileOptions = options
 
-	profileResponse := utils.MapProfile(&newProfile)
+	// Preload related fields for City, BodyType, Ethnos, HairColor, and IntimateHairCut
+	if err := tx.Preload("City").Preload("BodyType").Preload("Ethnos").
+		Preload("HairColor").Preload("IntimateHairCut").First(&newProfile, newProfile.ID).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to preload related data: %s", err.Error())})
+		return
+	}
 
 	// Commit the transaction if everything was successful
 	if err := tx.Commit().Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
+
+	profileResponse := utils.MapProfile(&newProfile)
 
 	// Return the created profile in the response
 	ctx.JSON(http.StatusCreated, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
@@ -235,7 +243,13 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 
 	// Find the existing profile
 	var existingProfile Profile
-	result := pc.DB.First(&existingProfile, "id = ?", profileId)
+	result := pc.DB.Preload("City").
+		Preload("BodyType").
+		Preload("Ethnos").
+		Preload("HairColor").
+		Preload("IntimateHairCut").
+		First(&existingProfile, "id = ?", profileId)
+
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "No profile with that ID exists"})
 		return
@@ -487,7 +501,13 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 
 	// Find the existing profile
 	var existingProfile Profile
-	result := pc.DB.First(&existingProfile, "id = ?", profileId)
+	result := pc.DB.Preload("City").
+		Preload("BodyType").
+		Preload("Ethnos").
+		Preload("HairColor").
+		Preload("IntimateHairCut").
+		First(&existingProfile, "id = ?", profileId)
+
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "No profile with that ID exists"})
 		return
@@ -591,6 +611,11 @@ func (pc *ProfileController) FindProfileByID(ctx *gin.Context) {
 	var profile Profile
 
 	result := pc.DB.Preload("Photos").
+		Preload("City").
+		Preload("BodyType").
+		Preload("Ethnos").
+		Preload("HairColor").
+		Preload("IntimateHairCut").
 		Preload("BodyArts").
 		Preload("ProfileOptions.ProfileTag").
 		First(&profile, "id = ?", id)
@@ -620,6 +645,11 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 	var profile Profile
 
 	result := pc.DB.Preload("Photos").
+		Preload("City").
+		Preload("BodyType").
+		Preload("Ethnos").
+		Preload("HairColor").
+		Preload("IntimateHairCut").
 		Preload("BodyArts").
 		Preload("ProfileOptions.ProfileTag").
 		First(&profile, "phone = ?", phone)
@@ -655,6 +685,11 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 	var profiles []Profile
 
 	dbQuery := pc.DB.Preload("Photos").
+		Preload("City").
+		Preload("BodyType").
+		Preload("Ethnos").
+		Preload("HairColor").
+		Preload("IntimateHairCut").
 		Preload("BodyArts").
 		Preload("ProfileOptions.ProfileTag").
 		Limit(intLimit).Offset(offset)
@@ -706,6 +741,11 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 	var profiles []Profile
 
 	dbQuery := pc.DB.Preload("Photos").
+		Preload("City").
+		Preload("BodyType").
+		Preload("Ethnos").
+		Preload("HairColor").
+		Preload("IntimateHairCut").
 		Preload("BodyArts").
 		Preload("ProfileOptions.ProfileTag").
 		Where("active = ?", true).
@@ -756,6 +796,11 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 	var profiles []Profile
 
 	dbQuery := pc.DB.Preload("Photos").
+		Preload("City").
+		Preload("BodyType").
+		Preload("Ethnos").
+		Preload("HairColor").
+		Preload("IntimateHairCut").
 		Preload("BodyArts").
 		Preload("ProfileOptions.ProfileTag").
 		Limit(intLimit).Offset(offset)
@@ -811,7 +856,15 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 	}
 
 	var profiles []Profile
-	dbQuery := pc.DB.Limit(intLimit).Offset(offset)
+	dbQuery := pc.DB.Preload("Photos").
+		Preload("City").
+		Preload("BodyType").
+		Preload("Ethnos").
+		Preload("HairColor").
+		Preload("IntimateHairCut").
+		Preload("BodyArts").
+		Preload("ProfileOptions.ProfileTag").
+		Limit(intLimit).Offset(offset)
 
 	// Apply filtering based on query parameters
 	if query.BodyTypeId != nil {

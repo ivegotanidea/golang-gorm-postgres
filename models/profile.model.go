@@ -7,26 +7,30 @@ import (
 )
 
 type Profile struct {
-	BodyTypeID        *int `gorm:"type:integer;default:null"`
-	EthnosID          *int `gorm:"type:integer;default:null"`
-	HairColorID       *int `gorm:"type:integer;default:null"`
-	IntimateHairCutID *int `gorm:"type:integer;default:null"`
-
-	CityID           int       `gorm:"type:integer;not null;default:0"`
-	ParsedUrl        string    `gorm:"type:varchar(255);not null;default:''"`
-	ID               uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	UserID           uuid.UUID `gorm:"type:uuid;not null"`
-	Active           bool      `gorm:"type:boolean;default:true"`
-	Phone            string    `gorm:"type:varchar(30)"` // ;index:,unique,composite:idx_single_profile"
-	Name             string    `gorm:"type:varchar(50)"`
-	Age              int       `gorm:"type:int;not null"`
-	Height           int       `gorm:"type:int;not null"`
-	Weight           int       `gorm:"type:int;not null"`
-	Bust             float64   `gorm:"type:float"`
-	Bio              string    `gorm:"type:varchar(2000)"`
-	Sex              string    `gorm:"type:varchar(10)"`
-	AddressLatitude  string    `gorm:"type:varchar(10)"`
-	AddressLongitude string    `gorm:"type:varchar(10)"`
+	BodyTypeID        *int             `gorm:"type:integer;default:null"`
+	BodyType          *BodyType        `gorm:"foreignKey:BodyTypeID"`
+	EthnosID          *int             `gorm:"type:integer;default:null"`
+	Ethnos            *Ethnos          `gorm:"foreignKey:EthnosID"`
+	HairColorID       *int             `gorm:"type:integer;default:null"`
+	HairColor         *HairColor       `gorm:"foreignKey:HairColorID"`
+	IntimateHairCutID *int             `gorm:"type:integer;default:null"`
+	IntimateHairCut   *IntimateHairCut `gorm:"foreignKey:IntimateHairCutID"`
+	CityID            int              `gorm:"type:integer;not null;default:0"`
+	City              *City            `gorm:"foreignKey:CityID"`
+	ParsedUrl         string           `gorm:"type:varchar(255);not null;default:''"`
+	ID                uuid.UUID        `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	UserID            uuid.UUID        `gorm:"type:uuid;not null"`
+	Active            bool             `gorm:"type:boolean;default:true"`
+	Phone             string           `gorm:"type:varchar(30)"` // ;index:,unique,composite:idx_single_profile"
+	Name              string           `gorm:"type:varchar(50)"`
+	Age               int              `gorm:"type:int;not null"`
+	Height            int              `gorm:"type:int;not null"`
+	Weight            int              `gorm:"type:int;not null"`
+	Bust              float64          `gorm:"type:float"`
+	Bio               string           `gorm:"type:varchar(2000)"`
+	Sex               string           `gorm:"type:varchar(10)"`
+	AddressLatitude   string           `gorm:"type:varchar(10)"`
+	AddressLongitude  string           `gorm:"type:varchar(10)"`
 
 	PriceInHouseNightRatio float64 `gorm:"type:float;not null;default:1"`
 	PriceInHouseContact    *int    `gorm:"type:int;default:null"`
@@ -212,10 +216,15 @@ type ProfileResponse struct {
 	AddressLatitude        string                   `json:"addressLatitude,omitempty"`
 	AddressLongitude       string                   `json:"addressLongitude,omitempty"`
 	CityID                 *int                     `json:"cityId,omitempty"`
+	City                   *CityResponse            `json:"city,omitempty"`
 	BodyTypeID             *int                     `json:"bodyTypeId,omitempty"`
+	BodyType               *BodyTypeResponse        `json:"bodyTypeResponse,omitempty"`
 	EthnosID               *int                     `json:"ethnosId,omitempty"`
+	Ethnos                 *EthnosResponse          `json:"ethnos,omitempty"`
 	HairColorID            *int                     `json:"hairColorId,omitempty"`
+	HairColor              *HairColorResponse       `json:"hairColor,omitempty"`
 	IntimateHairCutID      *int                     `json:"intimateHairCutId,omitempty"`
+	IntimateHairCut        *IntimateHairCutResponse `json:"intimateHairCut,omitempty"`
 	PriceInHouseNightRatio float64                  `json:"priceInHouseNightRatio"`
 	PriceInHouseContact    *int                     `json:"priceInHouseContact,omitempty"`
 	PriceInHouseHour       *int                     `json:"priceInHouseHour,omitempty"`
