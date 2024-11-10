@@ -423,7 +423,7 @@ func (uc *UserController) UpdateSelf(ctx *gin.Context) {
 //	@Tags			Users
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		string					true	"User ID"
+//	@Param			id		path		string						true	"User ID"
 //	@Param			body	body		UpdateUserPrivilegedRequest	true	"User Update Payload"
 //	@Success		200		{object}	SuccessResponse[UserResponse]
 //	@Failure		400		{object}	ErrorResponse

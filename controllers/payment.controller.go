@@ -26,7 +26,7 @@ func NewPaymentController(DB *gorm.DB, apiKey string, baseUrl string) PaymentCon
 //	@Tags			Payments
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		Payment							true	"Payment Update"
+//	@Param			body	body		Payment					true	"Payment Update"
 //	@Success		200		{object}	SuccessResponse[string]	"payment updated"
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse

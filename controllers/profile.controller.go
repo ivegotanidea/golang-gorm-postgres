@@ -602,8 +602,8 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 //	@Tags			Profiles
 //	@Produce		json
 //	@Param			id	path		string	true	"Profile ID"
-//	@Success		200		{object}	SuccessResponse[ProfileResponse]
-//	@Failure		404		{object}	ErrorResponse
+//	@Success		200	{object}	SuccessResponse[ProfileResponse]
+//	@Failure		404	{object}	ErrorResponse
 //	@Router			/profiles/{id} [get]
 func (pc *ProfileController) FindProfileByID(ctx *gin.Context) {
 	id := ctx.Param("id")
