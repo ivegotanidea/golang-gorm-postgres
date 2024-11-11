@@ -165,7 +165,7 @@ paths:
     get:
       description: "Retrieves all cities, supports pagination."
       tags:
-        - "Cities"
+        - "Dict"
       summary: "Lists all cities with pagination, auth required"
       parameters:
         - name: "page"
@@ -199,7 +199,7 @@ paths:
     get:
       description: "Retrieves all cities, supports pagination."
       tags:
-        - "Ethnos"
+        - "Dict"
       summary: "Lists all cities with pagination, auth required"
       parameters:
         - name: "page"
@@ -240,7 +240,7 @@ paths:
     get:
       description: "Retrieves all body types, supports pagination."
       tags:
-        - "Body Types"
+        - "Dict"
       summary: "Lists all body types with pagination, auth required."
       parameters:
         - name: "page"
@@ -274,7 +274,7 @@ paths:
     get:
       description: "Retrieves all body arts, supports pagination."
       tags:
-        - "Body Arts"
+        - "Dict"
       summary: "Lists all body arts with pagination, auth required."
       parameters:
         - name: "page"
@@ -308,7 +308,7 @@ paths:
     get:
       description: "Retrieves all hair colors, supports pagination."
       tags:
-        - "Hair Colors"
+        - "Dict"
       summary: "Lists all hair colors with pagination, auth required."
       parameters:
         - name: "page"
@@ -342,7 +342,7 @@ paths:
     get:
       description: "Retrieves all intimate hair cuts, supports pagination."
       tags:
-        - "Intimate Hair Cuts"
+        - "Dict"
       summary: "Lists all intimate hair cuts with pagination, auth required."
       parameters:
         - name: "page"

@@ -6,35 +6,32 @@ import "github.com/swaggo/swag"
 const docTemplate = `{
     "swagger": "2.0",
     "info": {
-        "description": "API Documentation",
         "title": "Your API Title",
         "version": "1.0.0",
         "contact": {}
     },
-    "host": "localhost",
-    "basePath": "/v1",
+    "host": "localhost/api/v1",
     "schemes": [
-        "https"
+        "http"
     ],
     "paths": {
         "/auth/bot/login": {
             "post": {
                 "description": "Authenticates a bot user by accepting Telegram User ID.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs in a bot user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Logs in a bot user",
                 "parameters": [
                     {
-                        "description": "Bot SignIn Input",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/BotSignInRequest"
@@ -45,7 +42,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/TokenResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -60,21 +57,20 @@ const docTemplate = `{
         "/auth/bot/signup": {
             "post": {
                 "description": "Registers a new user by accepting Telegram user ID and other basic details. Automatically generates password.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registers a new user via bot",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Registers a new user via bot",
                 "parameters": [
                     {
-                        "description": "Bot Signup Input",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/BotSignUpRequest"
@@ -85,7 +81,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/UserResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -106,21 +102,20 @@ const docTemplate = `{
         "/auth/login": {
             "post": {
                 "description": "Authenticates a user by accepting phone and password.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs in a user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Logs in a user",
                 "parameters": [
                     {
-                        "description": "SignIn Input",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/SignInRequest"
@@ -131,7 +126,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/TokenResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -146,13 +141,21 @@ const docTemplate = `{
         "/auth/logout": {
             "post": {
                 "description": "Clears the access and refresh tokens and logs out the user.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Logs out a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -166,18 +169,26 @@ const docTemplate = `{
         "/auth/refresh": {
             "post": {
                 "description": "Refreshes the access token using the refresh token cookie.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Refreshes access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/TokenResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "403": {
@@ -192,21 +203,20 @@ const docTemplate = `{
         "/auth/signup": {
             "post": {
                 "description": "Registers a new user by accepting basic details and password confirmation.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registers a new user",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Registers a new user",
                 "parameters": [
                     {
-                        "description": "SignUp Input",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/SignUpRequest"
@@ -241,40 +251,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/payments": {
+        "/dict/cities": {
             "get": {
-                "description": "Retrieves all payments, sorted by payment date in descending order with pagination.",
-                "consumes": [
-                    "application/json"
+                "description": "Retrieves all cities, supports pagination.",
+                "tags": [
+                    "Dict"
+                ],
+                "summary": "Lists all cities with pagination, auth required",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Payments"
-                ],
-                "summary": "List all payments",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
                     },
                     {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Limit per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessPageResponsePayment"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "500": {
@@ -286,47 +300,353 @@ const docTemplate = `{
                 }
             }
         },
-        "/payments/history/{userID}": {
+        "/dict/ethnos": {
             "get": {
-                "description": "Retrieves the payment history for a specified user between two dates.",
-                "consumes": [
-                    "application/json"
+                "description": "Retrieves all ethnos, supports pagination.",
+                "tags": [
+                    "Dict"
+                ],
+                "summary": "Lists all ethnos with pagination, auth required",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Payments"
-                ],
-                "summary": "Get payment history for a user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
                     },
                     {
-                        "type": "string",
-                        "description": "Start Date in RFC3339 format",
-                        "name": "start",
+                        "name": "limit",
                         "in": "query",
-                        "required": true
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
                     },
                     {
-                        "type": "string",
-                        "description": "End Date in RFC3339 format",
-                        "name": "end",
+                        "name": "sex",
                         "in": "query",
-                        "required": true
+                        "description": "Sex",
+                        "required": false,
+                        "type": "string",
+                        "default": "female"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessPageResponsePayment"
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dict/bodies": {
+            "get": {
+                "description": "Retrieves all body types, supports pagination.",
+                "tags": [
+                    "Dict"
+                ],
+                "summary": "Lists all body types with pagination, auth required.",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dict/arts": {
+            "get": {
+                "description": "Retrieves all body arts, supports pagination.",
+                "tags": [
+                    "Dict"
+                ],
+                "summary": "Lists all body arts with pagination, auth required.",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dict/colors": {
+            "get": {
+                "description": "Retrieves all hair colors, supports pagination.",
+                "tags": [
+                    "Dict"
+                ],
+                "summary": "Lists all hair colors with pagination, auth required.",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dict/cuts": {
+            "get": {
+                "description": "Retrieves all intimate hair cuts, supports pagination.",
+                "tags": [
+                    "Dict"
+                ],
+                "summary": "Lists all intimate hair cuts with pagination, auth required.",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/payments": {
+            "get": {
+                "description": "Retrieves all payments, sorted by payment date in descending order with pagination.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "List all payments",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/history/{userID}": {
+            "get": {
+                "description": "Retrieves the payment history for a specified user between two dates.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Get payment history for a user",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userID",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "description": "Start Date in RFC3339 format",
+                        "required": true,
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    {
+                        "name": "end",
+                        "in": "query",
+                        "description": "End Date in RFC3339 format",
+                        "required": true,
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "500": {
@@ -341,37 +661,41 @@ const docTemplate = `{
         "/payments/me": {
             "get": {
                 "description": "Retrieves the payments made by the current user, sorted by payment date in descending order with pagination.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Payments"
                 ],
                 "summary": "Get current user's payments",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
                     },
                     {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Limit per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessPageResponsePayment"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "500": {
@@ -386,21 +710,20 @@ const docTemplate = `{
         "/payments/webhook": {
             "post": {
                 "description": "Receives payment updates and updates the payment status in the database.",
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Webhook for payment updates",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Payments"
-                ],
-                "summary": "Webhook for payment updates",
                 "parameters": [
                     {
-                        "description": "Payment Update",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/Payment"
@@ -411,7 +734,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Payment updated",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseString"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -432,21 +755,25 @@ const docTemplate = `{
         "/profiles": {
             "post": {
                 "description": "Creates a new profile for the current user",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Creates a new profile",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Creates a new profile",
                 "parameters": [
                     {
-                        "description": "Create Profile Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/CreateProfileRequest"
@@ -457,7 +784,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseProfileResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -481,35 +808,234 @@ const docTemplate = `{
                 }
             }
         },
-        "/profiles/all": {
-            "get": {
-                "description": "Retrieves all profiles, supports pagination",
-                "produces": [
-                    "application/json"
-                ],
+        "/profiles/{id}": {
+            "delete": {
+                "description": "Deletes the profile with the given ID from the database",
                 "tags": [
                     "Profiles"
                 ],
-                "summary": "Lists all profiles with pagination, auth required",
+                "summary": "Deletes a profile by ID",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
+                        "name": "id",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "description": "Retrieves a profile based on the id",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Find a profile by id",
+                "security": [
                     {
-                        "type": "string",
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessPageResponseProfileResponse"
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{profileID}/services": {
+            "get": {
+                "description": "Retrieves all services for a specific profile, with filtered data based on the user's tier.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get all services for a specific profile",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "profileID",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{profileID}/services/{serviceID}": {
+            "get": {
+                "description": "Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get a specific service by profile and service ID",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "profileID",
+                        "in": "path",
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "serviceID",
+                        "in": "path",
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/all": {
+            "get": {
+                "description": "Retrieves all profiles, supports pagination",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Lists all profiles with pagination, auth required",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "502": {
@@ -523,33 +1049,44 @@ const docTemplate = `{
         },
         "/profiles/list": {
             "get": {
-                "description": "Retrieves all profiles, supports pagination",
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Retrieves all active profiles, supports pagination",
                 "tags": [
                     "Profiles"
                 ],
                 "summary": "Lists all active profiles with pagination, no auth required",
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
                     },
                     {
-                        "type": "string",
-                        "description": "Items per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
+                    },
+                    {
+                        "name": "sex",
+                        "in": "query",
+                        "description": "Sex",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessPageResponseProfileResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "502": {
@@ -564,32 +1101,41 @@ const docTemplate = `{
         "/profiles/my": {
             "get": {
                 "description": "Retrieves the profiles created by the currently authenticated user",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Profiles"
                 ],
                 "summary": "Get current user's profiles",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
                     },
                     {
-                        "type": "string",
-                        "description": "Items per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessPageResponseProfileResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "502": {
@@ -603,29 +1149,33 @@ const docTemplate = `{
         },
         "/profiles/my/{id}": {
             "put": {
-                "description": "User updates his own profile with the provided fields",
+                "description": "User updates their own profile with the provided fields",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "User updates their own profile",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "User updates his own profile",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Profile ID",
                         "name": "id",
                         "in": "path",
-                        "required": true
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "Profile Update Payload",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/UpdateOwnProfileRequest"
@@ -636,7 +1186,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseProfileResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -663,21 +1213,25 @@ const docTemplate = `{
         "/profiles/search": {
             "post": {
                 "description": "Retrieves profiles based on filters provided in the query",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Search for profiles",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Search for profiles",
                 "parameters": [
                     {
-                        "description": "Search Filters",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/FindProfilesQuery"
@@ -688,7 +1242,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessPageResponseProfileResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "400": {
@@ -709,28 +1263,32 @@ const docTemplate = `{
         "/profiles/update/{id}": {
             "put": {
                 "description": "Updates the profile with the given ID, allows updating specific fields",
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Updates an existing profile",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Updates an existing profile",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Profile ID",
                         "name": "id",
                         "in": "path",
-                        "required": true
+                        "description": "Profile ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "Profile Update Payload",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/UpdateProfileRequest"
@@ -741,7 +1299,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseProfileResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -765,207 +1323,32 @@ const docTemplate = `{
                 }
             }
         },
-        "/profiles/{id}": {
-            "delete": {
-                "description": "Deletes the profile with the given ID from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Deletes a profile by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Profile ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/{phone}": {
-            "get": {
-                "description": "Retrieves a profile based on the phone number provided",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profiles"
-                ],
-                "summary": "Find a profile by phone number",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Phone Number",
-                        "name": "phone",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/SuccessResponseProfileResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/{profileID}/services": {
-            "get": {
-                "description": "Retrieves all services for a specific profile, with filtered data based on the user's tier.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Get all services for a specific profile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Profile ID",
-                        "name": "profileID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "1",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "10",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/SuccessPageResponseServiceResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/{profileID}/services/{serviceID}": {
-            "get": {
-                "description": "Retrieves a service based on the profile ID and service ID, with filtered data based on the user's tier.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Get a specific service by profile and service ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Profile ID",
-                        "name": "profileID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Service ID",
-                        "name": "serviceID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/SuccessResponseService"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/reviews/client/update": {
             "put": {
                 "description": "Updates the user review for a service if the current user is authorized to do so and within the allowed time limit.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Services"
                 ],
                 "summary": "Update a client's user review on a profile service",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceId",
                         "in": "query",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "User Rating Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/CreateUserRatingRequest"
@@ -976,7 +1359,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseServiceResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -1009,28 +1392,29 @@ const docTemplate = `{
         "/reviews/client/visibility": {
             "put": {
                 "description": "Set visibility of the profile owner's review based on the client's request. Only available for non-basic tier users.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Services"
                 ],
                 "summary": "Set visibility of the profile owner's review",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceId",
                         "in": "query",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "Set Review Visibility Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/SetReviewVisibilityRequest"
@@ -1041,7 +1425,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseService"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -1074,28 +1458,32 @@ const docTemplate = `{
         "/reviews/host/update": {
             "put": {
                 "description": "Allows a profile owner to update their review on a client user within the allowed time limit.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Update the profile owner's review on a client user",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Update the profile owner's review on a client user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceId",
                         "in": "query",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "Create Profile Rating Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/CreateProfileRatingRequest"
@@ -1106,7 +1494,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseService"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -1139,28 +1527,29 @@ const docTemplate = `{
         "/reviews/host/visibility": {
             "put": {
                 "description": "Allows a profile owner to set user's review visibility. Only available for non-basic tier users.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Services"
                 ],
                 "summary": "Set visibility of user's review",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Service ID",
                         "name": "serviceId",
                         "in": "query",
-                        "required": true
+                        "description": "Service ID",
+                        "required": true,
+                        "type": "string"
                     },
                     {
-                        "description": "Set Review Visibility Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/SetReviewVisibilityRequest"
@@ -1171,7 +1560,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseService"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -1204,37 +1593,41 @@ const docTemplate = `{
         "/services": {
             "get": {
                 "description": "Retrieves a paginated list of services with all related information.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Services"
                 ],
                 "summary": "Get a list of services",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "default": "1",
-                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
                     },
                     {
-                        "type": "string",
-                        "default": "10",
-                        "description": "Number of items per page",
                         "name": "limit",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessPageResponseServiceResponse"
+                            "$ref": "#/definitions/SuccessPageResponse"
                         }
                     },
                     "502": {
@@ -1247,21 +1640,25 @@ const docTemplate = `{
             },
             "post": {
                 "description": "Creates a new service between a client user and a profile, including optional ratings for both the profile and the user.",
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Create a new service",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Create a new service",
                 "parameters": [
                     {
-                        "description": "Create Service Request",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/CreateServiceRequest"
@@ -1272,7 +1669,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseServiceResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -1293,41 +1690,46 @@ const docTemplate = `{
         "/users": {
             "get": {
                 "description": "Retrieve a user by providing their user ID, Telegram user ID, or phone number. At least one of these fields is required.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get a user by ID, Telegram user ID, or phone",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
                         "name": "id",
-                        "in": "query"
+                        "in": "query",
+                        "description": "User ID",
+                        "required": false,
+                        "type": "string"
                     },
                     {
-                        "type": "integer",
-                        "description": "Telegram User ID",
                         "name": "telegramUserId",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Telegram User ID",
+                        "required": false,
+                        "type": "integer"
                     },
                     {
-                        "type": "string",
-                        "description": "Phone number",
                         "name": "phone",
-                        "in": "query"
+                        "in": "query",
+                        "description": "Phone number",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseUserResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -1345,24 +1747,138 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/assign-role": {
-            "post": {
-                "description": "Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.",
+        "/users/{id}": {
+            "delete": {
+                "description": "Allows an authorized user to delete another user by their ID, with role-based restrictions.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user by ID",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update a user's information (privileged access)",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdateUserPrivilegedRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/assign-role": {
+            "post": {
+                "description": "Allows admins to assign roles to users. Only admin can assign roles, and cannot assign roles to other admins or owners.",
                 "tags": [
                     "Users"
                 ],
                 "summary": "Assign a role to a user",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
-                        "description": "Role assignment details",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/AssignRole"
@@ -1373,7 +1889,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseUserResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -1406,21 +1922,23 @@ const docTemplate = `{
         "/users/me": {
             "get": {
                 "description": "Retrieves the profile of the currently authenticated user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get current authenticated user",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseUserResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "401": {
@@ -1433,21 +1951,25 @@ const docTemplate = `{
             },
             "put": {
                 "description": "Allows the current user to update their own profile, including name, phone, and avatar.",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update the current user's information",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Update the current user's information",
                 "parameters": [
                     {
-                        "description": "User Update Payload",
-                        "name": "body",
                         "in": "body",
+                        "name": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/UpdateUser"
@@ -1458,7 +1980,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/SuccessResponseUserResponse"
+                            "$ref": "#/definitions/SuccessResponse"
                         }
                     },
                     "400": {
@@ -1485,107 +2007,17 @@ const docTemplate = `{
         "/users/self": {
             "delete": {
                 "description": "Allows the current user to delete their own account.",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Users"
                 ],
                 "summary": "Delete the currently authenticated user",
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
+                "security": [
+                    {
+                        "BearerAuth": []
                     }
-                }
-            }
-        },
-        "/users/{id}": {
-            "put": {
-                "description": "Allows privileged users to update user details, including Telegram ID, verification status, tier, and active status.",
-                "consumes": [
-                    "application/json"
                 ],
                 "produces": [
                     "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Update a user's information (privileged access)",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "User Update Payload",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/UpdateUserPrivilegedRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/SuccessResponseUserResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Allows an authorized user to delete another user by their ID, with role-based restrictions.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Delete a user by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
                 ],
                 "responses": {
                     "204": {
@@ -1593,12 +2025,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/ErrorResponse"
                         }
@@ -1613,6 +2039,13 @@ const docTemplate = `{
             }
         }
     },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
     "definitions": {
         "AssignRole": {
             "type": "object",
@@ -1622,14 +2055,16 @@ const docTemplate = `{
             ],
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_12345"
                 },
                 "role": {
                     "type": "string",
                     "enum": [
                         "moderator",
                         "admin"
-                    ]
+                    ],
+                    "example": "moderator"
                 }
             }
         },
@@ -1640,7 +2075,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "telegramUserId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "telegram_67890"
                 }
             }
         },
@@ -1654,15 +2090,52 @@ const docTemplate = `{
             "properties": {
                 "name": {
                     "type": "string",
-                    "minLength": 5
+                    "minLength": 5,
+                    "example": "JohnDoe"
                 },
                 "phone": {
                     "type": "string",
+                    "minLength": 11,
                     "maxLength": 11,
-                    "minLength": 11
+                    "example": "12345678901"
                 },
                 "telegramUserId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "telegram_67890"
+                }
+            }
+        },
+        "ContactResponse": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "example": "email"
+                },
+                "value": {
+                    "type": "string",
+                    "example": "user@example.com"
+                }
+            }
+        },
+        "PriceResponse": {
+            "type": "object",
+            "properties": {
+                "timeRange": {
+                    "type": "string",
+                    "example": "morning"
+                },
+                "setting": {
+                    "type": "string",
+                    "example": "standard"
+                },
+                "value": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "nightRatio": {
+                    "type": "number",
+                    "example": 1.5
                 }
             }
         },
@@ -1673,7 +2146,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "bodyArtId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -1684,7 +2158,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "url": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "https://example.com/photo.jpg"
                 }
             }
         },
@@ -1696,14 +2171,17 @@ const docTemplate = `{
             "properties": {
                 "comment": {
                     "type": "string",
-                    "maxLength": 50
+                    "maxLength": 50,
+                    "example": "No tattoos"
                 },
                 "price": {
                     "type": "integer",
-                    "minimum": 0
+                    "minimum": 0,
+                    "example": 50
                 },
                 "profileTagId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -1717,10 +2195,12 @@ const docTemplate = `{
                     }
                 },
                 "review": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Great service!"
                 },
                 "score": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 }
             }
         },
@@ -1743,10 +2223,12 @@ const docTemplate = `{
             ],
             "properties": {
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 25
                 },
                 "bio": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Experienced professional."
                 },
                 "bodyArts": {
                     "type": "array",
@@ -1755,46 +2237,62 @@ const docTemplate = `{
                     }
                 },
                 "bodyTypeId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "bust": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 34.5
                 },
                 "cityId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 101
                 },
                 "contactPhone": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "12345678901"
                 },
                 "contactTG": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "@johndoe"
                 },
                 "contactWA": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "+12345678901"
                 },
                 "ethnosId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 },
                 "hairColorId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "height": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 175
                 },
                 "intimateHairCutId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 4
                 },
                 "latitude": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "40.7128 N"
                 },
                 "longitude": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "74.0060 W"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jane Doe"
                 },
                 "phone": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 11,
+                    "maxLength": 11,
+                    "example": "09876543210"
                 },
                 "photos": {
                     "type": "array",
@@ -1803,28 +2301,52 @@ const docTemplate = `{
                     }
                 },
                 "priceCarContact": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 200
                 },
                 "priceCarHour": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 150
+                },
+                "priceCarNightRatio": {
+                    "type": "number",
+                    "example": 1.2
                 },
                 "priceInHouseContact": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 100
                 },
                 "priceInHouseHour": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 80
+                },
+                "priceInHouseNightRatio": {
+                    "type": "number",
+                    "example": 1.1
                 },
                 "priceSaunaContact": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 50
                 },
                 "priceSaunaHour": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 40
                 },
                 "priceVisitContact": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 70
                 },
                 "priceVisitHour": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 60
+                },
+                "priceVisitNightRatio": {
+                    "type": "number",
+                    "example": 1.3
+                },
+                "princeSaunaNightRatio": {
+                    "type": "number",
+                    "example": 1.4
                 },
                 "profileOptions": {
                     "type": "array",
@@ -1833,7 +2355,20 @@ const docTemplate = `{
                     }
                 },
                 "weight": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 60
+                },
+                "contacts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ContactResponse"
+                    }
+                },
+                "prices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PriceResponse"
+                    }
                 }
             }
         },
@@ -1841,10 +2376,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "tagId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "positive"
                 }
             }
         },
@@ -1852,10 +2389,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "tagId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "negative"
                 }
             }
         },
@@ -1863,28 +2402,35 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "clientUserLatitude": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 40.7128
                 },
                 "clientUserLongitude": {
-                    "type": "number"
+                    "type": "number",
+                    "example": -74.0060
                 },
                 "profileId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "profile_12345"
                 },
                 "profileOwnerId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_67890"
                 },
                 "profileRating": {
                     "$ref": "#/definitions/CreateProfileRatingRequest"
                 },
                 "profileUserLatitude": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 34.0522
                 },
                 "profileUserLongitude": {
-                    "type": "number"
+                    "type": "number",
+                    "example": -118.2437
                 },
                 "userId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_54321"
                 },
                 "userRating": {
                     "$ref": "#/definitions/CreateUserRatingRequest"
@@ -1901,10 +2447,12 @@ const docTemplate = `{
                     }
                 },
                 "review": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Excellent experience!"
                 },
                 "score": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 }
             }
         },
@@ -1913,12 +2461,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
-                    "description": "Message provides a human-readable description of the error that occurred.",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Invalid request payload",
+                    "description": "Message provides a human-readable description of the error that occurred."
                 },
                 "status": {
-                    "description": "Status represents the status of the response, usually set to \"error\".",
-                    "type": "string"
+                    "type": "string",
+                    "example": "error",
+                    "description": "Status represents the status of the response, usually set to 'error'."
                 }
             }
         },
@@ -1926,112 +2476,272 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "active": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 30
                 },
                 "bodyArtIds": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [1, 2]
                 },
                 "bodyTypeId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "bust": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 34.5
                 },
                 "cityId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 101
                 },
                 "ethnosId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 },
                 "hairColorId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "height": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 175
                 },
                 "intimateHairCutId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 4
                 },
                 "latitude": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "40.7128 N"
                 },
                 "longitude": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "74.0060 W"
                 },
                 "moderated": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jane"
                 },
                 "phone": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "09876543210"
                 },
                 "priceCarContactMax": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 300
                 },
                 "priceCarContactMin": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 100
                 },
                 "priceCarHourMax": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 200
                 },
                 "priceCarHourMin": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 50
                 },
                 "priceInHouseContactMax": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 150
                 },
                 "priceInHouseContactMin": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 50
                 },
                 "priceInHouseHourMax": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 120
                 },
                 "priceInHouseHourMin": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 30
                 },
                 "priceSaunaContactMax": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 80
                 },
                 "priceSaunaContactMin": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 20
                 },
                 "priceSaunaHourMax": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 60
                 },
                 "priceSaunaHourMin": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 15
                 },
                 "priceVisitContactMax": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 100
                 },
                 "priceVisitContactMin": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 30
                 },
                 "priceVisitHourMax": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 90
                 },
                 "priceVisitHourMin": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 25
                 },
                 "profileTagIds": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [1, 3, 5]
                 },
                 "verified": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "weight": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 60
+                }
+            }
+        },
+        "CityResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "city_12345"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "New York"
+                },
+                "aliasRu": {
+                    "type": "string",
+                    "example": "Нью-Йорк"
+                },
+                "aliasEn": {
+                    "type": "string",
+                    "example": "New York"
+                }
+            }
+        },
+        "EthnosResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "ethnos_12345"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Hispanic"
+                },
+                "aliasRu": {
+                    "type": "string",
+                    "example": "Испанцы"
+                },
+                "aliasEn": {
+                    "type": "string",
+                    "example": "Hispanic"
+                }
+            }
+        },
+        "BodyTypeResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "bodytype_12345"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Athletic"
+                },
+                "aliasRu": {
+                    "type": "string",
+                    "example": "Атлетичный"
+                },
+                "aliasEn": {
+                    "type": "string",
+                    "example": "Athletic"
+                }
+            }
+        },
+        "BodyArtResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "bodyart_12345"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Tattoo"
+                },
+                "aliasRu": {
+                    "type": "string",
+                    "example": "Татуировка"
+                },
+                "aliasEn": {
+                    "type": "string",
+                    "example": "Tattoo"
+                }
+            }
+        },
+        "HairColorResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "haircolor_12345"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Blonde"
+                },
+                "aliasRu": {
+                    "type": "string",
+                    "example": "Блондин"
+                },
+                "aliasEn": {
+                    "type": "string",
+                    "example": "Blonde"
+                }
+            }
+        },
+        "IntimateHairCutResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "haircut_12345"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Trim"
+                },
+                "aliasRu": {
+                    "type": "string",
+                    "example": "Стрижка"
+                },
+                "aliasEn": {
+                    "type": "string",
+                    "example": "Trim"
                 }
             }
         },
@@ -2039,30 +2749,41 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 99.99
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "payment_12345"
                 },
                 "paymentDate": {
+                    "type": "string",
+                    "format": "date-time",
                     "description": "Date at which payment is completed",
-                    "type": "string"
+                    "example": "2023-10-23T12:00:00Z"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "completed"
                 },
                 "type": {
+                    "type": "string",
                     "description": "Type: subscription, one_hour, three_hours, twelve_hours, two_days, one_week",
-                    "type": "string"
+                    "example": "subscription"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:30:00Z"
                 },
                 "userID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_67890"
                 }
             }
         },
@@ -2070,16 +2791,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "approved": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "deleted": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "disabled": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "url": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "https://example.com/photo.jpg"
                 }
             }
         },
@@ -2087,10 +2812,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "bodyArtId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "profileId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "profile_12345"
                 }
             }
         },
@@ -2098,10 +2825,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "comment": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "No smoking"
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 50
                 },
                 "profileTag": {
                     "$ref": "#/definitions/ProfileTagResponse"
@@ -2112,13 +2841,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_12345"
                 },
                 "profileID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "profile_12345"
                 },
                 "ratedProfileTags": {
                     "type": "array",
@@ -2127,22 +2860,29 @@ const docTemplate = `{
                     }
                 },
                 "review": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Excellent profile!"
                 },
                 "reviewTextVisible": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "score": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 },
                 "serviceID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "service_12345"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:00:00Z"
                 },
                 "updatedBy": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "admin_67890"
                 }
             }
         },
@@ -2150,13 +2890,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_12345"
                 },
                 "profileId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "profile_12345"
                 },
                 "ratedProfileTags": {
                     "type": "array",
@@ -2165,42 +2909,240 @@ const docTemplate = `{
                     }
                 },
                 "review": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Excellent profile!"
                 },
                 "reviewTextVisible": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "score": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 },
                 "serviceId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "service_12345"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:00:00Z"
                 },
                 "updatedBy": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "admin_67890"
                 }
             }
         },
         "ProfileResponse": {
             "type": "object",
+            "required": [
+                "id",
+                "userId",
+                "active",
+                "phone",
+                "name",
+                "age",
+                "height",
+                "weight",
+                "bust",
+                "bio",
+                "priceInHouseNightRatio",
+                "priceSaunaNightRatio",
+                "priceVisitNightRatio",
+                "priceCarNightRatio",
+                "contactPhone",
+                "moderated",
+                "verified",
+                "createdAt"
+            ],
             "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "profile_12345"
+                },
+                "userId": {
+                    "type": "string",
+                    "example": "user_67890"
+                },
                 "active": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
-                "addressLatitude": {
-                    "type": "string"
+                "phone": {
+                    "type": "string",
+                    "example": "09876543210"
                 },
-                "addressLongitude": {
-                    "type": "string"
+                "name": {
+                    "type": "string",
+                    "example": "Jane Doe"
                 },
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 28
+                },
+                "height": {
+                    "type": "integer",
+                    "example": 165
+                },
+                "weight": {
+                    "type": "integer",
+                    "example": 60
+                },
+                "bust": {
+                    "type": "number",
+                    "example": 34.5
                 },
                 "bio": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Passionate about wellness and beauty."
+                },
+                "addressLatitude": {
+                    "type": "string",
+                    "example": "40.7128 N"
+                },
+                "addressLongitude": {
+                    "type": "string",
+                    "example": "74.0060 W"
+                },
+                "cityId": {
+                    "type": "integer",
+                    "example": 101
+                },
+                "city": {
+                    "$ref": "#/definitions/CityResponse"
+                },
+                "bodyTypeId": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "bodyType": {
+                    "$ref": "#/definitions/BodyTypeResponse"
+                },
+                "ethnosId": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "ethnos": {
+                    "$ref": "#/definitions/EthnosResponse"
+                },
+                "hairColorId": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "hairColor": {
+                    "$ref": "#/definitions/HairColorResponse"
+                },
+                "intimateHairCutId": {
+                    "type": "integer",
+                    "example": 4
+                },
+                "intimateHairCut": {
+                    "$ref": "#/definitions/IntimateHairCutResponse"
+                },
+                "priceInHouseNightRatio": {
+                    "type": "number",
+                    "example": 1.1
+                },
+                "priceInHouseContact": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "priceInHouseHour": {
+                    "type": "integer",
+                    "example": 80
+                },
+                "priceSaunaNightRatio": {
+                    "type": "number",
+                    "example": 1.2
+                },
+                "priceSaunaContact": {
+                    "type": "integer",
+                    "example": 50
+                },
+                "priceSaunaHour": {
+                    "type": "integer",
+                    "example": 40
+                },
+                "priceVisitNightRatio": {
+                    "type": "number",
+                    "example": 1.3
+                },
+                "priceVisitContact": {
+                    "type": "integer",
+                    "example": 70
+                },
+                "priceVisitHour": {
+                    "type": "integer",
+                    "example": 60
+                },
+                "priceCarNightRatio": {
+                    "type": "number",
+                    "example": 1.4
+                },
+                "priceCarContact": {
+                    "type": "integer",
+                    "example": 200
+                },
+                "priceCarHour": {
+                    "type": "integer",
+                    "example": 150
+                },
+                "contactPhone": {
+                    "type": "string",
+                    "example": "12345678901"
+                },
+                "contactWA": {
+                    "type": "string",
+                    "example": "+12345678901"
+                },
+                "contactTG": {
+                    "type": "string",
+                    "example": "@janedoe"
+                },
+                "contacts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ContactResponse"
+                    }
+                },
+                "prices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PriceResponse"
+                    }
+                },
+                "moderated": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "moderatedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:00:00Z"
+                },
+                "moderatedBy": {
+                    "type": "string",
+                    "example": "admin_67890"
+                },
+                "verified": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "verifiedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-24T08:30:00Z"
+                },
+                "verifiedBy": {
+                    "type": "string",
+                    "example": "admin_67890"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "bodyArts": {
                     "type": "array",
@@ -2208,98 +3150,11 @@ const docTemplate = `{
                         "$ref": "#/definitions/ProfileBodyArtResponse"
                     }
                 },
-                "bodyTypeId": {
-                    "type": "integer"
-                },
-                "bust": {
-                    "type": "number"
-                },
-                "cityId": {
-                    "type": "integer"
-                },
-                "contactPhone": {
-                    "type": "string"
-                },
-                "contactTG": {
-                    "type": "string"
-                },
-                "contactWA": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "ethnosId": {
-                    "type": "integer"
-                },
-                "hairColorId": {
-                    "type": "integer"
-                },
-                "height": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "intimateHairCutId": {
-                    "type": "integer"
-                },
-                "moderated": {
-                    "type": "boolean"
-                },
-                "moderatedAt": {
-                    "type": "string"
-                },
-                "moderatedBy": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
                 "photos": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/PhotoResponse"
                     }
-                },
-                "priceCarContact": {
-                    "type": "integer"
-                },
-                "priceCarHour": {
-                    "type": "integer"
-                },
-                "priceCarNightRatio": {
-                    "type": "number"
-                },
-                "priceInHouseContact": {
-                    "type": "integer"
-                },
-                "priceInHouseHour": {
-                    "type": "integer"
-                },
-                "priceInHouseNightRatio": {
-                    "type": "number"
-                },
-                "priceSaunaContact": {
-                    "type": "integer"
-                },
-                "priceSaunaHour": {
-                    "type": "integer"
-                },
-                "priceVisitContact": {
-                    "type": "integer"
-                },
-                "priceVisitHour": {
-                    "type": "integer"
-                },
-                "priceVisitNightRatio": {
-                    "type": "number"
-                },
-                "princeSaunaNightRatio": {
-                    "type": "number"
                 },
                 "profileOptions": {
                     "type": "array",
@@ -2314,22 +3169,8 @@ const docTemplate = `{
                     }
                 },
                 "updatedBy": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "string"
-                },
-                "verified": {
-                    "type": "boolean"
-                },
-                "verifiedAt": {
-                    "type": "string"
-                },
-                "verifiedBy": {
-                    "type": "string"
-                },
-                "weight": {
-                    "type": "integer"
+                    "type": "string",
+                    "example": "user_67890"
                 }
             }
         },
@@ -2337,10 +3178,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Cleanliness"
                 }
             }
         },
@@ -2348,7 +3191,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Cleanliness"
                 }
             }
         },
@@ -2359,13 +3203,16 @@ const docTemplate = `{
                     "$ref": "#/definitions/ProfileTag"
                 },
                 "profileTagID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "ratingID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_12345"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "positive"
                 }
             }
         },
@@ -2376,7 +3223,8 @@ const docTemplate = `{
                     "$ref": "#/definitions/ProfileTagResponse"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "positive"
                 }
             }
         },
@@ -2384,16 +3232,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "ratingID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_67890"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "negative"
                 },
                 "userTag": {
                     "$ref": "#/definitions/UserTag"
                 },
                 "userTagID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -2401,7 +3252,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "negative"
                 },
                 "userTag": {
                     "$ref": "#/definitions/UserTagResponse"
@@ -2412,59 +3264,72 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "clientUserID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_54321"
                 },
                 "clientUserLat": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "34.0522 N"
                 },
                 "clientUserLon": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "118.2437 W"
                 },
                 "clientUserRating": {
-                    "description": "Profile owner's review on client",
-                    "type": "object",
                     "$ref": "#/definitions/UserRating"
                 },
                 "clientUserRatingID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_67890"
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "distanceBetweenUsers": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 5.5
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "service_12345"
                 },
                 "profileID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "profile_12345"
                 },
                 "profileOwnerID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_67890"
                 },
                 "profileRating": {
-                    "description": "Client's review on profile",
-                    "type": "object",
                     "$ref": "#/definitions/ProfileRating"
                 },
                 "profileRatingID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_12345"
                 },
                 "profileUserLat": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "40.7128 N"
                 },
                 "profileUserLon": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "74.0060 W"
                 },
                 "trustedDistance": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:00:00Z"
                 },
                 "updatedBy": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "admin_67890"
                 }
             }
         },
@@ -2472,43 +3337,56 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "clientUserId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_54321"
                 },
                 "clientUserRating": {
                     "$ref": "#/definitions/UserRatingResponse"
                 },
                 "clientUserRatingId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_67890"
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "distanceBetweenUsers": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 5.5
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "service_12345"
                 },
                 "profileId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "profile_12345"
                 },
                 "profileOwnerId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_67890"
                 },
                 "profileRating": {
                     "$ref": "#/definitions/ProfileRatingResponse"
                 },
                 "profileRatingId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_12345"
                 },
                 "trustedDistance": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:00:00Z"
                 },
                 "updatedBy": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "admin_67890"
                 }
             }
         },
@@ -2516,7 +3394,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "visible": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
@@ -2529,12 +3408,14 @@ const docTemplate = `{
             "properties": {
                 "password": {
                     "type": "string",
-                    "minLength": 8
+                    "minLength": 8,
+                    "example": "StrongPass123"
                 },
                 "phone": {
                     "type": "string",
+                    "minLength": 11,
                     "maxLength": 11,
-                    "minLength": 11
+                    "example": "12345678901"
                 }
             }
         },
@@ -2548,265 +3429,106 @@ const docTemplate = `{
             "properties": {
                 "password": {
                     "type": "string",
-                    "minLength": 8
+                    "minLength": 8,
+                    "example": "StrongPass123"
                 },
                 "passwordConfirm": {
                     "type": "string",
-                    "minLength": 8
+                    "minLength": 8,
+                    "example": "StrongPass123"
                 },
                 "phone": {
                     "type": "string",
+                    "minLength": 11,
                     "maxLength": 11,
-                    "minLength": 11
+                    "example": "12345678901"
                 }
             }
         },
-        "SuccessPageResponsePayment": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the payment records for the current page.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/Payment"
-                    }
-                },
-                "limit": {
-                    "description": "Limit specifies the maximum number of items that can be returned in a single page.",
-                    "type": "integer",
-                    "example": 10
-                },
-                "page": {
-                    "description": "Page specifies the current page number in the paginated result set.",
-                    "type": "integer",
-                    "example": 1
-                },
-                "results": {
-                    "description": "Results specifies the number of items returned in the current page.",
-                    "type": "integer",
-                    "example": 10
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
-                    "type": "string",
-                    "example": "success"
-                }
-            },
-            "required": [
-                "data",
-                "limit",
-                "page",
-                "results",
-                "status"
-            ]
-        },
-        "SuccessPageResponseProfileResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the profile records for the current page.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ProfileResponse"
-                    }
-                },
-                "limit": {
-                    "description": "Limit specifies the maximum number of items that can be returned in a single page.",
-                    "type": "integer",
-                    "example": 10
-                },
-                "page": {
-                    "description": "Page specifies the current page number in the paginated result set.",
-                    "type": "integer",
-                    "example": 1
-                },
-                "results": {
-                    "description": "Results specifies the number of items returned in the current page.",
-                    "type": "integer",
-                    "example": 10
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
-                    "type": "string",
-                    "example": "success"
-                }
-            },
-            "required": [
-                "data",
-                "limit",
-                "page",
-                "results",
-                "status"
-            ]
-        },
-        "SuccessPageResponseServiceResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the service records for the current page.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ServiceResponse"
-                    }
-                },
-                "limit": {
-                    "description": "Limit specifies the maximum number of items that can be returned in a single page.",
-                    "type": "integer",
-                    "example": 10
-                },
-                "page": {
-                    "description": "Page specifies the current page number in the paginated result set.",
-                    "type": "integer",
-                    "example": 1
-                },
-                "results": {
-                    "description": "Results specifies the number of items returned in the current page.",
-                    "type": "integer",
-                    "example": 10
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
-                    "type": "string",
-                    "example": "success"
-                }
-            },
-            "required": [
-                "data",
-                "limit",
-                "page",
-                "results",
-                "status"
-            ]
-        },
         "SuccessResponse": {
             "type": "object",
+            "required": [
+                "data",
+                "status"
+            ],
             "properties": {
                 "data": {
-                    "description": "Data contains the result of the successful operation.",
                     "type": "object",
-                    "example": {
-                        "id": "12345",
-                        "name": "John Doe"
+                    "description": "Data contains the result of the successful operation. It can be one of the following types:\n- UserResponse\n- ProfileResponse\n- ServiceResponse\n- Payment\n- string"
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\""
+                }
+            }
+        },
+        "SuccessPageResponse": {
+            "type": "object",
+            "required": [
+                "data",
+                "limit",
+                "page",
+                "results",
+                "status"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "description": "Data contains the data payload for the current page. It can be an array of:\n- UserResponse\n- ProfileResponse\n- ServiceResponse\n- Payment\n- CityResponse\n- EthnosResponse\n- BodyTypeResponse\n- BodyArtResponse\n- HairColorResponse\n- IntimateHairCutResponse\n- string"
                     }
                 },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
-                    "type": "string",
-                    "example": "success"
-                }
-            },
-            "required": [
-                "data",
-                "status"
-            ]
-        },
-        "SuccessResponseService": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the service information.",
-                    "type": "object",
-                    "$ref": "#/definitions/Service"
+                "limit": {
+                    "type": "integer",
+                    "description": "Limit specifies the maximum number of items that can be returned in a single page.\nExample: 10"
+                },
+                "page": {
+                    "type": "integer",
+                    "description": "Page specifies the current page number in the paginated result set.\nExample: 1"
+                },
+                "results": {
+                    "type": "integer",
+                    "description": "Results specifies the number of items returned in the current page.\nExample: 10"
                 },
                 "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
                     "type": "string",
-                    "example": "success"
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\""
                 }
-            },
-            "required": [
-                "data",
-                "status"
-            ]
-        },
-        "SuccessResponseServiceResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the service response information.",
-                    "type": "object",
-                    "$ref": "#/definitions/ServiceResponse"
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
-                    "type": "string",
-                    "example": "success"
-                }
-            },
-            "required": [
-                "data",
-                "status"
-            ]
-        },
-        "SuccessResponseUserResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains the user information.",
-                    "type": "object",
-                    "$ref": "#/definitions/UserResponse"
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
-                    "type": "string",
-                    "example": "success"
-                }
-            },
-            "required": [
-                "data",
-                "status"
-            ]
-        },
-        "SuccessResponseString": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Data contains a string message.",
-                    "type": "string",
-                    "example": "Payment updated successfully."
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
-                    "type": "string",
-                    "example": "success"
-                }
-            },
-            "required": [
-                "data",
-                "status"
-            ]
+            }
         },
         "TokenResponse": {
             "description": "This model is used to return an access token after a user logs in or when a token is refreshed.",
             "type": "object",
-            "properties": {
-                "access_token": {
-                    "description": "AccessToken is the token that allows the user to authenticate subsequent API requests.",
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                },
-                "status": {
-                    "description": "Status represents the status of the response, typically set to \"success\".",
-                    "type": "string",
-                    "example": "success"
-                }
-            },
             "required": [
                 "access_token",
                 "status"
-            ]
+            ],
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "description": "AccessToken is the token that allows the user to authenticate subsequent API requests.\nExample: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\""
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Status represents the status of the response, typically set to \"success\".\nExample: \"success\""
+                }
+            }
         },
         "UpdateOwnProfileRequest": {
             "type": "object",
             "properties": {
                 "active": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 26
                 },
                 "bio": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Updated bio information."
                 },
                 "bodyArts": {
                     "type": "array",
@@ -2815,46 +3537,60 @@ const docTemplate = `{
                     }
                 },
                 "bodyTypeId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "bust": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 34.5
                 },
                 "cityId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 101
                 },
                 "contactPhone": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "12345678901"
                 },
                 "contactTG": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "@johndoe_updated"
                 },
                 "contactWA": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "+12345678901"
                 },
                 "ethnosId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 },
                 "hairColorId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "height": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 175
                 },
                 "intimateHairCutId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 4
                 },
                 "latitude": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "40.7128 N"
                 },
                 "longitude": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "74.0060 W"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jane Doe Updated"
                 },
                 "phone": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "09876543210"
                 },
                 "photos": {
                     "type": "array",
@@ -2863,40 +3599,52 @@ const docTemplate = `{
                     }
                 },
                 "priceCarContact": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 200
                 },
                 "priceCarHour": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 150
                 },
                 "priceCarNightRatio": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 1.2
                 },
                 "priceInHouseContact": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 100
                 },
                 "priceInHouseHour": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 80
                 },
                 "priceInHouseNightRatio": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 1.1
                 },
                 "priceSaunaContact": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 50
                 },
                 "priceSaunaHour": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 40
                 },
                 "priceVisitContact": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 70
                 },
                 "priceVisitHour": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 60
                 },
                 "priceVisitNightRatio": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 1.3
                 },
                 "princeSaunaNightRatio": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 1.4
                 },
                 "profileOptions": {
                     "type": "array",
@@ -2905,7 +3653,20 @@ const docTemplate = `{
                     }
                 },
                 "weight": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 60
+                },
+                "contacts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ContactResponse"
+                    }
+                },
+                "prices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PriceResponse"
+                    }
                 }
             }
         },
@@ -2913,16 +3674,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "active": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "bio": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Updated bio information."
                 },
                 "moderated": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jane Doe Updated"
                 },
                 "photos": {
                     "type": "array",
@@ -2931,7 +3696,8 @@ const docTemplate = `{
                     }
                 },
                 "verified": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
@@ -2941,15 +3707,18 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "minLength": 3,
-                    "maxLength": 20
+                    "maxLength": 20,
+                    "example": "John"
                 },
                 "phone": {
                     "type": "string",
                     "minLength": 11,
-                    "maxLength": 11
+                    "maxLength": 11,
+                    "example": "12345678901"
                 },
                 "photo": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "https://example.com/newphoto.jpg"
                 }
             }
         },
@@ -2957,24 +3726,29 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "active": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "name": {
                     "type": "string",
                     "minLength": 3,
-                    "maxLength": 20
+                    "maxLength": 20,
+                    "example": "John Updated"
                 },
                 "phone": {
                     "type": "string",
                     "minLength": 11,
-                    "maxLength": 11
+                    "maxLength": 11,
+                    "example": "12345678901"
                 },
                 "photo": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "https://example.com/newphoto.jpg"
                 },
                 "telegramUserId": {
                     "type": "string",
-                    "minLength": 6
+                    "minLength": 6,
+                    "example": "telegram_67890"
                 },
                 "tier": {
                     "type": "string",
@@ -2982,10 +3756,12 @@ const docTemplate = `{
                         "basic",
                         "expert",
                         "guru"
-                    ]
+                    ],
+                    "example": "expert"
                 },
                 "verified": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
@@ -2993,10 +3769,13 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_12345"
                 },
                 "ratedUserTags": {
                     "type": "array",
@@ -3005,25 +3784,33 @@ const docTemplate = `{
                     }
                 },
                 "review": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Great collaborator!"
                 },
                 "reviewTextVisible": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "score": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 },
                 "serviceID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "service_12345"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:00:00Z"
                 },
                 "updatedBy": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "admin_67890"
                 },
                 "userID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_67890"
                 }
             }
         },
@@ -3031,10 +3818,13 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "rating_12345"
                 },
                 "ratedUserTags": {
                     "type": "array",
@@ -3043,25 +3833,33 @@ const docTemplate = `{
                     }
                 },
                 "review": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Great collaborator!"
                 },
                 "reviewTextVisible": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "score": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 },
                 "serviceId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "service_12345"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:00:00Z"
                 },
                 "updatedBy": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "admin_67890"
                 },
                 "userId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_67890"
                 }
             }
         },
@@ -3069,40 +3867,54 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "active": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T10:00:00Z"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user_12345"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John Doe"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "hashed_password"
                 },
                 "phone": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "12345678901"
                 },
                 "photo": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "https://example.com/photo.jpg"
                 },
                 "role": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user"
                 },
                 "telegramUserId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 67890
                 },
                 "tier": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "basic"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-23T12:00:00Z"
                 },
                 "verified": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
@@ -3110,10 +3922,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Communication"
                 }
             }
         },
@@ -3121,7 +3935,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Communication"
                 }
             }
         }
