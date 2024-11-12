@@ -90,7 +90,7 @@ jobs:
 
 
   publish_to_stage:
-    runs-on: budget
+    runs-on: self-hosted
     needs: [ collect_envs ]
 
     steps:
