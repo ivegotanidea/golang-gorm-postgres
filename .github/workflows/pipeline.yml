@@ -86,7 +86,7 @@ jobs:
           echo "service_name=$svc" >> $GITHUB_ENV
 
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Launch
         id: launch_job
