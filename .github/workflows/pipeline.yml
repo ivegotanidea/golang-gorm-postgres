@@ -22,7 +22,7 @@ env:
 
 
 jobs:
-  collect_env:
+  collect_envs:
     runs-on: ubuntu-latest
     outputs:
       branch: ${{ env.branch }}
@@ -91,7 +91,7 @@ jobs:
 
   publish_to_stage:
     runs-on: budget
-    needs: [ build_and_test ]
+    needs: [ collect_envs ]
 
     steps:
 
