@@ -112,6 +112,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
+          ref: master
           fetch-depth: 0                 # Fetch full history
           sparse-checkout: false          # Disable sparse checkout
           sparse-checkout-cone-mode: false  # Ensure full directory structure is fetched
