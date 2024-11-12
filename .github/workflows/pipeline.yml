@@ -20,7 +20,6 @@ env:
   TRIVY_VERSION: "0.49.1"
   check_image_exists: 0
 
-
 jobs:
   collect_envs:
     runs-on: ubuntu-latest
@@ -31,17 +30,10 @@ jobs:
       build_number: ${{ env.build_number }}
 
     steps:
-
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+          fetch-depth: 0  # Fetch full history
 
       - name: Expose git commit data
         uses: rlespinasse/git-commit-data-action@v1
@@ -50,17 +42,13 @@ jobs:
         id: get-ids
         run: |
           set -x
-
           committer=${{ env.GIT_COMMIT_COMMITTER_EMAIL }}
-
           author=${{ env.GIT_COMMIT_AUTHOR_EMAIL }}
-
           if [[ $author == *@*.* ]]; then
             author=$(echo $author | awk -F@ '{print $1}')
           else
             author="${{ env.GIT_COMMIT_AUTHOR_EMAIL }}"
           fi
-
           echo "author=${author}" >> $GITHUB_OUTPUT
           echo "committer=${committer}" >> $GITHUB_OUTPUT
 
@@ -68,11 +56,9 @@ jobs:
         run: |
           svc=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           echo "service_name=$svc" >> $GITHUB_ENV
-
           raw=$(git branch -r --contains ${{ github.ref }})
           branch=${raw##*/}
           echo "branch=${branch}" >> $GITHUB_ENV
-
           sha=$(echo ${GITHUB_SHA} | cut -c1-7)
           case $branch in
            master)
@@ -82,26 +68,20 @@ jobs:
                build_number="${sha}-qa"
           esac
           echo "build_number=${build_number}" >> $GITHUB_ENV
-
           image_name="${{ env.container_registry }}/${svc}:${build_number}"
           image_latest="${{ env.container_registry }}/${svc}:latest"
           echo "image_name=${image_name}" >> $GITHUB_ENV
           echo "image_latest=${image_latest}" >> $GITHUB_ENV
-
 
   publish_to_stage:
     runs-on: self-hosted
     needs: [ collect_envs ]
 
     steps:
-
       - name: Set service name to GITHUB_ENV
         id: set_service_name
         run: |
-          # этот шаг задублирован из джобы build_and_test, потому что гитхаб считает
-          # что в нем лежит какой-то секрет и не даёт его передать в качестве аутпута
-          # предыдущей джобы
-
+          # This step duplicates the job from collect_envs
           svc=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           echo "service_name=$svc" >> $GITHUB_ENV
 
@@ -112,10 +92,10 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          ref: master
-          fetch-depth: 0                 # Fetch full history
-          sparse-checkout: false          # Disable sparse checkout
-          sparse-checkout-cone-mode: false  # Ensure full directory structure is fetched
+          fetch-depth: 0  # Fetch full history
+          sparse-checkout: false
+          sparse-checkout-cone-mode: false
+          clean: false    # Prevents unwanted deletion of files
 
       - name: Launch
         id: launch_job
