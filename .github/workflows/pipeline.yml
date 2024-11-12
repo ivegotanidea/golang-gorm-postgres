@@ -22,7 +22,7 @@ env:
 
 
 jobs:
-  build_and_test:
+  collect_env:
     runs-on: ubuntu-latest
     outputs:
       branch: ${{ env.branch }}
@@ -88,76 +88,6 @@ jobs:
           echo "image_name=${image_name}" >> $GITHUB_ENV
           echo "image_latest=${image_latest}" >> $GITHUB_ENV
 
-      - name: Login Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_LOGIN }}
-          password: ${{ secrets.DOCKER_PASS }}
-
-      - name: Check if image already exists
-        if: ${{ env.check_image_exists == 1 }}
-        run: |
-          # exists = 0, not exists = 1
-          image_exists=$(docker manifest inspect "${{ env.image_name }}" > /dev/null; echo $?)
-          echo "image_exists=${image_exists}" >> $GITHUB_ENV
-          if [ "${image_exists}" == 1 ]
-          then
-            pull_latest=$(docker pull "${{ env.image_latest }}" > /dev/null; echo $?)
-          fi
-
-      - name: Validate values files
-        if: ${{ env.check_image_exists == 1 }}
-        uses: addnab/docker-run-action@v3
-        with:
-          username: ${{ secrets.DOCKER_LOGIN }}
-          password: ${{ secrets.DOCKER_PASS }}
-          registry: ${{ secrets.CONTAINER_REGISTRY }}
-          image: ${{ secrets.CONTAINER_REGISTRY }}/qa-environment-helpers:${{ secrets.QA_ENVIRONMENT_HELPERS_TAG }}
-          options: --rm -i -v ${{ github.workspace }}:/app
-          run: |
-            for file in /app/.k8s/*.yaml;
-            do
-              yamale -s /charts/generic-application/schema.yaml $file
-            done
-
-      - name: Docker build
-        id: docker_build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile
-          build-args: |
-            build_number=${{ env.build_number }}
-          push: false
-          load: true
-          platforms: linux/amd64
-          tags: "${{ env.image_name }}"
-
-      - name: Trivy Scanning
-        run: |
-          docker run \
-          -v /var/run/docker.sock:/var/run/docker.sock:rw \
-          -v /trivy/cache:/tmp/trivy/db \
-          aquasec/trivy:${{ env.TRIVY_VERSION }} \
-          image \
-          --scanners vuln,misconfig,secret \
-          --cache-dir /tmp/trivy/ \
-          --severity CRITICAL,HIGH \
-          --no-progress \
-          --ignore-unfixed \
-          --exit-code 0 "${{ env.image_name }}"
-
-      - name: Docker push
-        id: docker_push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile
-          build-args: |
-            build_number=${{ env.build_number }}
-          push: true
-          platforms: linux/amd64
-          tags: "${{ env.image_name }},${{ env.image_latest }}"
 
   publish_to_stage:
     runs-on: budget
@@ -182,12 +112,6 @@ jobs:
           sparse-checkout: |
             docker-compose.yml
           sparse-checkout-cone-mode: false
-
-      - name: Login Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_LOGIN }}
-          password: ${{ secrets.DOCKER_PASS }}
 
       - name: Launch
         id: launch_job
