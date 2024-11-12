@@ -112,7 +112,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0                 # Fetch full history
+          sparse-checkout: false          # Disable sparse checkout
+          sparse-checkout-cone-mode: false  # Ensure full directory structure is fetched
 
       - name: Launch
         id: launch_job
