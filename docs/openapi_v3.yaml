@@ -1888,6 +1888,8 @@ components:
           type: integer
         profileId:
           type: string
+        bodyArt:
+          $ref: '#/components/schemas/BodyArtResponse'
 
     ProfileOptionResponse:
       type: object

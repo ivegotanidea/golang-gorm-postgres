@@ -11,6 +11,7 @@ func MapBodyArts(bodyArts []ProfileBodyArt) []ProfileBodyArtResponse {
 		bodyArtResponses[i] = ProfileBodyArtResponse{
 			ProfileID: bodyArt.ProfileID.String(),
 			BodyArtID: bodyArt.BodyArtID,
+			BodyArt:   MapBodyArt(bodyArt.BodyArt),
 		}
 	}
 	return bodyArtResponses

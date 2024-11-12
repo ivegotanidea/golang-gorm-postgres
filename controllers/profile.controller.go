@@ -616,7 +616,7 @@ func (pc *ProfileController) FindProfileByID(ctx *gin.Context) {
 		Preload("Ethnos").
 		Preload("HairColor").
 		Preload("IntimateHairCut").
-		Preload("BodyArts").
+		Preload("BodyArts.BodyArt").
 		Preload("ProfileOptions.ProfileTag").
 		First(&profile, "id = ?", id)
 
@@ -650,7 +650,7 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 		Preload("Ethnos").
 		Preload("HairColor").
 		Preload("IntimateHairCut").
-		Preload("BodyArts").
+		Preload("BodyArts.BodyArt").
 		Preload("ProfileOptions.ProfileTag").
 		First(&profile, "phone = ?", phone)
 
@@ -690,7 +690,7 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 		Preload("Ethnos").
 		Preload("HairColor").
 		Preload("IntimateHairCut").
-		Preload("BodyArts").
+		Preload("BodyArts.BodyArt").
 		Preload("ProfileOptions.ProfileTag").
 		Limit(intLimit).Offset(offset)
 
@@ -746,7 +746,7 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		Preload("Ethnos").
 		Preload("HairColor").
 		Preload("IntimateHairCut").
-		Preload("BodyArts").
+		Preload("BodyArts.BodyArt").
 		Preload("ProfileOptions.ProfileTag").
 		Where("active = ?", true).
 		Where("sex = ?", sex).
@@ -801,7 +801,7 @@ func (pc *ProfileController) GetMyProfiles(ctx *gin.Context) {
 		Preload("Ethnos").
 		Preload("HairColor").
 		Preload("IntimateHairCut").
-		Preload("BodyArts").
+		Preload("BodyArts.BodyArt").
 		Preload("ProfileOptions.ProfileTag").
 		Limit(intLimit).Offset(offset)
 
@@ -862,7 +862,7 @@ func (pc *ProfileController) FindProfiles(ctx *gin.Context) {
 		Preload("Ethnos").
 		Preload("HairColor").
 		Preload("IntimateHairCut").
-		Preload("BodyArts").
+		Preload("BodyArts.BodyArt").
 		Preload("ProfileOptions.ProfileTag").
 		Limit(intLimit).Offset(offset)
 

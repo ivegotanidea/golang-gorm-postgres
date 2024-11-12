@@ -51,6 +51,7 @@ type BodyArtResponse struct {
 type ProfileBodyArt struct {
 	ProfileID uuid.UUID `gorm:"primaryKey;type:uuid"` // Part of composite primary key
 	BodyArtID int       `gorm:"primaryKey"`           // Part of composite primary key, and also a foreign key
+	BodyArt   *BodyArt  `gorm:"foreignKey:BodyArtID"`
 }
 
 type CreateBodyArtRequest struct {
@@ -79,7 +80,6 @@ type IntimateHairCut struct {
 	AliasEn string `gorm:"size:30;not null"`
 }
 
-// IntimateHairCutResponse represents the JSON response for intimate hair cut data
 type IntimateHairCutResponse struct {
 	ID      int    `json:"id"`
 	Name    string `json:"name"`
@@ -88,6 +88,7 @@ type IntimateHairCutResponse struct {
 }
 
 type ProfileBodyArtResponse struct {
-	ProfileID string `json:"profileId"`
-	BodyArtID int    `json:"bodyArtId"`
+	ProfileID string           `json:"profileId"`
+	BodyArtID int              `json:"bodyArtId"`
+	BodyArt   *BodyArtResponse `json:"bodyArtName"`
 }
