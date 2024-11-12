@@ -91,10 +91,12 @@ jobs:
       - name: Print working directory
         run: pwd
 
-      - name: List directory before checkout
+      - name: Cleanup build folder
         run: |
-          ls -al
-          rm -rf app.env
+          ls -la ./
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+          ls -la ./
 
       - name: Checkout source
         uses: actions/checkout@v4
