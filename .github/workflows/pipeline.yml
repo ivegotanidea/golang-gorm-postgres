@@ -85,15 +85,17 @@ jobs:
           svc=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           echo "service_name=$svc" >> $GITHUB_ENV
 
+      - name: Print working directory
+        run: pwd
+
+      - name: List directory before checkout
+        run: ls -al
+
       - name: Checkout source
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.ORG_PAT_KEY }}
-          clean: false
 
-      - name: LS
-        run: |
-          ls -lah
+      - name: List directory after checkout
+        run: ls -al
 
       - name: Launch
         id: launch_job
