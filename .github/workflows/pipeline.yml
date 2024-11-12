@@ -85,10 +85,6 @@ jobs:
           svc=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           echo "service_name=$svc" >> $GITHUB_ENV
 
-      - name: Cleanup
-        run: |
-          rm -rf app.env
-
       - name: Checkout source
         uses: actions/checkout@v4
         with:
