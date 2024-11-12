@@ -90,11 +90,14 @@ jobs:
         with:
           ref: 'master'
 
+      - name: LS
+        run: |
+          ls -lah
+
       - name: Launch
         id: launch_job
         run: |
           echo ${{ secrets.DOTENV }} | base64 -d > app.env
-          docker compose pull
           docker compose down
           docker compose -f docker-compose.prod.yml up -d --force-recreate --no-deps 
 
