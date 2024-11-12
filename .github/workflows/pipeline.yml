@@ -1,0 +1,221 @@
+name: CD pipeline
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+-.*
+
+  release:
+    types:
+      - published
+
+permissions:
+  actions: read
+  contents: read
+
+env:
+  team: me
+  container_registry: "0p3xh7"
+  TRIVY_VERSION: "0.49.1"
+  check_image_exists: 0
+
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ env.branch }}
+      author: ${{ steps.get-ids.outputs.author }}
+      committer: ${{ steps.get-ids.outputs.committer }}
+      build_number: ${{ env.build_number }}
+
+    steps:
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Expose git commit data
+        uses: rlespinasse/git-commit-data-action@v1
+
+      - name: Get ids
+        id: get-ids
+        run: |
+          set -x
+
+          committer=${{ env.GIT_COMMIT_COMMITTER_EMAIL }}
+
+          author=${{ env.GIT_COMMIT_AUTHOR_EMAIL }}
+
+          if [[ $author == *@*.* ]]; then
+            author=$(echo $author | awk -F@ '{print $1}')
+          else
+            author="${{ env.GIT_COMMIT_AUTHOR_EMAIL }}"
+          fi
+
+          echo "author=${author}" >> $GITHUB_OUTPUT
+          echo "committer=${committer}" >> $GITHUB_OUTPUT
+
+      - name: Set build vars to GITHUB_ENV
+        run: |
+          svc=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+          echo "service_name=$svc" >> $GITHUB_ENV
+
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=${raw##*/}
+          echo "branch=${branch}" >> $GITHUB_ENV
+
+          sha=$(echo ${GITHUB_SHA} | cut -c1-7)
+          case $branch in
+           master)
+               build_number=$sha
+               ;;
+           *)
+               build_number="${sha}-qa"
+          esac
+          echo "build_number=${build_number}" >> $GITHUB_ENV
+
+          image_name="${{ env.container_registry }}/${svc}:${build_number}"
+          image_latest="${{ env.container_registry }}/${svc}:latest"
+          echo "image_name=${image_name}" >> $GITHUB_ENV
+          echo "image_latest=${image_latest}" >> $GITHUB_ENV
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Check if image already exists
+        if: ${{ env.check_image_exists == 1 }}
+        run: |
+          # exists = 0, not exists = 1
+          image_exists=$(docker manifest inspect "${{ env.image_name }}" > /dev/null; echo $?)
+          echo "image_exists=${image_exists}" >> $GITHUB_ENV
+          if [ "${image_exists}" == 1 ]
+          then
+            pull_latest=$(docker pull "${{ env.image_latest }}" > /dev/null; echo $?)
+          fi
+
+      - name: Validate values files
+        if: ${{ env.check_image_exists == 1 }}
+        uses: addnab/docker-run-action@v3
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_PASS }}
+          registry: ${{ secrets.CONTAINER_REGISTRY }}
+          image: ${{ secrets.CONTAINER_REGISTRY }}/qa-environment-helpers:${{ secrets.QA_ENVIRONMENT_HELPERS_TAG }}
+          options: --rm -i -v ${{ github.workspace }}:/app
+          run: |
+            for file in /app/.k8s/*.yaml;
+            do
+              yamale -s /charts/generic-application/schema.yaml $file
+            done
+
+      - name: Docker build
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            build_number=${{ env.build_number }}
+          push: false
+          load: true
+          platforms: linux/amd64
+          tags: "${{ env.image_name }}"
+
+      - name: Trivy Scanning
+        run: |
+          docker run \
+          -v /var/run/docker.sock:/var/run/docker.sock:rw \
+          -v /trivy/cache:/tmp/trivy/db \
+          aquasec/trivy:${{ env.TRIVY_VERSION }} \
+          image \
+          --scanners vuln,misconfig,secret \
+          --cache-dir /tmp/trivy/ \
+          --severity CRITICAL,HIGH \
+          --no-progress \
+          --ignore-unfixed \
+          --exit-code 0 "${{ env.image_name }}"
+
+      - name: Docker push
+        id: docker_push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            build_number=${{ env.build_number }}
+          push: true
+          platforms: linux/amd64
+          tags: "${{ env.image_name }},${{ env.image_latest }}"
+
+  publish_to_stage:
+    runs-on: budget
+    needs: [ build_and_test ]
+
+    steps:
+
+      - name: Set service name to GITHUB_ENV
+        id: set_service_name
+        run: |
+          # этот шаг задублирован из джобы build_and_test, потому что гитхаб считает
+          # что в нем лежит какой-то секрет и не даёт его передать в качестве аутпута
+          # предыдущей джобы
+
+          svc=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+          echo "service_name=$svc" >> $GITHUB_ENV
+
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docker-compose.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Launch
+        id: launch_job
+        run: |
+          echo ${{ secrets.DOTENV }} | base64 -d > .env
+          docker compose pull
+          docker compose down
+          docker compose up -d --force-recreate --no-deps
+          docker system prune -a -f
+
+      - name: Get Current Job Log URL
+        uses: Tiryoh/gha-jobid-action@v1
+        id: jobs
+        with:
+          job_name: "publish_to_stage"
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Notify
+        uses: cbrgm/telegram-github-action@v1
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            New deploy just happened
+            URL: ${{ steps.jobs.outputs.html_url }}
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}

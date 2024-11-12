@@ -1,0 +1,13 @@
+.git
+backups
+caddy
+nginx
+tmp
+
+.gitignore
+docker-compose.yml
+docker-compose.tests.yml
+example.env
+gh.env
+
+*/**.md

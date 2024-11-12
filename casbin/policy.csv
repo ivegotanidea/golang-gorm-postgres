@@ -1,0 +1,31 @@
+# sub, obj, act, tier, hasProfile
+# moderator
+
+p, moderator, users, list, guru, false
+p, moderator, users, update, guru, false
+
+p, moderator, profiles, list, guru, false
+p, moderator, profiles, update, guru, false
+p, moderator, profiles, query, guru, false
+
+p, moderator, services, list, guru, false
+p, moderator, reviews, set-visibility, guru, false
+
+# admin
+p, admin, *, *, *, *
+
+# owner
+p, owner, *, *, *, *
+
+# tiers
+
+p, user, users, list, expert, false
+p, user, users, list, guru, false
+
+p, user, profiles, query, expert, false
+p, user, profiles, query, guru, false
+
+p, user, services, list, guru, false
+
+p, user, reviews, set-visibility, expert, false
+p, user, reviews, set-visibility, guru, false
