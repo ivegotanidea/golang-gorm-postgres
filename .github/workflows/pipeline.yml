@@ -116,7 +116,7 @@ jobs:
           echo ${{ secrets.DOTENV }} | base64 -d > app.env
           docker compose pull
           docker compose down
-          docker compose up  -f docker-compose.prod.yml -d --force-recreate --no-deps
+          docker compose -f docker-compose.prod.yml up -d --force-recreate --no-deps 
           docker system prune -a -f
 
       - name: Get Current Job Log URL
