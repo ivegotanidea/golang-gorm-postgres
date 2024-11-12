@@ -105,6 +105,10 @@ jobs:
           svc=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           echo "service_name=$svc" >> $GITHUB_ENV
 
+      - name: Cleanup
+        run: |
+          rm -rf app.env
+
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -117,7 +121,6 @@ jobs:
           docker compose pull
           docker compose down
           docker compose -f docker-compose.prod.yml up -d --force-recreate --no-deps 
-          docker system prune -a -f
 
       - name: Get Current Job Log URL
         uses: Tiryoh/gha-jobid-action@v1
