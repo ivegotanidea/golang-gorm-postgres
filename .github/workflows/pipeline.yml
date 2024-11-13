@@ -110,7 +110,7 @@ jobs:
         id: launch_job
         run: |
           echo ${{ secrets.DOTENV }} | base64 -d > app.env
-          docker compose down
+          docker compose down || true
           docker compose -f docker-compose.prod.yml up -d --force-recreate --no-deps 
 
       - name: Get Current Job Log URL
