@@ -23,7 +23,7 @@ services:
       - "8899:80"
     environment:
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
-      BACKEND_URL: ${BACKEND_URL:-http://nginx:80}
+      BACKEND_URL: ${BACKEND_URL:-http://go_service:8888}
       NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
     volumes:
       - ./nginx/templates:/etc/nginx/templates
