@@ -1080,6 +1080,13 @@ const docTemplate = `{
                         "description": "Sex",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "description": "City Id",
+                        "required": false,
+                        "type": "integer"
                     }
                 ],
                 "responses": {

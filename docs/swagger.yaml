@@ -722,6 +722,11 @@ paths:
           description: "Sex"
           required: false
           type: string
+        - name: "city"
+          in: "query"
+          description: "City ID"
+          required: false
+          type: integer
       responses:
         '200':
           description: "OK"
