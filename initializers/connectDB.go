@@ -23,9 +23,9 @@ func ConnectDB(config *Config) {
 	customLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // Output logs to the console
 		logger.Config{
-			SlowThreshold: time.Second, // Threshold for slow query logging
-			LogLevel:      logger.Info, // Log level: Info logs all queries
-			Colorful:      true,        // Enable color output
+			SlowThreshold: time.Millisecond, // Threshold for slow query logging
+			LogLevel:      logger.Info,      // Log level: Info logs all queries
+			Colorful:      true,             // Enable color output
 		},
 	)
 
