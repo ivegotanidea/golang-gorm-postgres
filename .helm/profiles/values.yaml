@@ -37,6 +37,7 @@ ingress:
   enabled: false
   className: "nginx"
   annotations:
+    # ingress controller cm should have `allow-snippet-annotations: "true"`
     nginx.ingress.kubernetes.io/server-snippet: |
       if ($request_method = 'OPTIONS') {
           return 204;
