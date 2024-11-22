@@ -63,14 +63,15 @@ func init() {
 
 func healthCheckHandler(ctx *gin.Context) {
 
-	var message string
-
 	if ctx.Request.Method == "GET" {
-		message = "Welcome to Golang with Gorm and Postgres"
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "It's alive!"})
 	} else if ctx.Request.Method == "HEAD" {
 		ctx.Status(http.StatusOK)
 	}
+}
+
+func pingPongHandler(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, "pong")
 }
 
 func main() {
@@ -80,18 +81,21 @@ func main() {
 	}
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
-	router := server.Group("/api/v1")
+	router := server.Group("/")
 
-	router.HEAD("/healthchecker", healthCheckHandler)
-	router.GET("/healthchecker", healthCheckHandler)
+	router.HEAD("/health", healthCheckHandler)
+	router.GET("/health", healthCheckHandler)
+	router.GET("/ping", pingPongHandler)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	AuthRouteController.AuthRoute(router)
-	UserRouteController.UserRoute(router)
-	ProfileRouteController.ProfileRoute(router)
-	ServiceRouteController.ServiceRoute(router)
-	ReviewsRouteController.ReviewsRoute(router)
-	DictionaryRouteController.DictionaryRoute(router)
+	apiRouter := router.Group("/api/v1")
+
+	AuthRouteController.AuthRoute(apiRouter)
+	UserRouteController.UserRoute(apiRouter)
+	ProfileRouteController.ProfileRoute(apiRouter)
+	ServiceRouteController.ServiceRoute(apiRouter)
+	ReviewsRouteController.ReviewsRoute(apiRouter)
+	DictionaryRouteController.DictionaryRoute(apiRouter)
 
 	log.Fatal(server.Run(":" + config.ServerPort))
 }
