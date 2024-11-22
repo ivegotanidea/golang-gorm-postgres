@@ -741,18 +741,49 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 
 	var profiles []Profile
 
-	dbQuery := pc.DB.Preload("Photos").
-		Preload("City").
-		Preload("BodyType").
-		Preload("Ethnos").
-		Preload("HairColor").
-		Preload("IntimateHairCut").
-		Preload("BodyArts.BodyArt").
-		Preload("ProfileOptions.ProfileTag").
-		Where("active = ?", true).
-		Where("sex = ?", sex).
-		Where("city_id = ?", cityId).
-		Limit(intLimit).Offset(offset)
+	// 70ms
+	//dbQuery := pc.DB.Preload("Photos").
+	//	Preload("City").
+	//	Preload("BodyType").
+	//	Preload("Ethnos").
+	//	Preload("HairColor").
+	//	Preload("IntimateHairCut").
+	//	Preload("BodyArts.BodyArt").
+	//	Preload("ProfileOptions.ProfileTag").
+	//	Where("active = ?", true).
+	//	Where("sex = ?", sex).
+	//	Where("city_id = ?", cityId).
+	//	Limit(intLimit).Offset(offset)
+
+	// 4ms
+	//dbQuery := pc.DB.
+	//	Joins("LEFT JOIN cities ON cities.id = profiles.city_id").
+	//	Joins("LEFT JOIN body_types ON body_types.id = profiles.body_type_id").
+	//	Joins("LEFT JOIN ethnos ON ethnos.id = profiles.ethnos_id").
+	//	Joins("LEFT JOIN hair_colors ON hair_colors.id = profiles.hair_color_id").
+	//	Joins("LEFT JOIN intimate_hair_cuts ON intimate_hair_cuts.id = profiles.intimate_hair_cut_id").
+	//	Joins("LEFT JOIN photos ON photos.profile_id = profiles.id").
+	//	Joins("LEFT JOIN profile_body_arts ON profile_body_arts.profile_id = profiles.id").
+	//	Joins("LEFT JOIN body_arts ON body_arts.id = profile_body_arts.body_art_id").
+	//	Joins("LEFT JOIN profile_options ON profile_options.profile_id = profiles.id").
+	//	Joins("LEFT JOIN profile_tags ON profile_tags.id = profile_options.profile_tag_id").
+	//	Where("profiles.active = ?", true).
+	//	Where("profiles.sex = ?", sex).
+	//	Where("profiles.city_id = ?", cityId).
+	//	Limit(intLimit).
+	//	Offset(offset)
+
+	dbQuery := pc.DB.
+		Joins("LEFT JOIN cities ON cities.id = profiles.city_id").
+		Joins("LEFT JOIN body_types ON body_types.id = profiles.body_type_id").
+		Joins("LEFT JOIN ethnos ON ethnos.id = profiles.ethnos_id").
+		Joins("LEFT JOIN hair_colors ON hair_colors.id = profiles.hair_color_id").
+		Joins("LEFT JOIN intimate_hair_cuts ON intimate_hair_cuts.id = profiles.intimate_hair_cut_id").
+		Where("profiles.active = ?", true).
+		Where("profiles.sex = ?", sex).
+		Where("profiles.city_id = ?", cityId).
+		Limit(intLimit).
+		Offset(offset)
 
 	results := dbQuery.Find(&profiles)
 
@@ -760,6 +791,13 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: results.Error.Error()})
 		return
 	}
+
+	pc.DB.Preload("Photos").
+		Preload("BodyArts.BodyArt").
+		Preload("ProfileOptions.ProfileTag").
+		Limit(intLimit).
+		Offset(offset).
+		Find(&profiles)
 
 	profileResponses := make([]ProfileResponse, len(profiles))
 	for i, profile := range profiles {

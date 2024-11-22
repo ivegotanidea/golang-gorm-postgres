@@ -11,6 +11,8 @@ services:
              /app/main"
     env_file:
       - ./app.env
+    environment:
+      GIN_MODE: debug
     networks:
       - backend
 
