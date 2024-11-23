@@ -17,9 +17,7 @@ func MapBodyArts(bodyArts []ProfileBodyArt) []ProfileBodyArtResponse {
 	return bodyArtResponses
 }
 
-func MapPhotos(photos []Photo) []PhotoResponse {
-
-	baseUrl := "http://fmnow-qiz8dar.com"
+func MapPhotos(photos []Photo, baseUrl string) []PhotoResponse {
 
 	photoResponses := make([]PhotoResponse, len(photos))
 	for i, photo := range photos {
@@ -84,7 +82,7 @@ func MapServices(services []Service) []ServiceResponse {
 	return serviceResponses
 }
 
-func MapProfile(newProfile *Profile) *ProfileResponse {
+func MapProfile(newProfile *Profile, baseUrl string) *ProfileResponse {
 	profileResponse := &ProfileResponse{
 		ID:                     newProfile.ID.String(),
 		UpdatedBy:              &newProfile.UpdatedBy,
@@ -134,7 +132,7 @@ func MapProfile(newProfile *Profile) *ProfileResponse {
 	}
 
 	profileResponse.BodyArts = MapBodyArts(newProfile.BodyArts)
-	profileResponse.Photos = MapPhotos(newProfile.Photos)
+	profileResponse.Photos = MapPhotos(newProfile.Photos, baseUrl)
 	profileResponse.ProfileOptions = MapProfileOptions(newProfile.ProfileOptions)
 	profileResponse.Services = MapServices(newProfile.Services)
 

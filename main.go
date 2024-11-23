@@ -47,7 +47,7 @@ func init() {
 	UserController = controllers.NewUserController(initializers.DB)
 	UserRouteController = routes.NewRouteUserController(UserController)
 
-	ProfileController = controllers.NewProfileController(initializers.DB)
+	ProfileController = controllers.NewProfileController(config.ParsedBaseUrl, initializers.DB)
 	ProfileRouteController = routes.NewRouteProfileController(ProfileController)
 
 	ServiceController = controllers.NewServiceController(initializers.DB, config.ReviewUpdateLimitHours)

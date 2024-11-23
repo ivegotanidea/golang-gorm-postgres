@@ -38,7 +38,7 @@ func SetupPCController() controllers.ProfileController {
 	initializers.ConnectDB(&config)
 	initializers.InitCasbin(&config)
 
-	profileController := controllers.NewProfileController(initializers.DB)
+	profileController := controllers.NewProfileController(config.ParsedBaseUrl, initializers.DB)
 	profileController.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	if err := profileController.DB.AutoMigrate(

@@ -30,6 +30,8 @@ type Config struct {
 
 	VerifiedDistanceThreshold int `mapstructure:"VERIFIED_DISTANCE_THRESHOLD"`
 	ReviewUpdateLimitHours    int `mapstructure:"REVIEW_UPDATE_LIMIT_HOURS"`
+
+	ParsedBaseUrl string `mapstructure:"PARSED_BASE_URL"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
