@@ -1582,7 +1582,7 @@ definitions:
       priceVisitNightRatio:
         type: number
         example: 1.3
-      princeSaunaNightRatio:
+      priceSaunaNightRatio:
         type: number
         example: 1.4
       profileOptions:
@@ -2596,7 +2596,7 @@ definitions:
       priceVisitNightRatio:
         type: number
         example: 1.3
-      princeSaunaNightRatio:
+      priceSaunaNightRatio:
         type: number
         example: 1.4
       profileOptions:

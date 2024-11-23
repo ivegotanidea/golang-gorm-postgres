@@ -94,7 +94,7 @@ type CreateProfileRequest struct {
 	//PriceInHouseNightRatio float64 `json:"priceInHouseNightRatio,omitempty"`
 	PriceInHouseContact *int `json:"priceInHouseContact,omitempty" validate:"gte=0"`
 	PriceInHouseHour    *int `json:"priceInHouseHour,omitempty" validate:"gte=0"`
-	//PriceSaunaNightRatio  float64 `json:"princeSaunaNightRatio,omitempty"`
+	//PriceSaunaNightRatio  float64 `json:"priceSaunaNightRatio,omitempty"`
 	PriceSaunaContact *int `json:"priceSaunaContact,omitempty" validate:"gte=0"`
 	PriceSaunaHour    *int `json:"priceSaunaHour,omitempty" validate:"gte=0"`
 	//PriceVisitNightRatio   float64 `json:"priceVisitNightRatio,omitempty"`
@@ -136,7 +136,7 @@ type UpdateOwnProfileRequest struct {
 	PriceInHouseNightRatio *float64 `json:"priceInHouseNightRatio,omitempty" validate:"gte=0"`
 	PriceInHouseContact    *int     `json:"priceInHouseContact,omitempty" validate:"gte=0"`
 	PriceInHouseHour       *int     `json:"priceInHouseHour,omitempty" validate:"gte=0"`
-	PrinceSaunaNightRatio  *float64 `json:"princeSaunaNightRatio,omitempty" validate:"gte=0"`
+	PriceSaunaNightRatio   *float64 `json:"priceSaunaNightRatio,omitempty" validate:"gte=0"`
 	PriceSaunaContact      *int     `json:"priceSaunaContact,omitempty" validate:"gte=0"`
 	PriceSaunaHour         *int     `json:"priceSaunaHour,omitempty" validate:"gte=0"`
 	PriceVisitNightRatio   *float64 `json:"priceVisitNightRatio,omitempty" validate:"gte=0"`

@@ -1618,7 +1618,7 @@ components:
           type: integer
         priceVisitNightRatio:
           type: number
-        princeSaunaNightRatio:
+        priceSaunaNightRatio:
           type: number
         profileOptions:
           type: array
@@ -2458,7 +2458,7 @@ components:
           type: integer
         priceVisitNightRatio:
           type: number
-        princeSaunaNightRatio:
+        priceSaunaNightRatio:
           type: number
         profileOptions:
           type: array

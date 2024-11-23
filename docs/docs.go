@@ -2351,7 +2351,7 @@ const docTemplate = `{
                     "type": "number",
                     "example": 1.3
                 },
-                "princeSaunaNightRatio": {
+                "priceSaunaNightRatio": {
                     "type": "number",
                     "example": 1.4
                 },
@@ -3649,7 +3649,7 @@ const docTemplate = `{
                     "type": "number",
                     "example": 1.3
                 },
-                "princeSaunaNightRatio": {
+                "priceSaunaNightRatio": {
                     "type": "number",
                     "example": 1.4
                 },

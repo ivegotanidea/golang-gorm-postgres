@@ -337,8 +337,8 @@ func (pc *ProfileController) UpdateOwnProfile(ctx *gin.Context) {
 		updateFields["PriceInHouseHour"] = payload.PriceInHouseHour
 	}
 
-	if payload.PrinceSaunaNightRatio != nil && *payload.PrinceSaunaNightRatio != existingProfile.PriceSaunaNightRatio {
-		updateFields["PriceSaunaNightRatio"] = *payload.PrinceSaunaNightRatio
+	if payload.PriceSaunaNightRatio != nil && *payload.PriceSaunaNightRatio != existingProfile.PriceSaunaNightRatio {
+		updateFields["PriceSaunaNightRatio"] = *payload.PriceSaunaNightRatio
 	}
 
 	if payload.PriceSaunaContact != nil && payload.PriceSaunaContact != existingProfile.PriceSaunaContact {
@@ -809,12 +809,6 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 			return db.Where("profile_options.profile_id IN ?", profileIDs)
 		}).
 		Find(&profiles)
-
-	//pc.DB.Where("profile_id IN ?", profileIDs).
-	//	Preload("Photos").
-	//	Preload("ProfileBodyArts.BodyArts.BodyArt").
-	//	Preload("ProfileOptions.ProfileTag").
-	//	Find(&profiles)
 
 	profileResponses := make([]ProfileResponse, len(profiles))
 	for i, profile := range profiles {
