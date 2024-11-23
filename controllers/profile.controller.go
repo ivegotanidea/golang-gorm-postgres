@@ -793,11 +793,15 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		return
 	}
 
-	pc.DB.Preload("Photos").
-		Preload("BodyArts.BodyArt").
+	var profileIDs []string
+	for _, profile := range profiles {
+		profileIDs = append(profileIDs, profile.ID.String())
+	}
+
+	pc.DB.Where("profile_id IN ?", profileIDs).
+		Preload("Photos").
+		Preload("ProfileBodyArts.BodyArts.BodyArt").
 		Preload("ProfileOptions.ProfileTag").
-		Limit(intLimit).
-		Offset(offset).
 		Find(&profiles)
 
 	profileResponses := make([]ProfileResponse, len(profiles))

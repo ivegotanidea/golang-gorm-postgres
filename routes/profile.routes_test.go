@@ -82,7 +82,7 @@ func TestProfileRoutes(t *testing.T) {
 
 	bodyTypes := populateBodyTypes(*pc.DB)
 
-	ethnos := populateEthnos(*pc.DB)
+	ethnos := filterEthnosBySex(populateEthnos(*pc.DB), "female")
 
 	hairColors := populateHairColors(*pc.DB)
 
@@ -1173,10 +1173,11 @@ func TestProfileRoutes(t *testing.T) {
 
 		listProfilesReq, _ := http.NewRequest(
 			"GET",
-			"/api/profiles/list?page=1&limit=10",
+			"/api/profiles/all?page=1&limit=10",
 			nil)
 
 		listProfilesReq.Header.Set("Content-Type", "application/json")
+		listProfilesReq.AddCookie(&http.Cookie{Name: secondUserAccessTokenCookie.Name, Value: secondUserAccessTokenCookie.Value})
 
 		w := httptest.NewRecorder()
 		profileRouter.ServeHTTP(w, listProfilesReq)
@@ -1200,7 +1201,6 @@ func TestProfileRoutes(t *testing.T) {
 			}
 		}
 
-		assert.False(t, foundInactive)
-
+		assert.True(t, foundInactive)
 	})
 }
