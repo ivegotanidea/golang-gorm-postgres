@@ -798,11 +798,23 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		profileIDs = append(profileIDs, profile.ID.String())
 	}
 
-	pc.DB.Where("profile_id IN ?", profileIDs).
-		Preload("Photos").
-		Preload("ProfileBodyArts.BodyArts.BodyArt").
-		Preload("ProfileOptions.ProfileTag").
+	// Use Preloads with explicit filtering by profile_id
+	pc.DB.Preload("Photos", func(db *gorm.DB) *gorm.DB {
+		return db.Where("photos.profile_id IN ?", profileIDs)
+	}).
+		Preload("ProfileBodyArts.BodyArts.BodyArt", func(db *gorm.DB) *gorm.DB {
+			return db.Where("profile_body_arts.profile_id IN ?", profileIDs)
+		}).
+		Preload("ProfileOptions.ProfileTag", func(db *gorm.DB) *gorm.DB {
+			return db.Where("profile_options.profile_id IN ?", profileIDs)
+		}).
 		Find(&profiles)
+
+	//pc.DB.Where("profile_id IN ?", profileIDs).
+	//	Preload("Photos").
+	//	Preload("ProfileBodyArts.BodyArts.BodyArt").
+	//	Preload("ProfileOptions.ProfileTag").
+	//	Find(&profiles)
 
 	profileResponses := make([]ProfileResponse, len(profiles))
 	for i, profile := range profiles {
