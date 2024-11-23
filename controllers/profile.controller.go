@@ -808,6 +808,7 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		Preload("ProfileOptions.ProfileTag", func(db *gorm.DB) *gorm.DB {
 			return db.Where("profile_options.profile_id IN ?", profileIDs)
 		}).
+		Where("id IN ?", profileIDs).
 		Find(&profiles)
 
 	profileResponses := make([]ProfileResponse, len(profiles))
