@@ -90,7 +90,7 @@ func (ic *ImageController) sign(path string) string {
 	return base64.RawURLEncoding.EncodeToString(mac.Sum(nil))
 }
 
-func (ic *ImageController) generateURL(
+func (ic *ImageController) generateImageProxyUrl(
 	imgURI string,
 	resize string,
 	width int,
@@ -241,7 +241,7 @@ func (ic *ImageController) UploadProfileImage(ctx *gin.Context) {
 		return
 	}
 
-	imgURL := ic.generateURL(fmt.Sprintf("s3://%s/%s", ic.bucket, imgKey), resize, width, height, enlarge, gravity, extension)
+	imgURL := ic.generateImageProxyUrl(fmt.Sprintf("s3://%s/%s", ic.bucket, imgKey), resize, width, height, enlarge, gravity, extension)
 
 	imageResponse := &ImageResponse{
 		URL: imgURL,
