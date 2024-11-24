@@ -1,5 +1,6 @@
 *.env
 
+backups/data_backup.sql
 # Binaries for programs and plugins
 *.exe
 *.exe~
