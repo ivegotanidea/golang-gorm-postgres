@@ -7,6 +7,16 @@ import (
 )
 
 type Config struct {
+	S3AccessKey    string `mapstructure:"S3_ACCESS_KEY"`
+	S3AccessSecret string `mapstructure:"S3_ACCESS_SECRET"`
+	S3Bucket       string `mapstructure:"S3_IMG_UPLOAD_BUCKET"`
+	S3Endpoint     string `mapstructure:"S3_RESOURCE_ENDPOINT"`
+	S3Region       string `mapstructure:"S3_RESOURCE_REGION"`
+
+	ImgProxyBaseUrl        string `mapstructure:"IMG_PROXY_BASE_URL"`
+	ImgProxySigningHexKey  string `mapstructure:"IMG_PROXY_SIGNING_HEX_KEY"`
+	ImgProxySigningSaltHex string `mapstructure:"IMG_PROXY_SIGNING_SALT_HEX"`
+
 	CasbinModelPath  string `mapstructure:"CASBIN_MODEL_PATH"`
 	CasbinPolicyPath string `mapstructure:"CASBIN_POLICY_PATH"`
 
