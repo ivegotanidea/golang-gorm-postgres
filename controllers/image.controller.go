@@ -7,6 +7,10 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	s3 "github.com/fclairamb/afero-s3"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	. "github.com/ivegotanidea/golang-gorm-postgres/models"
@@ -26,28 +30,38 @@ import (
 )
 
 type ImageController struct {
-	DB          *gorm.DB
-	baseURL     string
-	cdnBaseURL  string
-	signingKey  []byte
-	signingSalt []byte
-	storage     afero.Fs
-	bucket      string
+	DB              *gorm.DB
+	imgProxyBaseUrl string
+	cdnBaseURL      string
+	signingKey      []byte
+	signingSalt     []byte
+	storage         afero.Fs
+	config          S3Config
 
-	maxWidth  int
-	maxHeight int
+	processingGoroutinesCount int
 }
 
 func NewImageController(
 	DB *gorm.DB,
-	storage afero.Fs,
 	baseUrl string,
 	cdnBaseURL string,
 	signingKeyHex string,
 	signingSaltHex string,
-	bucket string,
-	maxWidth int,
-	maxHeight int) ImageController {
+	config S3Config,
+	processingGoroutinesCount int) ImageController {
+
+	sess, err := session.NewSession(&aws.Config{
+		Region:           aws.String(config.Region),
+		Endpoint:         aws.String(config.Endpoint),
+		Credentials:      credentials.NewStaticCredentials(config.AccessKey, config.AccessSecret, ""),
+		S3ForcePathStyle: aws.Bool(true),
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	storage := s3.NewFs(config.Bucket, sess)
 
 	key, err := hex.DecodeString(signingKeyHex)
 
@@ -62,15 +76,14 @@ func NewImageController(
 	}
 
 	return ImageController{
-		DB:          DB,
-		baseURL:     baseUrl,
-		cdnBaseURL:  cdnBaseURL,
-		signingKey:  key,
-		signingSalt: salt,
-		storage:     storage,
-		bucket:      bucket,
-		maxWidth:    maxWidth,
-		maxHeight:   maxHeight,
+		DB:                        DB,
+		imgProxyBaseUrl:           baseUrl,
+		cdnBaseURL:                cdnBaseURL,
+		signingKey:                key,
+		signingSalt:               salt,
+		storage:                   storage,
+		config:                    config,
+		processingGoroutinesCount: processingGoroutinesCount,
 	}
 }
 
@@ -117,7 +130,7 @@ func (ic *ImageController) generateImgProxyUrl(
 	imgURI = base64.RawURLEncoding.EncodeToString([]byte(imgURI))
 	path := fmt.Sprintf("/rs:%s:%d:%d:0/g:%s/watermark:1:ce:0:0:0.3/q:%d/plain/%s.%s", resize, width, height, gravity, quality, imgURI, extension)
 
-	return fmt.Sprintf("%s/%s%s", ic.baseURL, ic.sign(path), path)
+	return fmt.Sprintf("%s/%s%s", ic.imgProxyBaseUrl, ic.sign(path), path)
 }
 
 func (ic *ImageController) generateCDNURL(key string) string {
@@ -178,7 +191,7 @@ func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart
 	}
 
 	// Base source URL for imgproxy
-	sourceImageURL := fmt.Sprintf("s3://%s/%s", ic.bucket, tempImgKey)
+	sourceImageURL := fmt.Sprintf("s3://%s/%s", ic.config.Bucket, tempImgKey)
 
 	// Initialize a WaitGroup and mutex for concurrency
 	var wg sync.WaitGroup
@@ -387,7 +400,7 @@ func (ic *ImageController) UploadProfileImage(ctx *gin.Context) {
 	}
 
 	// Base source URL for imgproxy
-	sourceImageURL := fmt.Sprintf("s3://%s/%s", ic.bucket, tempImgKey)
+	sourceImageURL := fmt.Sprintf("s3://%s/%s", ic.config.Bucket, tempImgKey)
 
 	for _, version := range imageVersions {
 		// Generate the imgproxy URL
@@ -483,7 +496,7 @@ func (ic *ImageController) UploadProfileImage(ctx *gin.Context) {
 //	@Success		200			{object}	SuccessResponse[[]PhotoResponse]
 //	@Failure		400			{object}	ErrorResponse
 //	@Failure		500			{object}	ErrorResponse
-//	@Router			/images/upload [post]
+//	@Router			/images [post]
 func (ic *ImageController) UploadProfileImages(ctx *gin.Context) {
 	// Retrieve all files from the "images" form field
 	formFiles, err := ctx.MultipartForm()
@@ -520,7 +533,7 @@ func (ic *ImageController) UploadProfileImages(ctx *gin.Context) {
 	var mu sync.Mutex // To protect shared slices
 
 	// Limit the number of concurrent goroutines
-	semaphore := make(chan struct{}, 5) // Adjust the concurrency level as needed
+	semaphore := make(chan struct{}, ic.processingGoroutinesCount) // Adjust the concurrency level as needed
 
 	for _, fileHeader := range files {
 		wg.Add(1)

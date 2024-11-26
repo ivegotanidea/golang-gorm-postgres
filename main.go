@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/ivegotanidea/golang-gorm-postgres/docs"
+	"github.com/ivegotanidea/golang-gorm-postgres/models"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
@@ -31,6 +32,9 @@ var (
 
 	DictionaryController      controllers.DictionaryController
 	DictionaryRouteController routes.DictionaryRouteController
+
+	ImageController      controllers.ImageController
+	ImageRouteController routes.ImageRouteController
 )
 
 func init() {
@@ -57,6 +61,23 @@ func init() {
 
 	DictionaryController = controllers.NewDictionaryController(initializers.DB)
 	DictionaryRouteController = routes.NewRouteDictionaryController(DictionaryController)
+
+	ImageController = controllers.NewImageController(
+		initializers.DB,
+		config.ImgProxyBaseUrl,
+		config.S3Endpoint,
+		config.ImgProxySigningHexKey,
+		config.ImgProxySigningSaltHex,
+		models.S3Config{
+			AccessKey:    config.S3AccessKey,
+			AccessSecret: config.S3AccessSecret,
+			Bucket:       config.S3Bucket,
+			Region:       config.S3Region,
+			Endpoint:     config.S3Endpoint,
+		},
+		config.ProcessingGoroutinesCount)
+
+	ImageRouteController = routes.NewImageRouteController(ImageController)
 
 	server = gin.Default()
 }
@@ -96,6 +117,7 @@ func main() {
 	ServiceRouteController.ServiceRoute(apiRouter)
 	ReviewsRouteController.ReviewsRoute(apiRouter)
 	DictionaryRouteController.DictionaryRoute(apiRouter)
+	ImageRouteController.ImageRoute(apiRouter)
 
 	log.Fatal(server.Run(":" + config.ServerPort))
 }

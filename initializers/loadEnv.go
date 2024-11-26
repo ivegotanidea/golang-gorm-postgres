@@ -13,9 +13,10 @@ type Config struct {
 	S3Endpoint     string `mapstructure:"S3_RESOURCE_ENDPOINT"`
 	S3Region       string `mapstructure:"S3_RESOURCE_REGION"`
 
-	ImgProxyBaseUrl        string `mapstructure:"IMG_PROXY_BASE_URL"`
-	ImgProxySigningHexKey  string `mapstructure:"IMG_PROXY_SIGNING_HEX_KEY"`
-	ImgProxySigningSaltHex string `mapstructure:"IMG_PROXY_SIGNING_SALT_HEX"`
+	ImgProxyBaseUrl           string `mapstructure:"IMG_PROXY_BASE_URL"`
+	ImgProxySigningHexKey     string `mapstructure:"IMG_PROXY_SIGNING_HEX_KEY"`
+	ImgProxySigningSaltHex    string `mapstructure:"IMG_PROXY_SIGNING_SALT_HEX"`
+	ProcessingGoroutinesCount int    `mapstructure:"PROCESSING_GOROUTINES_COUNT"`
 
 	CasbinModelPath  string `mapstructure:"CASBIN_MODEL_PATH"`
 	CasbinPolicyPath string `mapstructure:"CASBIN_POLICY_PATH"`
