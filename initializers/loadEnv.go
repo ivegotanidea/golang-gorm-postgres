@@ -7,15 +7,15 @@ import (
 )
 
 type Config struct {
-	S3AccessKey    string `mapstructure:"S3_ACCESS_KEY"`
-	S3AccessSecret string `mapstructure:"S3_ACCESS_SECRET"`
-	S3Bucket       string `mapstructure:"S3_IMG_UPLOAD_BUCKET"`
-	S3Endpoint     string `mapstructure:"S3_RESOURCE_ENDPOINT"`
-	S3Region       string `mapstructure:"S3_RESOURCE_REGION"`
+	S3AccessKey    string `mapstructure:"AWS_ACCESS_KEY_ID"`
+	S3AccessSecret string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
+	S3Bucket       string `mapstructure:"MINIO_DEFAULT_BUCKET"`
+	S3Endpoint     string `mapstructure:"IMGPROXY_S3_ENDPOINT"`
+	S3Region       string `mapstructure:"MINIO_SITE_REGION"`
 
 	ImgProxyBaseUrl           string `mapstructure:"IMG_PROXY_BASE_URL"`
-	ImgProxySigningHexKey     string `mapstructure:"IMG_PROXY_SIGNING_HEX_KEY"`
-	ImgProxySigningSaltHex    string `mapstructure:"IMG_PROXY_SIGNING_SALT_HEX"`
+	ImgProxySigningHexKey     string `mapstructure:"IMGPROXY_KEY"`
+	ImgProxySigningSaltHex    string `mapstructure:"IMGPROXY_SALT"`
 	ProcessingGoroutinesCount int    `mapstructure:"PROCESSING_GOROUTINES_COUNT"`
 
 	CasbinModelPath  string `mapstructure:"CASBIN_MODEL_PATH"`

@@ -1,4 +1,37 @@
 services:
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    hostname: minio
+    ports:
+      - "50300:9000"
+      - "50400:9001"
+    env_file:
+      - ./app.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    volumes:
+      - data:/data
+    networks:
+      - common
+
+  imgproxy:
+    image: darthsim/imgproxy@sha256:c1250eeb8efb8b3946e9393f4b1e2871cf15e74e3a546e4110568c147b1a8628
+    container_name: imgproxy
+    ports:
+      - "50200:8888"
+    env_file:
+      - ./app.env
+    links:
+      - minio
+    networks:
+      - common
+
   postgres:
     platform: linux/amd64
     image: postgres:16
@@ -42,31 +75,31 @@ services:
     networks:
       - common
 
-  init_db:
-    platform: linux/amd64
-    image: postgres:16
-    container_name: postgres_init
-    env_file:
-      - ./app.env
-    volumes:
-      - ./backups:/backups
-    command: >
-      bash -c "
-      set -x;
-      echo "Started...";
-      
-      until PGPASSWORD=$$POSTGRES_PASSWORD psql -h $$POSTGRES_HOST -p $$POSTGRES_PORT -U $$POSTGRES_USER -d $$POSTGRES_DB -c \"\\q\"; do
-        echo 'Waiting for db to be ready...';
-        sleep 5;
-      done;
-      
-      PGPASSWORD=$$POSTGRES_PASSWORD psql -h $$POSTGRES_HOST -U $$POSTGRES_USER -p $$POSTGRES_PORT -d $$POSTGRES_DB < /backups/data_backup.sql;
-      echo 'Database restoration completed!'"
-    depends_on:
-      - postgres
-    networks:
-      - common
-    restart: "no" # Ensures it doesn't restart after completion
+#  init_db:
+#    platform: linux/amd64
+#    image: postgres:16
+#    container_name: postgres_init
+#    env_file:
+#      - ./app.env
+#    volumes:
+#      - ./backups:/backups
+#    command: >
+#      bash -c "
+#      set -x;
+#      echo "Started...";
+#
+#      until PGPASSWORD=$$POSTGRES_PASSWORD psql -h $$POSTGRES_HOST -p $$POSTGRES_PORT -U $$POSTGRES_USER -d $$POSTGRES_DB -c \"\\q\"; do
+#        echo 'Waiting for db to be ready...';
+#        sleep 5;
+#      done;
+#
+#      PGPASSWORD=$$POSTGRES_PASSWORD psql -h $$POSTGRES_HOST -U $$POSTGRES_USER -p $$POSTGRES_PORT -d $$POSTGRES_DB < /backups/data_backup.sql;
+#      echo 'Database restoration completed!'"
+#    depends_on:
+#      - postgres
+#    networks:
+#      - common
+#    restart: "no" # Ensures it doesn't restart after completion
 
   nginx:
     platform: linux/amd64
@@ -102,6 +135,7 @@ services:
 
 volumes:
   postgres:
+  data:
 
 networks:
   common:
