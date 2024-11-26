@@ -1,10 +1,5 @@
 package models
 
-// ImageResponse represents the response containing the image URL
-type ImageResponse struct {
-	URL string `json:"url"`
-}
-
 // ErrorResponse represents a general error response.
 // @Description This model is returned when an API call fails due to an error.
 type ErrorResponse struct {

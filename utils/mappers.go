@@ -29,10 +29,12 @@ func MapPhotos(photos []Photo, baseUrl string) []PhotoResponse {
 		}
 
 		photoResponses[i] = PhotoResponse{
-			URL:      photoUrl,
-			Disabled: photo.Disabled,
-			Approved: photo.Approved,
-			Deleted:  photo.Deleted,
+			URL:        photoUrl,
+			PreviewURL: photo.PreviewUrl,
+			PhrURL:     photo.PhrURL,
+			Disabled:   photo.Disabled,
+			Approved:   photo.Approved,
+			Deleted:    photo.Deleted,
 		}
 	}
 	return photoResponses
