@@ -17,3 +17,5 @@ And this is how you make a dump:
 ### watermark
 
 > convert -background none -fill "rgba(255,255,255,0.5)" -font Arial -pointsize 48 label:"© Your Company" watermark.png\n
+
+> base64 -i watermark.png -o watermark.b64
