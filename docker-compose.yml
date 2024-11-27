@@ -17,8 +17,8 @@ services:
       retries: 3
     volumes:
       - data:/data
-#    networks:
-#      - common
+    networks:
+      - common
 
   imgproxy:
     image: darthsim/imgproxy@sha256:c1250eeb8efb8b3946e9393f4b1e2871cf15e74e3a546e4110568c147b1a8628
@@ -27,10 +27,8 @@ services:
       - "50200:8888"
     env_file:
       - ./app.env
-    links:
-      - minio
-#    networks:
-#      - common
+    networks:
+      - common
 
   postgres:
     platform: linux/amd64
@@ -42,8 +40,8 @@ services:
       - ./app.env
     volumes:
       - postgres:/var/lib/postgresql/data
-#    networks:
-#      - common
+    networks:
+      - common
 
   pgadmin:
     platform: linux/amd64
@@ -56,8 +54,8 @@ services:
       - "8080:80"
     depends_on:
       - postgres
-#    networks:
-#      - common
+    networks:
+      - common
 
   go-service:
     platform: linux/amd64
@@ -72,8 +70,8 @@ services:
       - ./app.env
     depends_on:
       - postgres
-#    networks:
-#      - common
+    networks:
+      - common
 
 #  init_db:
 #    platform: linux/amd64
@@ -116,8 +114,8 @@ services:
       NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
     depends_on:
       - go-service
-#    networks:
-#      - common
+    networks:
+      - common
 
   caddy:
     image: caddy
@@ -130,12 +128,12 @@ services:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
     depends_on:
       - go-service
-#    networks:
-#      - common
+    networks:
+      - common
 
 volumes:
   postgres:
   data:
 
-#networks:
-#  common:
+networks:
+  common:

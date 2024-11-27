@@ -155,6 +155,7 @@ func TestImageRoutes(t *testing.T) {
 		//utils.DropAllTables(pc.DB)
 	})
 
+	// should be e2e tests running inside of docker
 	t.Run("POST /api/images/: success with access_token", func(t *testing.T) {
 		user := generateUser(random, authRouter, t, "")
 
