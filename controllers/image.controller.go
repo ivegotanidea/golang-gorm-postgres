@@ -18,7 +18,6 @@ import (
 	"github.com/spf13/afero"
 	"gorm.io/gorm"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -88,6 +87,7 @@ func NewImageController(
 }
 
 func (ic *ImageController) store(key string, image io.Reader) error {
+
 	file, err := ic.storage.OpenFile(key, os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		return errors.Wrap(err, "failed to open image")
@@ -104,9 +104,7 @@ func (ic *ImageController) store(key string, image io.Reader) error {
 
 func (ic *ImageController) sign(path string) string {
 	mac := hmac.New(sha256.New, ic.signingKey)
-	mac.Write(ic.signingSalt)
-	mac.Write([]byte(path))
-
+	mac.Write(append(ic.signingSalt, []byte(path)...))
 	return base64.RawURLEncoding.EncodeToString(mac.Sum(nil))
 }
 
@@ -127,10 +125,13 @@ func (ic *ImageController) generateImgProxyUrl(
 	extension string,
 	quality int,
 ) string {
-	imgURI = base64.RawURLEncoding.EncodeToString([]byte(imgURI))
-	path := fmt.Sprintf("/rs:%s:%d:%d:0/g:%s/watermark:1:ce:0:0:0.3/q:%d/plain/%s.%s", resize, width, height, gravity, quality, imgURI, extension)
+	//imgURIEncoded := base64.RawURLEncoding.EncodeToString([]byte(imgURI))
 
-	return fmt.Sprintf("%s/%s%s", ic.imgProxyBaseUrl, ic.sign(path), path)
+	path := fmt.Sprintf("/rs:%s:%d:%d:0/g:%s/f:%s/watermark:1:ce:0:0:0.3/q:%d/plain/%s", resize, width, height, gravity, extension, quality, imgURI)
+	signature := ic.sign(path)
+	imgproxyURL := fmt.Sprintf("%s/%s%s", ic.imgProxyBaseUrl, signature, path)
+
+	return imgproxyURL
 }
 
 func (ic *ImageController) generateCDNURL(key string) string {
@@ -138,8 +139,9 @@ func (ic *ImageController) generateCDNURL(key string) string {
 }
 
 // processSingleImage handles the processing of a single image
-func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart.FileHeader, profileID string) (*PhotoResponse, error) {
+func (ic *ImageController) processSingleImage(fileHeader *multipart.FileHeader, profileID string) (*Photo, error) {
 	// Open the uploaded file
+
 	file, err := fileHeader.Open()
 	if err != nil {
 		return nil, fmt.Errorf("failed to open image: %w", err)
@@ -147,12 +149,11 @@ func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart
 	defer file.Close()
 
 	// Read the file into a buffer
-	fileBytes, err := ioutil.ReadAll(file)
+	fileBytes, err := io.ReadAll(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read image: %w", err)
 	}
 
-	// Generate a new ID for the image
 	newImageID := uuid.New()
 
 	now := time.Now()
@@ -166,15 +167,10 @@ func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart
 		Approved:  false,
 	}
 
-	// Save image metadata in the database
-	if err := tx.Create(&newImage).Error; err != nil {
-		return nil, fmt.Errorf("failed to save image metadata: %w", err)
-	}
-
 	imgKeyBase := newImage.ID.String()
 
 	// Store the original image temporarily
-	tempImgKey := imgKeyBase + "_temp" + filepath.Ext(fileHeader.Filename)
+	tempImgKey := imgKeyBase + filepath.Ext(fileHeader.Filename)
 	if err := ic.store(tempImgKey, bytes.NewReader(fileBytes)); err != nil {
 		return nil, fmt.Errorf("failed to store original image: %w", err)
 	}
@@ -185,13 +181,12 @@ func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart
 		Width  int
 		Height int
 	}{
-		{Suffix: "", Width: 1065, Height: 705},   // Main image
 		{Suffix: "_pr", Width: 336, Height: 504}, // Preview
 		{Suffix: "_phr", Width: 60, Height: 60},  // Photorama
 	}
 
 	// Base source URL for imgproxy
-	sourceImageURL := fmt.Sprintf("s3://%s/%s", ic.config.Bucket, tempImgKey)
+	sourceImageURL := fmt.Sprintf("%s/%s/%s", ic.cdnBaseURL, ic.config.Bucket, tempImgKey)
 
 	// Initialize a WaitGroup and mutex for concurrency
 	var wg sync.WaitGroup
@@ -217,7 +212,7 @@ func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart
 				v.Height,
 				"sm",
 				"webp",
-				30, // Quality set to 30%
+				30,
 			)
 
 			// Fetch the processed image from imgproxy
@@ -231,7 +226,7 @@ func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart
 			defer resp.Body.Close()
 
 			if resp.StatusCode != http.StatusOK {
-				bodyBytes, _ := ioutil.ReadAll(resp.Body)
+				bodyBytes, _ := io.ReadAll(resp.Body)
 				mu.Lock()
 				processingError = append(processingError, fmt.Sprintf("Imgproxy returned error: %s", string(bodyBytes)))
 				mu.Unlock()
@@ -239,7 +234,7 @@ func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart
 			}
 
 			// Read the transformed image data
-			transformedImageData, err := ioutil.ReadAll(resp.Body)
+			transformedImageData, err := io.ReadAll(resp.Body)
 			if err != nil {
 				mu.Lock()
 				processingError = append(processingError, fmt.Sprintf("Failed to read transformed image data: %v", err))
@@ -278,27 +273,16 @@ func (ic *ImageController) processSingleImage(tx *gorm.DB, fileHeader *multipart
 	// Wait for all goroutines to finish
 	wg.Wait()
 
-	// Delete the temporary original image
-	if err := ic.delete(tempImgKey); err != nil {
-		log.Printf("Failed to delete temporary image %s: %v", tempImgKey, err)
-	}
-
 	// Check if any processing errors occurred
 	if len(processingError) > 0 {
 		return nil, fmt.Errorf(strings.Join(processingError, "; "))
 	}
 
-	// Prepare the response
-	photoResponse := PhotoResponse{
-		URL:        processedURLs["main"],
-		PreviewURL: processedURLs["preview"],
-		PhrURL:     processedURLs["photorama"],
-		Disabled:   newImage.Disabled,
-		Approved:   newImage.Approved,
-		Deleted:    newImage.Deleted,
-	}
+	newImage.URL = processedURLs["main"]
+	newImage.PreviewUrl = processedURLs["preview"]
+	newImage.PhrURL = processedURLs["photorama"]
 
-	return &photoResponse, nil
+	return &newImage, nil
 }
 
 // UploadProfileImage godoc
@@ -400,7 +384,7 @@ func (ic *ImageController) UploadProfileImage(ctx *gin.Context) {
 	}
 
 	// Base source URL for imgproxy
-	sourceImageURL := fmt.Sprintf("s3://%s/%s", ic.config.Bucket, tempImgKey)
+	sourceImageURL := fmt.Sprintf("http://%s/%s", ic.config.Bucket, tempImgKey)
 
 	for _, version := range imageVersions {
 		// Generate the imgproxy URL
@@ -493,7 +477,7 @@ func (ic *ImageController) UploadProfileImage(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			profileID	formData	string	true	"Profile ID"
 //	@Param			images		formData	[]file	true	"Image files"
-//	@Success		200			{object}	SuccessResponse[[]PhotoResponse]
+//	@Success		201			{object}	SuccessResponse[[]PhotoResponse]
 //	@Failure		400			{object}	ErrorResponse
 //	@Failure		500			{object}	ErrorResponse
 //	@Router			/images [post]
@@ -518,7 +502,7 @@ func (ic *ImageController) UploadProfileImages(ctx *gin.Context) {
 	}
 
 	// Initialize a slice to hold the responses
-	var photoResponses []PhotoResponse
+	var photos []Photo
 	var processingErrors []string
 
 	// Begin a database transaction
@@ -544,7 +528,7 @@ func (ic *ImageController) UploadProfileImages(ctx *gin.Context) {
 			defer func() { <-semaphore }() // Release the slot
 
 			// Process each file
-			photoResp, err := ic.processSingleImage(tx, fh, profileID)
+			photo, err := ic.processSingleImage(fh, profileID)
 			if err != nil {
 				mu.Lock()
 				processingErrors = append(processingErrors, fmt.Sprintf("Failed to process %s: %v", fh.Filename, err))
@@ -553,7 +537,7 @@ func (ic *ImageController) UploadProfileImages(ctx *gin.Context) {
 			}
 
 			mu.Lock()
-			photoResponses = append(photoResponses, *photoResp)
+			photos = append(photos, *photo)
 			mu.Unlock()
 		}(fileHeader)
 	}
@@ -582,5 +566,5 @@ func (ic *ImageController) UploadProfileImages(ctx *gin.Context) {
 	}
 
 	// Return the aggregated responses
-	ctx.JSON(http.StatusOK, SuccessResponse[[]PhotoResponse]{Status: "success", Data: photoResponses})
+	ctx.JSON(http.StatusCreated, nil)
 }

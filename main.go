@@ -77,7 +77,7 @@ func init() {
 		},
 		config.ProcessingGoroutinesCount)
 
-	ImageRouteController = routes.NewImageRouteController(ImageController)
+	ImageRouteController = routes.NewRouteImageController(ImageController)
 
 	server = gin.Default()
 }

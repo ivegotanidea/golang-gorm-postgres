@@ -109,7 +109,7 @@ type CreateProfileRequest struct {
 	ContactWA    string `json:"contactWA,omitempty" validate:"e164"`
 
 	BodyArts []CreateBodyArtRequest       `json:"bodyArts" binding:"omitempty,dive"`
-	Photos   []CreatePhotoRequest         `json:"photos" binding:"required,dive"`
+	Photos   []CreatePhotoRequest         `json:"photos" binding:"omitempty,dive"`
 	Options  []CreateProfileOptionRequest `json:"profileOptions" binding:"required,dive"`
 }
 

@@ -10,7 +10,7 @@ type ImageRouteController struct {
 	imageController controllers.ImageController
 }
 
-func NewImageRouteController(imageController controllers.ImageController) ImageRouteController {
+func NewRouteImageController(imageController controllers.ImageController) ImageRouteController {
 	return ImageRouteController{imageController}
 }
 
@@ -21,5 +21,5 @@ func (ic *ImageRouteController) ImageRoute(rg *gin.RouterGroup) {
 
 	router.Use(middleware.DeserializeUser())
 
-	router.POST("/", ic.imageController.UploadProfileImages)
+	router.POST("", ic.imageController.UploadProfileImages)
 }

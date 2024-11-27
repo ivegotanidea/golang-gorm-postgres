@@ -39,9 +39,9 @@ type CreateProfileResponse struct {
 }
 
 type ProfilesResponse struct {
-	Status string           `json:"status"`
-	Length int              `json:"results"`
-	Data   []models.Profile `json:"data"`
+	Status string                   `json:"status"`
+	Length int                      `json:"results"`
+	Data   []models.ProfileResponse `json:"data"`
 }
 
 type ServiceResponse struct {
