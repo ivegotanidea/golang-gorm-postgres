@@ -13,3 +13,9 @@ applied. If it's not ok for you, you need to:
 The command clears docker volume, then you can apply db migrations.<br>
 And this is how you make a dump:
 > pg_dump -h localhost -p 6500 -U postgres -f data_backup.sql golang-gorm
+
+### watermark
+
+> convert -background none -fill "rgba(255,255,255,0.5)" -font Arial -pointsize 48 label:"© Your Company" watermark.png\n
+
+> base64 -i watermark.png -o watermark.b64

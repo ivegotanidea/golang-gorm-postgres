@@ -32,6 +32,16 @@ func CreateOwnerUser(db *gorm.DB) {
 		Tier:           "owner",
 	}
 
+	existingUser := db.Where("id =?", owner.ID).First(&owner)
+
+	if existingUser.Error != nil {
+		panic(existingUser.Error)
+	}
+
+	if existingUser.RowsAffected != 0 {
+		fmt.Println("🧘‍♂️He Who Remains is there ⏳")
+	}
+
 	if err := db.Where("role = ?", "owner").FirstOrCreate(&owner).Error; err != nil {
 		panic(err)
 	}
@@ -41,21 +51,25 @@ func Init() {
 	initializers.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
 	err := initializers.DB.AutoMigrate(
-		&HairColor{},
-		&IntimateHairCut{},
+		&City{},
 		&Ethnos{},
 		&BodyType{},
-		&ProfileBodyArt{},
 		&BodyArt{},
-		&City{},
-		&User{},
-		&Profile{},
-		&Service{},
+		&ProfileBodyArt{},
+		&HairColor{},
+		&IntimateHairCut{},
+		&Payment{},
 		&Photo{},
+		&Profile{},
 		&ProfileOption{},
-		&UserRating{},
 		&ProfileRating{},
-		&ProfileTag{})
+		&ProfileTag{},
+		&RatedProfileTag{},
+		&RatedUserTag{},
+		&Service{},
+		&User{},
+		&UserRating{},
+		&UserTag{})
 
 	// Auto-migrate the User model
 	if err != nil {

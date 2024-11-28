@@ -8,11 +8,11 @@ import (
 type Photo struct {
 	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	ProfileID  uuid.UUID `gorm:"type:uuid;not null"`
-	Extension  string    `gorm:"type:varchar(10);"`
 	URL        string    `gorm:"type:varchar(255);not null"`
 	PhrURL     string    `gorm:"type:varchar(255);null"`
 	PreviewUrl string    `gorm:"type:varchar(255);null"`
 	CreatedAt  time.Time `gorm:"type:timestamp"`
+	Hash       string    `gorm:"type:varchar(255);"`
 	Disabled   bool      `gorm:"type:boolean;default:false"`
 	Approved   bool      `gorm:"type:boolean;default:false"`
 	Deleted    bool      `gorm:"type:boolean;default:false"`

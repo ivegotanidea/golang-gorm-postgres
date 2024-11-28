@@ -717,7 +717,7 @@ func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
 
 // todo: ListProfilesNonAuth
 // todo: restricting logic for non authorized users
-// todo: add tests
+// todo: add .tests
 
 // ListProfilesNonAuth godoc
 //

@@ -7,25 +7,28 @@ import (
 )
 
 type Config struct {
-	S3AccessKey    string `mapstructure:"S3_ACCESS_KEY"`
-	S3AccessSecret string `mapstructure:"S3_ACCESS_SECRET"`
-	S3Bucket       string `mapstructure:"S3_IMG_UPLOAD_BUCKET"`
-	S3Endpoint     string `mapstructure:"S3_RESOURCE_ENDPOINT"`
-	S3Region       string `mapstructure:"S3_RESOURCE_REGION"`
+	S3AccessKey    string `mapstructure:"AWS_ACCESS_KEY_ID"`
+	S3AccessSecret string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
+	S3Bucket       string `mapstructure:"MINIO_DEFAULT_BUCKET"`
+	S3Endpoint     string `mapstructure:"IMGPROXY_S3_ENDPOINT"`
+	S3Region       string `mapstructure:"MINIO_SITE_REGION"`
 
-	ImgProxyBaseUrl        string `mapstructure:"IMG_PROXY_BASE_URL"`
-	ImgProxySigningHexKey  string `mapstructure:"IMG_PROXY_SIGNING_HEX_KEY"`
-	ImgProxySigningSaltHex string `mapstructure:"IMG_PROXY_SIGNING_SALT_HEX"`
+	ImgProxyBaseUrl           string `mapstructure:"IMG_PROXY_BASE_URL"`
+	ImgProxySigningHexKey     string `mapstructure:"IMGPROXY_KEY"`
+	ImgProxySigningSaltHex    string `mapstructure:"IMGPROXY_SALT"`
+	ProcessingGoroutinesCount int    `mapstructure:"PROCESSING_GOROUTINES_COUNT"`
 
 	CasbinModelPath  string `mapstructure:"CASBIN_MODEL_PATH"`
 	CasbinPolicyPath string `mapstructure:"CASBIN_POLICY_PATH"`
 
-	DBHost         string `mapstructure:"POSTGRES_HOST"`
-	DBUserName     string `mapstructure:"POSTGRES_USER"`
-	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
-	DBName         string `mapstructure:"POSTGRES_DB"`
-	DBPort         string `mapstructure:"POSTGRES_PORT"`
-	ServerPort     string `mapstructure:"PORT"`
+	DBHost                 string `mapstructure:"POSTGRES_HOST"`
+	DBUserName             string `mapstructure:"POSTGRES_USER"`
+	DBUserPassword         string `mapstructure:"POSTGRES_PASSWORD"`
+	DBName                 string `mapstructure:"POSTGRES_DB"`
+	DBPort                 string `mapstructure:"POSTGRES_PORT"`
+	ServerPort             string `mapstructure:"PORT"`
+	DBQueriesSlowThreshold string `mapstructure:"DB_QUERIES_SLOW_THRESHOLD"`
+	DBLogLevel             int    `mapstructure:"DB_LOG_LEVEL"`
 
 	ClientOrigin string `mapstructure:"CLIENT_ORIGIN"`
 
