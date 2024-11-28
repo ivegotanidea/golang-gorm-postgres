@@ -152,14 +152,19 @@ func (ic *ImageController) processSingleImage(fileHeader *multipart.FileHeader, 
 		return nil, fmt.Errorf("failed to read image: %w", err)
 	}
 
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return nil, fmt.Errorf("failed to calculate image hash: %w", err)
+	}
+
 	newImageID := uuid.New()
 
 	now := time.Now()
 	newImage := Photo{
 		ID:        newImageID,
 		ProfileID: uuid.MustParse(profileID),
-		Extension: ".webp", // Images will be stored in webp format
 		CreatedAt: now,
+		Hash:      hex.EncodeToString(hash.Sum(nil)),
 		Disabled:  false,
 		Deleted:   false,
 		Approved:  false,
@@ -291,189 +296,6 @@ func (ic *ImageController) processSingleImage(fileHeader *multipart.FileHeader, 
 	return &newImage, nil
 }
 
-// UploadProfileImage godoc
-//
-//	@Summary		Uploads an image
-//	@Description	Uploads an image file and returns the image URL
-//	@Tags			Image
-//	@Accept			multipart/form-data
-//	@Produce		json
-//	@Param			profileID	formData	string	true	"Profile ID"
-//	@Param			resize		formData	string	false	"Resize option (default: fill) (options: fill, fit, crop)"
-//	@Param			width		formData	int		false	"Width (default: 300)"
-//	@Param			height		formData	int		false	"Height (default: 300)"
-//	@Param			gravity		formData	string	false	"Gravity (default: no) (options: no, center, north, south, east, west)"
-//	@Param			enlarge		formData	int		false	"Enlarge option (default: 1) (options: 0 or 1)"
-//	@Param			extension	formData	string	false	"Image extension (default: png) (options: png, jpg, jpeg)"
-//	@Param			image		formData	file	true	"Image file"
-//	@Success		200			{object}	SuccessResponse[ImageResponse]
-//	@Failure		400			{object}	ErrorResponse
-//	@Failure		500			{object}	ErrorResponse
-//	@Router			/images/upload [post]
-func (ic *ImageController) UploadProfileImage(ctx *gin.Context) {
-	fileHeader, err := ctx.FormFile("image")
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to get image: %v", err)})
-		return
-	}
-
-	// Open the uploaded file
-	file, err := fileHeader.Open()
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to open image: %v", err)})
-		return
-	}
-	defer file.Close()
-
-	profileID := ctx.PostForm("profileID")
-	if profileID == "" {
-		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "ProfileID is required"})
-		return
-	}
-
-	// Read the file into a buffer
-	fileBytes, err := io.ReadAll(file)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to read image: %v", err)})
-		return
-	}
-
-	// Generate a new ID for the image
-	newImageID := uuid.New()
-
-	now := time.Now()
-	newImage := Photo{
-		ID:        newImageID,
-		ProfileID: uuid.MustParse(profileID),
-		Extension: ".webp", // Images will be stored in webp format
-		CreatedAt: now,
-		Disabled:  false,
-		Deleted:   false,
-		Approved:  false,
-	}
-
-	tx := ic.DB.Begin()
-
-	err = tx.Create(&newImage).Error
-	if err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
-			Status:  "error",
-			Message: "Failed to save image metadata",
-		})
-		return
-	}
-
-	imgKeyBase := newImage.ID.String()
-
-	tempImgKey := imgKeyBase + "_temp" + filepath.Ext(fileHeader.Filename)
-
-	err = ic.store(tempImgKey, bytes.NewReader(fileBytes))
-	if err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to store original image: %v", err)})
-		return
-	}
-
-	// /rs:fill:1065:705:0/g:sm/watermark:1:ce:0:0:0.3/q:70/plain
-	// /rs:fill:336:504:0/g:sm/watermark:1:ce:0:0:0.3/q:70/plain
-	// /rs:fill:120:120:0/g:sm/watermark:1:ce:0:0:0.3/q:70/plain
-
-	imageVersions := []struct {
-		Suffix string
-		Width  int
-		Height int
-	}{
-		{Suffix: "", Width: 1065, Height: 705},   // Main image
-		{Suffix: "_pr", Width: 336, Height: 504}, // Preview
-		{Suffix: "_phr", Width: 60, Height: 60},  // Photorama
-	}
-
-	// Base source URL for imgproxy
-	sourceImageURL := fmt.Sprintf("http://%s/%s", ic.config.Bucket, tempImgKey)
-
-	for _, version := range imageVersions {
-		// Generate the imgproxy URL
-		imgproxyURL := ic.generateImgProxyUrl(
-			sourceImageURL,
-			"fill",
-			version.Width,
-			version.Height,
-			"sm",
-			"webp",
-			70,
-		)
-
-		// Fetch the processed image from imgproxy
-		resp, err := http.Get(imgproxyURL)
-		if err != nil {
-			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to process image via imgproxy: %v", err)})
-			return
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			bodyBytes, _ := io.ReadAll(resp.Body)
-			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, ErrorResponse{
-				Status:  "error",
-				Message: fmt.Sprintf("Imgproxy returned error: %s", string(bodyBytes)),
-			})
-			return
-		}
-
-		// Read the transformed image data
-		transformedImageData, err := io.ReadAll(resp.Body)
-		if err != nil {
-			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to read transformed image data: %v", err)})
-			return
-		}
-
-		// Generate the filename/key for storing the transformed image
-		versionFilename := imgKeyBase + version.Suffix + ".webp"
-
-		// Store the transformed image
-		err = ic.store(versionFilename, bytes.NewReader(transformedImageData))
-		if err != nil {
-			tx.Rollback()
-			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to store transformed image: %v", err)})
-			return
-		}
-	}
-
-	err = ic.delete(tempImgKey)
-	if err != nil {
-		log.Printf("Failed to delete temporary image: %v", err)
-	}
-
-	newImage.URL = imgKeyBase + ".webp"
-	newImage.PreviewUrl = imgKeyBase + "_pr.webp"
-	newImage.PhrURL = imgKeyBase + "_phr.webp"
-
-	// Commit the transaction
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{
-			Status:  "error",
-			Message: "Failed to commit transaction",
-		})
-		return
-	}
-
-	photoResponse := &PhotoResponse{
-		URL:        newImage.URL,
-		PreviewURL: newImage.PreviewUrl,
-		PhrURL:     newImage.PhrURL,
-		Disabled:   newImage.Disabled,
-		Approved:   newImage.Approved,
-		Deleted:    newImage.Deleted,
-	}
-
-	ctx.JSON(http.StatusOK, SuccessResponse[*PhotoResponse]{Status: "success", Data: photoResponse})
-}
-
 // UploadProfileImages handles multiple image uploads and processing
 //
 //	@Summary		Uploads multiple images
@@ -504,6 +326,15 @@ func (ic *ImageController) UploadProfileImages(ctx *gin.Context) {
 	profileID := ctx.PostForm("profileID")
 	if profileID == "" {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "ProfileID is required"})
+		return
+	}
+
+	var profile Profile
+	if err := ic.DB.Where("id = ?", profileID).First(&profile).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, ErrorResponse{
+			Status:  "error",
+			Message: fmt.Sprintf("Profile not found"),
+		})
 		return
 	}
 
@@ -543,6 +374,13 @@ func (ic *ImageController) UploadProfileImages(ctx *gin.Context) {
 			}
 
 			mu.Lock()
+
+			if err := tx.Create(&photo).Error; err != nil {
+				processingErrors = append(processingErrors, fmt.Sprintf("Failed to save photo %s: %v", fh.Filename, err))
+				mu.Unlock()
+				return
+			}
+
 			photos = append(photos, *photo)
 			mu.Unlock()
 		}(fileHeader)

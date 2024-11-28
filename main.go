@@ -44,6 +44,7 @@ func init() {
 	}
 
 	initializers.ConnectDB(&config)
+	initializers.Migrate()
 
 	AuthController = controllers.NewAuthController(initializers.DB)
 	AuthRouteController = routes.NewAuthRouteController(AuthController)
