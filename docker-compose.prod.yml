@@ -9,7 +9,7 @@ services:
       - ./app.env
     networks:
       - backend
-      - minio
+      - s3_minio
 
   go-service:
     platform: linux/amd64
@@ -36,7 +36,7 @@ services:
       - "8899:80"
     environment:
       FRONTEND_URL: ${FRONTEND_URL:-http://31.129.107.103:4200}
-      BACKEND_URL: ${BACKEND_URL:-http://go_service:8888}
+      BACKEND_URL: ${BACKEND_URL:-http://go_service:8000}
       NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
     volumes:
       - ./nginx/templates:/etc/nginx/templates
@@ -48,5 +48,5 @@ services:
 networks:
   backend:
     external: true
-  minio:
+  s3_minio:
     external: true
