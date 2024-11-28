@@ -125,8 +125,6 @@ func (ic *ImageController) generateImgProxyUrl(
 	extension string,
 	quality int,
 ) string {
-	//imgURIEncoded := base64.RawURLEncoding.EncodeToString([]byte(imgURI))
-
 	path := fmt.Sprintf("/rs:%s:%d:%d:0/g:%s/f:%s/watermark:1:ce:0:0:0.3/q:%d/plain/%s", resize, width, height, gravity, extension, quality, imgURI)
 	signature := ic.sign(path)
 	imgproxyURL := fmt.Sprintf("%s/%s%s", ic.imgProxyBaseUrl, signature, path)
