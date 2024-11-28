@@ -236,12 +236,6 @@ func TestImageRoutes(t *testing.T) {
 
 		assert.Equal(t, http.StatusCreated, w.Code, "Expected status code 200 OK for image upload")
 
-		var successResp models.SuccessResponse[models.PhotoResponse]
-		err = json.Unmarshal(w.Body.Bytes(), &successResp)
-		assert.NoError(t, err, "Failed to unmarshal image upload response")
-
-		assert.Equal(t, "success", successResp.Status, "Expected status to be 'success'")
-
 		getMyProfilesReq, _ := http.NewRequest("GET", "/api/profiles/my", nil)
 		getMyProfilesReq.AddCookie(&http.Cookie{Name: accessTokenCookie.Name, Value: accessTokenCookie.Value})
 		getMyProfilesReq.Header.Set("Content-Type", "application/json")

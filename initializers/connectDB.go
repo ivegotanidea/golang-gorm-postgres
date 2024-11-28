@@ -21,13 +21,19 @@ func ConnectDB(config *Config) {
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
 		config.DBHost, config.DBUserName, config.DBUserPassword, config.DBName, config.DBPort)
 
+	duration, err := time.ParseDuration(config.DBQueriesSlowThreshold)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Create a custom logger
 	customLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // Output logs to the console
 		logger.Config{
-			SlowThreshold: time.Millisecond, // Threshold for slow query logging
-			LogLevel:      logger.Info,      // Log level: Info logs all queries
-			Colorful:      true,             // Enable color output
+			SlowThreshold: duration,
+			LogLevel:      logger.LogLevel(config.DBLogLevel), // Log level: Info logs all queries
+			Colorful:      true,                               // Enable color output
 		},
 	)
 

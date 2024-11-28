@@ -21,12 +21,14 @@ type Config struct {
 	CasbinModelPath  string `mapstructure:"CASBIN_MODEL_PATH"`
 	CasbinPolicyPath string `mapstructure:"CASBIN_POLICY_PATH"`
 
-	DBHost         string `mapstructure:"POSTGRES_HOST"`
-	DBUserName     string `mapstructure:"POSTGRES_USER"`
-	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
-	DBName         string `mapstructure:"POSTGRES_DB"`
-	DBPort         string `mapstructure:"POSTGRES_PORT"`
-	ServerPort     string `mapstructure:"PORT"`
+	DBHost                 string `mapstructure:"POSTGRES_HOST"`
+	DBUserName             string `mapstructure:"POSTGRES_USER"`
+	DBUserPassword         string `mapstructure:"POSTGRES_PASSWORD"`
+	DBName                 string `mapstructure:"POSTGRES_DB"`
+	DBPort                 string `mapstructure:"POSTGRES_PORT"`
+	ServerPort             string `mapstructure:"PORT"`
+	DBQueriesSlowThreshold string `mapstructure:"DB_QUERIES_SLOW_THRESHOLD"`
+	DBLogLevel             int    `mapstructure:"DB_LOG_LEVEL"`
 
 	ClientOrigin string `mapstructure:"CLIENT_ORIGIN"`
 

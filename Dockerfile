@@ -1,6 +1,8 @@
 # Start by pulling the Go image
 FROM golang:1.22-alpine AS builder
 
+RUN apk update && apk add curl
+
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
@@ -20,8 +22,6 @@ RUN go build -o main .
 
 # Start a new stage from scratch
 FROM alpine:latest
-
-RUN apk update && apk add curl
 
 # Copy the Pre-built binary file from the builder stage
 COPY --from=builder /app/main /app/main
