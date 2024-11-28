@@ -181,6 +181,7 @@ func (ic *ImageController) processSingleImage(fileHeader *multipart.FileHeader, 
 		Width  int
 		Height int
 	}{
+		{Suffix: "", Width: 1065, Height: 705},   // Main
 		{Suffix: "_pr", Width: 336, Height: 504}, // Preview
 		{Suffix: "_phr", Width: 60, Height: 60},  // Photorama
 	}
@@ -276,6 +277,13 @@ func (ic *ImageController) processSingleImage(fileHeader *multipart.FileHeader, 
 	// Check if any processing errors occurred
 	if len(processingError) > 0 {
 		return nil, fmt.Errorf(strings.Join(processingError, "; "))
+	}
+
+	err = ic.delete(tempImgKey)
+
+	if err != nil {
+		// Log the error but proceed
+		log.Printf("Failed to delete temporary image: %v", err)
 	}
 
 	newImage.URL = processedURLs["main"]

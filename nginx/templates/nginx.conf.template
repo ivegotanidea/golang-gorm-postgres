@@ -10,6 +10,7 @@ http {
 
         # Main API handling location
         location /api/v1/ {
+
             # Handle CORS preflight requests
             if ($request_method = 'OPTIONS') {
                 add_header 'Access-Control-Allow-Origin' '${FRONTEND_URL}' always;
@@ -21,6 +22,8 @@ http {
                 add_header 'Content-Length' 0;
                 return 204;
             }
+
+            client_max_body_size 100M;
 
             # Proxy pass to the backend service
             proxy_pass ${BACKEND_URL};
