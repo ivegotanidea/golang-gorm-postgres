@@ -1,5 +1,15 @@
 services:
 
+  x-go-service-common: &go-service-common
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./app.env
+    depends_on:
+      - postgres
+
   minio:
     image: minio/minio
     container_name: minio
@@ -34,6 +44,7 @@ services:
     platform: linux/amd64
     image: postgres:16
     container_name: postgres
+    hostname: postgres
     ports:
       - 6500:5432
     env_file:
@@ -58,46 +69,68 @@ services:
       - common
 
   go-service:
-    platform: linux/amd64
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: go_service
+    <<: *go-service-common
+    container_name: go-service
+    hostname: go-service
     command: >
       sh -c "sleep 5 &&
              /app/main"
+    healthcheck:
+      test: [ "CMD", "curl", "localhost:8888/health" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - common
+
+
+  go-service-tests:
+    <<: *go-service-common
+    container_name: go-service-tests
+    command: >
+      sh -c "
+      echo 'Starting tests...';
+      
+      echo 'Waiting for go service to start...';
+      until curl -s -f http://go-service:8888/ping > /dev/null; do
+        echo 'Waiting for go-service to be healthy...';
+        sleep 3;
+      done;
+      
+      echo 'Running tests...';
+      /usr/local/go/bin/go test -v ./... 2>&1 | tee /test_output.log
+      echo 'Tests completed!'
+      "
+    depends_on:
+      - go-service
+    networks:
+      - common
+
+  init_db:
+    platform: linux/amd64
+    image: postgres:16
+    container_name: postgres_init
     env_file:
       - ./app.env
+    volumes:
+      - ./backups:/backups
+    command: >
+      bash -c "
+      set -x;
+      echo "Started...";
+
+      until PGPASSWORD=$$POSTGRES_PASSWORD psql -h $$POSTGRES_HOST -p $$POSTGRES_PORT -U $$POSTGRES_USER -d $$POSTGRES_DB -c \"\\q\"; do
+        echo 'Waiting for db to be ready...';
+        sleep 5;
+      done;
+
+      PGPASSWORD=$$POSTGRES_PASSWORD psql -h $$POSTGRES_HOST -U $$POSTGRES_USER -p $$POSTGRES_PORT -d $$POSTGRES_DB < /backups/data_backup.sql;
+      echo 'Database restoration completed!'"
     depends_on:
       - postgres
     networks:
       - common
-
-#  init_db:
-#    platform: linux/amd64
-#    image: postgres:16
-#    container_name: postgres_init
-#    env_file:
-#      - ./app.env
-#    volumes:
-#      - ./backups:/backups
-#    command: >
-#      bash -c "
-#      set -x;
-#      echo "Started...";
-#
-#      until PGPASSWORD=$$POSTGRES_PASSWORD psql -h $$POSTGRES_HOST -p $$POSTGRES_PORT -U $$POSTGRES_USER -d $$POSTGRES_DB -c \"\\q\"; do
-#        echo 'Waiting for db to be ready...';
-#        sleep 5;
-#      done;
-#
-#      PGPASSWORD=$$POSTGRES_PASSWORD psql -h $$POSTGRES_HOST -U $$POSTGRES_USER -p $$POSTGRES_PORT -d $$POSTGRES_DB < /backups/data_backup.sql;
-#      echo 'Database restoration completed!'"
-#    depends_on:
-#      - postgres
-#    networks:
-#      - common
-#    restart: "no" # Ensures it doesn't restart after completion
+    restart: "no" # Ensures it doesn't restart after completion
 
   nginx:
     platform: linux/amd64

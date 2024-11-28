@@ -21,6 +21,8 @@ RUN go build -o main .
 # Start a new stage from scratch
 FROM alpine:latest
 
+RUN apk update && apk add curl
+
 # Copy the Pre-built binary file from the builder stage
 COPY --from=builder /app/main /app/main
 COPY app.env .
