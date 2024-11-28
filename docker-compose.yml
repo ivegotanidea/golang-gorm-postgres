@@ -99,8 +99,13 @@ services:
       done;
       
       echo 'Running tests...';
-      /usr/local/go/bin/go test -v ./... 2>&1 | tee /test_output.log
-      echo 'Tests completed!'
+      /usr/local/go/bin/go test -v ./... 2>&1 | tee /test_output.log;
+      
+      if [ $? -eq 0 ]; then
+        echo 'Tests completed!';
+      else
+        echo 'Tests failed!';
+      fi;
       "
     depends_on:
       - go-service
