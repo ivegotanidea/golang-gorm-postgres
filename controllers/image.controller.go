@@ -133,7 +133,7 @@ func (ic *ImageController) generateImgProxyUrl(
 }
 
 func (ic *ImageController) generateCDNURL(key string) string {
-	return fmt.Sprintf("%s/%s", ic.cdnBaseURL, key)
+	return fmt.Sprintf("%s/%s/%s", ic.cdnBaseURL, ic.config.Bucket, key)
 }
 
 // processSingleImage handles the processing of a single image
