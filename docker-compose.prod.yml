@@ -4,9 +4,11 @@ services:
     image: darthsim/imgproxy@sha256:c1250eeb8efb8b3946e9393f4b1e2871cf15e74e3a546e4110568c147b1a8628
     container_name: imgproxy
     ports:
-      - "50200:8888"
+      - "50200:8000"
     env_file:
       - ./app.env
+    environment:
+      PORT: 8000
     networks:
       - backend
       - s3_minio
@@ -23,6 +25,7 @@ services:
     env_file:
       - ./app.env
     environment:
+      PORT: 8888
       GIN_MODE: debug
       CASBIN_MODEL_PATH: /etc/casbin/model.conf
       CASBIN_POLICY_PATH: /etc/casbin/policy.csv
