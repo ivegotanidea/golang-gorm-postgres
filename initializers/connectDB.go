@@ -62,10 +62,6 @@ func CreateOwnerUser(db *gorm.DB) {
 
 	existingUser := db.Where("id =?", owner.ID).First(&owner)
 
-	if existingUser.Error != nil {
-		panic(existingUser.Error)
-	}
-
 	if existingUser.RowsAffected != 0 {
 		fmt.Println("🧘‍♂️He Who Remains is there ⏳")
 		return
@@ -83,7 +79,12 @@ func CreateOwnerUser(db *gorm.DB) {
 func Migrate() {
 	DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
+	log.Printf("Automigrating tables...")
+
 	err := DB.AutoMigrate(
+		&User{},
+		&Profile{},
+		&Service{},
 		&City{},
 		&Ethnos{},
 		&BodyType{},
@@ -93,14 +94,11 @@ func Migrate() {
 		&IntimateHairCut{},
 		&Payment{},
 		&Photo{},
-		&Profile{},
 		&ProfileOption{},
 		&ProfileRating{},
 		&ProfileTag{},
 		&RatedProfileTag{},
 		&RatedUserTag{},
-		&Service{},
-		&User{},
 		&UserRating{},
 		&UserTag{})
 
@@ -109,7 +107,9 @@ func Migrate() {
 		log.Fatalf("Failed to auto-migrate models: %v", err)
 	}
 
+	fmt.Println("Creating owner users...")
 	CreateOwnerUser(DB)
+	fmt.Println("Creating owner users... OK")
 
 	fmt.Println("👍 Migration complete")
 }
