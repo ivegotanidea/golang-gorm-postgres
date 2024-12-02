@@ -61,6 +61,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: rblbl@mail.ru
       PGADMIN_DEFAULT_PASSWORD: s0m30n3
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
     ports:
       - "8080:80"
     depends_on:
@@ -178,6 +180,7 @@ services:
 volumes:
   postgres:
   data:
+  pgadmin-data:
 
 networks:
   common:

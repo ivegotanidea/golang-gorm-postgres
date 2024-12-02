@@ -82,25 +82,28 @@ func Migrate() {
 	log.Printf("Automigrating tables...")
 
 	err := DB.AutoMigrate(
-		&User{},
-		&Profile{},
-		&Service{},
+		// no needs
 		&City{},
 		&Ethnos{},
 		&BodyType{},
 		&BodyArt{},
-		&ProfileBodyArt{},
 		&HairColor{},
 		&IntimateHairCut{},
-		&Payment{},
-		&Photo{},
-		&ProfileOption{},
-		&ProfileRating{},
+		&UserTag{},
 		&ProfileTag{},
-		&RatedProfileTag{},
-		&RatedUserTag{},
-		&UserRating{},
-		&UserTag{})
+		&User{},
+		// ---
+		&Profile{},         // needs User
+		&Payment{},         // needs User
+		&Photo{},           // needs Profile
+		&RatedProfileTag{}, // needs ProfileTag
+		&RatedUserTag{},    // needs UserTag
+		&Service{},         // needs User, Profile
+		&ProfileBodyArt{},  // needs Profile, BodyArt
+		&ProfileOption{},   // needs Profile, ProfileTag
+		&ProfileRating{},   // needs User, Profile, Service, RatedProfileTag
+		&UserRating{},      // needs User, Service, RatedProfileTag
+	)
 
 	// Auto-migrate the User model
 	if err != nil {
