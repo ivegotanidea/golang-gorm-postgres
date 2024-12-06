@@ -34,5 +34,18 @@ http {
             add_header 'Access-Control-Allow-Headers' 'Authorization,Accept,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range' always;
             add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE, PATCH' always;
         }
+
+
+        location /static/4d4e2c88c98ba36d5ece9b4396.yaml {
+            alias /var/www/openapi_v3.yaml;
+            default_type application/yaml;
+
+            # Optional: Prevent listing the directory
+            autoindex off;
+
+            # Optional: Add security headers
+            add_header Cache-Control "no-store";
+            add_header Content-Disposition "inline";
+        }
     }
 }

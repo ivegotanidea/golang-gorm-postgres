@@ -156,6 +156,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/templates:/etc/nginx/templates
+      - ./docs/openapi_v3.yaml:/var/www/openapi_v3.yaml:ro
     environment:
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
       BACKEND_URL: ${BACKEND_URL:-http://go-service:8888}
