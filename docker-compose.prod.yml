@@ -27,8 +27,6 @@ services:
     environment:
       GIN_PORT: 8888
       GIN_MODE: debug
-      CASBIN_MODEL_PATH: /etc/casbin/model.conf
-      CASBIN_POLICY_PATH: /etc/casbin/policy.csv
     volumes:
       - ./casbin:/etc/casbin
     networks:
