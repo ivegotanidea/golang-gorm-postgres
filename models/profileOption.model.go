@@ -19,7 +19,7 @@ type CreateProfileOptionRequest struct {
 }
 
 type ProfileOptionResponse struct {
-	Price      int64              `json:"price"`
-	Comment    string             `json:"comment"`
-	ProfileTag ProfileTagResponse `json:"profileTag"`
+	Price   int64  `json:"price"`
+	Comment string `json:"comment"`
+	Name    string `json:"name"`
 }

@@ -1904,8 +1904,8 @@ components:
           type: string
         price:
           type: integer
-        profileTag:
-          $ref: '#/components/schemas/ProfileTagResponse'
+        name:
+          type: string
 
     ProfileRating:
       type: object

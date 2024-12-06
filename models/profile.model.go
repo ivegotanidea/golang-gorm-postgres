@@ -165,6 +165,13 @@ type UpdateProfileRequest struct {
 	Photos []CreatePhotoRequest `json:"photos" binding:"omitempty,dive"`
 }
 
+type ListProfilesQuery struct {
+	Page   int    `form:"page" validate:"gte=0"`
+	Limit  int    `form:"limit" validate:"gte=0;lte=12"`
+	CityID int    `form:"city" validate:"gte=0;lte=100"`
+	Sex    string `form:"sex" validate:"oneof=female male"`
+}
+
 type FindProfilesQuery struct {
 	BodyTypeId             *int     `json:"bodyTypeId,omitempty" validate:"gte=0"`
 	EthnosId               *int     `json:"ethnosId,omitempty" validate:"gte=0"`
@@ -213,47 +220,47 @@ type ProfileResponse struct {
 	Weight                 int                      `json:"weight"`
 	Bust                   float64                  `json:"bust"`
 	Bio                    string                   `json:"bio"`
-	AddressLatitude        string                   `json:"addressLatitude,omitempty"`
-	AddressLongitude       string                   `json:"addressLongitude,omitempty"`
-	CityID                 *int                     `json:"cityId,omitempty"`
-	City                   *CityResponse            `json:"city,omitempty"`
-	BodyTypeID             *int                     `json:"bodyTypeId,omitempty"`
-	BodyType               *BodyTypeResponse        `json:"bodyTypeResponse,omitempty"`
-	EthnosID               *int                     `json:"ethnosId,omitempty"`
-	Ethnos                 *EthnosResponse          `json:"ethnos,omitempty"`
-	HairColorID            *int                     `json:"hairColorId,omitempty"`
-	HairColor              *HairColorResponse       `json:"hairColor,omitempty"`
-	IntimateHairCutID      *int                     `json:"intimateHairCutId,omitempty"`
-	IntimateHairCut        *IntimateHairCutResponse `json:"intimateHairCut,omitempty"`
+	AddressLatitude        string                   `json:"addressLatitude"`
+	AddressLongitude       string                   `json:"addressLongitude"`
+	CityID                 *int                     `json:"cityId"`
+	City                   *CityResponse            `json:"city"`
+	BodyTypeID             *int                     `json:"bodyTypeId"`
+	BodyType               *BodyTypeResponse        `json:"bodyTypeResponse"`
+	EthnosID               *int                     `json:"ethnosId"`
+	Ethnos                 *EthnosResponse          `json:"ethnos"`
+	HairColorID            *int                     `json:"hairColorId"`
+	HairColor              *HairColorResponse       `json:"hairColor"`
+	IntimateHairCutID      *int                     `json:"intimateHairCutId"`
+	IntimateHairCut        *IntimateHairCutResponse `json:"intimateHairCut"`
 	PriceInHouseNightRatio float64                  `json:"priceInHouseNightRatio"`
-	PriceInHouseContact    *int                     `json:"priceInHouseContact,omitempty"`
-	PriceInHouseHour       *int                     `json:"priceInHouseHour,omitempty"`
+	PriceInHouseContact    *int                     `json:"priceInHouseContact"`
+	PriceInHouseHour       *int                     `json:"priceInHouseHour"`
 	PriceSaunaNightRatio   float64                  `json:"priceSaunaNightRatio"`
-	PriceSaunaContact      *int                     `json:"priceSaunaContact,omitempty"`
-	PriceSaunaHour         *int                     `json:"priceSaunaHour,omitempty"`
+	PriceSaunaContact      *int                     `json:"priceSaunaContact"`
+	PriceSaunaHour         *int                     `json:"priceSaunaHour"`
 	PriceVisitNightRatio   float64                  `json:"priceVisitNightRatio"`
-	PriceVisitContact      *int                     `json:"priceVisitContact,omitempty"`
-	PriceVisitHour         *int                     `json:"priceVisitHour,omitempty"`
+	PriceVisitContact      *int                     `json:"priceVisitContact"`
+	PriceVisitHour         *int                     `json:"priceVisitHour"`
 	PriceCarNightRatio     float64                  `json:"priceCarNightRatio"`
-	PriceCarContact        *int                     `json:"priceCarContact,omitempty"`
-	PriceCarHour           *int                     `json:"priceCarHour,omitempty"`
+	PriceCarContact        *int                     `json:"priceCarContact"`
+	PriceCarHour           *int                     `json:"priceCarHour"`
 	ContactPhone           string                   `json:"contactPhone"`
-	ContactWA              string                   `json:"contactWA,omitempty"`
-	ContactTG              string                   `json:"contactTG,omitempty"`
-	Contacts               []ContactResponse        `json:"contacts,omitempty"`
-	Prices                 []PriceResponse          `json:"prices,omitempty"`
+	ContactWA              string                   `json:"contactWA"`
+	ContactTG              string                   `json:"contactTG"`
+	Contacts               []ContactResponse        `json:"contacts"`
+	Prices                 []PriceResponse          `json:"prices"`
 	Moderated              bool                     `json:"moderated"`
-	ModeratedAt            *time.Time               `json:"moderatedAt,omitempty"`
-	ModeratedBy            *uuid.UUID               `json:"moderatedBy,omitempty"`
+	ModeratedAt            *time.Time               `json:"moderatedAt"`
+	ModeratedBy            *uuid.UUID               `json:"moderatedBy"`
 	Verified               bool                     `json:"verified"`
-	VerifiedAt             *time.Time               `json:"verifiedAt,omitempty"`
-	VerifiedBy             *uuid.UUID               `json:"verifiedBy,omitempty"`
+	VerifiedAt             *time.Time               `json:"verifiedAt"`
+	VerifiedBy             *uuid.UUID               `json:"verifiedBy"`
 	CreatedAt              time.Time                `json:"createdAt"`
-	BodyArts               []ProfileBodyArtResponse `json:"bodyArts,omitempty"`
-	Photos                 []PhotoResponse          `json:"photos,omitempty"`
-	ProfileOptions         []ProfileOptionResponse  `json:"profileOptions,omitempty"`
-	Services               []ServiceResponse        `json:"services,omitempty"`
-	UpdatedBy              *uuid.UUID               `json:"updatedBy,omitempty"`
+	BodyArts               []ProfileBodyArtResponse `json:"bodyArts"`
+	Photos                 []PhotoResponse          `json:"photos"`
+	ProfileOptions         []ProfileOptionResponse  `json:"profileOptions"`
+	Services               []ServiceResponse        `json:"services"`
+	UpdatedBy              *uuid.UUID               `json:"updatedBy"`
 }
 
 type ContactResponse struct {

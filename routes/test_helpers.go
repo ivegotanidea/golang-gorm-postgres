@@ -867,5 +867,5 @@ func checkProfilesMatch(t *testing.T, userID string, payload models.CreateProfil
 	assert.Equal(t, profileResponse.Data.PriceSaunaHour, payload.PriceSaunaHour)
 
 	assert.Equal(t, profileResponse.Data.DeletedAt.Valid, false)
-	assert.Nil(t, profileResponse.Data.Services)
+	assert.Empty(t, profileResponse.Data.Services)
 }

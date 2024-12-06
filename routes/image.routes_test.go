@@ -19,6 +19,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -157,6 +158,11 @@ func TestImageRoutes(t *testing.T) {
 
 	// should be e2e tests running inside of docker
 	t.Run("POST /api/images: success with access_token", func(t *testing.T) {
+
+		if os.Getenv("TEST_MODE") == "local" {
+			t.Skip()
+		}
+
 		user := generateUser(random, authRouter, t, "")
 
 		accessTokenCookie, err := loginUserGetAccessToken(t, user.Password, user.TelegramUserID, authRouter)

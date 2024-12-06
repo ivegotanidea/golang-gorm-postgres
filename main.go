@@ -43,6 +43,7 @@ func init() {
 		log.Fatal("🚀 Could not load environment variables", err)
 	}
 
+	initializers.InitCasbin(&config)
 	initializers.ConnectDB(&config)
 	//initializers.Migrate()
 

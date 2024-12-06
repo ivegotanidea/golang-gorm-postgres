@@ -664,7 +664,45 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
 }
 
+func (pc *ProfileController) GetListProfilesQuery(ctx *gin.Context) (*ListProfilesQuery, error) {
+	var page = ctx.DefaultQuery("page", "1")
+	var limit = ctx.DefaultQuery("limit", "10")
+	var sex = ctx.DefaultQuery("sex", "female")
+	var cityIdParam = ctx.DefaultQuery("city", "1")
+
+	intPage, pageErr := strconv.Atoi(page)
+
+	if pageErr != nil {
+		return nil, pageErr
+	}
+
+	intLimit, limitErr := strconv.Atoi(limit)
+
+	if limitErr != nil {
+		return nil, limitErr
+	}
+
+	cityId, cityErr := strconv.Atoi(cityIdParam)
+
+	if cityErr != nil {
+		return nil, cityErr
+	}
+
+	if sex != "male" && sex != "female" {
+		return nil, fmt.Errorf("invalid sex param")
+	}
+
+	return &ListProfilesQuery{
+		Page:   intPage,
+		Limit:  intLimit,
+		Sex:    sex,
+		CityID: cityId,
+	}, nil
+
+}
+
 // ListProfiles godoc
+// This route is for admins and moderators
 //
 //	@Summary		Lists all profiles with pagination, auth required
 //	@Description	Retrieves all profiles, supports pagination
@@ -676,103 +714,17 @@ func (pc *ProfileController) FindProfileByPhone(ctx *gin.Context) {
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/profiles/all [get]
 func (pc *ProfileController) ListProfiles(ctx *gin.Context) {
-	var page = ctx.DefaultQuery("page", "1")
-	var limit = ctx.DefaultQuery("limit", "10")
 
-	intPage, _ := strconv.Atoi(page)
-	intLimit, _ := strconv.Atoi(limit)
-	offset := (intPage - 1) * intLimit
+	query, err := pc.GetListProfilesQuery(ctx)
 
-	var profiles []Profile
-
-	dbQuery := pc.DB.Preload("Photos").
-		Preload("City").
-		Preload("BodyType").
-		Preload("Ethnos").
-		Preload("HairColor").
-		Preload("IntimateHairCut").
-		Preload("BodyArts.BodyArt").
-		Preload("ProfileOptions.ProfileTag").
-		Limit(intLimit).Offset(offset)
-
-	results := dbQuery.Find(&profiles)
-
-	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: results.Error.Error()})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: err.Error()})
 		return
 	}
 
-	profileResponses := make([]ProfileResponse, len(profiles))
-	for i, profile := range profiles {
-		profileResponses[i] = *utils.MapProfile(&profile, pc.parsedBaseUrl) // Assuming you have the mapProfile function
-	}
-
-	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ProfileResponse]{
-		Status:  "success",
-		Data:    profileResponses,
-		Results: len(profiles),
-		Page:    intPage,
-	})
-}
-
-// todo: ListProfilesNonAuth
-// todo: restricting logic for non authorized users
-// todo: add .tests
-
-// ListProfilesNonAuth godoc
-//
-//	@Summary		Lists all active profiles with pagination, no auth required
-//	@Description	Retrieves all profiles, supports pagination
-//	@Tags			Profiles
-//	@Produce		json
-//	@Param			page	query		string	false	"Page number"
-//	@Param			limit	query		string	false	"Items per page"
-//	@Success		200		{object}	SuccessPageResponse[ProfileResponse[]]
-//	@Failure		502		{object}	ErrorResponse
-//	@Router			/profiles/list [get]
-func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
-	var page = ctx.DefaultQuery("page", "1")
-	var limit = ctx.DefaultQuery("limit", "10")
-	var sex = ctx.DefaultQuery("sex", "female")
-	var cityId = ctx.DefaultQuery("city", "1")
-
-	intPage, _ := strconv.Atoi(page)
-	intLimit, _ := strconv.Atoi(limit)
-	offset := (intPage - 1) * intLimit
+	offset := (query.Page - 1) * query.Limit
 
 	var profiles []Profile
-
-	// 70ms
-	//dbQuery := pc.DB.Preload("Photos").
-	//	Preload("City").
-	//	Preload("BodyType").
-	//	Preload("Ethnos").
-	//	Preload("HairColor").
-	//	Preload("IntimateHairCut").
-	//	Preload("BodyArts.BodyArt").
-	//	Preload("ProfileOptions.ProfileTag").
-	//	Where("active = ?", true).
-	//	Where("sex = ?", sex).
-	//	Where("city_id = ?", cityId).
-	//	Limit(intLimit).Offset(offset)
-
-	// 4ms
-	//dbQuery := pc.DB.
-	//	Joins("LEFT JOIN cities ON cities.id = profiles.city_id").
-	//	Joins("LEFT JOIN body_types ON body_types.id = profiles.body_type_id").
-	//	Joins("LEFT JOIN ethnos ON ethnos.id = profiles.ethnos_id").
-	//	Joins("LEFT JOIN hair_colors ON hair_colors.id = profiles.hair_color_id").
-	//	Joins("LEFT JOIN intimate_hair_cuts ON intimate_hair_cuts.id = profiles.intimate_hair_cut_id").
-	//	Joins("LEFT JOIN photos ON photos.profile_id = profiles.id").
-	//	Joins("LEFT JOIN profile_body_arts ON profile_body_arts.profile_id = profiles.id").
-	//	Joins("LEFT JOIN body_arts ON body_arts.id = profile_body_arts.body_art_id").
-	//	Joins("LEFT JOIN profile_options ON profile_options.profile_id = profiles.id").
-	//	Joins("LEFT JOIN profile_tags ON profile_tags.id = profile_options.profile_tag_id").
-	//	Where("profiles.active = ?", true).
-	//	Where("profiles.sex = ?", sex).
-	//	Where("profiles.city_id = ?", cityId).
-	//	Limit(intLimit).
-	//	Offset(offset)
 
 	dbQuery := pc.DB.
 		Joins("LEFT JOIN cities ON cities.id = profiles.city_id").
@@ -780,10 +732,9 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		Joins("LEFT JOIN ethnos ON ethnos.id = profiles.ethnos_id").
 		Joins("LEFT JOIN hair_colors ON hair_colors.id = profiles.hair_color_id").
 		Joins("LEFT JOIN intimate_hair_cuts ON intimate_hair_cuts.id = profiles.intimate_hair_cut_id").
-		Where("profiles.active = ?", true).
-		Where("profiles.sex = ?", sex).
-		Where("profiles.city_id = ?", cityId).
-		Limit(intLimit).
+		Where("profiles.sex = ?", query.Sex).
+		Where("profiles.city_id = ?", query.CityID).
+		Limit(query.Limit).
 		Offset(offset)
 
 	results := dbQuery.Find(&profiles)
@@ -802,12 +753,14 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 	pc.DB.Preload("Photos", func(db *gorm.DB) *gorm.DB {
 		return db.Where("photos.profile_id IN ?", profileIDs)
 	}).
-		Preload("ProfileBodyArts.BodyArts.BodyArt", func(db *gorm.DB) *gorm.DB {
-			return db.Where("profile_body_arts.profile_id IN ?", profileIDs)
+		Preload("ProfileOptions", func(db *gorm.DB) *gorm.DB {
+			return db.Where("profile_id IN ?", profileIDs)
 		}).
-		Preload("ProfileOptions.ProfileTag", func(db *gorm.DB) *gorm.DB {
-			return db.Where("profile_options.profile_id IN ?", profileIDs)
+		Preload("ProfileOptions.ProfileTag").
+		Preload("BodyArts", func(db *gorm.DB) *gorm.DB {
+			return db.Where("profile_id IN ?", profileIDs)
 		}).
+		Preload("BodyArts.BodyArt").
 		Where("id IN ?", profileIDs).
 		Find(&profiles)
 
@@ -820,7 +773,82 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 		Status:  "success",
 		Data:    profileResponses,
 		Results: len(profiles),
-		Page:    intPage,
+		Page:    query.Page,
+	})
+}
+
+// ListProfilesNonAuth godoc
+//
+//	@Summary		Lists all active profiles with pagination, no auth required
+//	@Description	Retrieves all profiles, supports pagination
+//	@Tags			Profiles
+//	@Produce		json
+//	@Param			page	query		string	false	"Page number"
+//	@Param			limit	query		string	false	"Items per page"
+//	@Success		200		{object}	SuccessPageResponse[ProfileResponse[]]
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/profiles/list [get]
+func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
+	query, err := pc.GetListProfilesQuery(ctx)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: err.Error()})
+		return
+	}
+
+	offset := (query.Page - 1) * query.Limit
+
+	var profiles []Profile
+
+	dbQuery := pc.DB.
+		Joins("LEFT JOIN cities ON cities.id = profiles.city_id").
+		Joins("LEFT JOIN body_types ON body_types.id = profiles.body_type_id").
+		Joins("LEFT JOIN ethnos ON ethnos.id = profiles.ethnos_id").
+		Joins("LEFT JOIN hair_colors ON hair_colors.id = profiles.hair_color_id").
+		Joins("LEFT JOIN intimate_hair_cuts ON intimate_hair_cuts.id = profiles.intimate_hair_cut_id").
+		Where("profiles.active = ?", true).
+		Where("profiles.sex = ?", query.Sex).
+		Where("profiles.city_id = ?", query.CityID).
+		Limit(query.Limit).
+		Offset(offset)
+
+	results := dbQuery.Find(&profiles)
+
+	if results.Error != nil {
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: results.Error.Error()})
+		return
+	}
+
+	var profileIDs []string
+	for _, profile := range profiles {
+		profileIDs = append(profileIDs, profile.ID.String())
+	}
+
+	// Use Preloads with explicit filtering by profile_id
+	pc.DB.Preload("Photos", func(db *gorm.DB) *gorm.DB {
+		return db.Where("photos.profile_id IN ?", profileIDs)
+	}).
+		Preload("ProfileOptions", func(db *gorm.DB) *gorm.DB {
+			return db.Where("profile_id IN ?", profileIDs)
+		}).
+		Preload("ProfileOptions.ProfileTag").
+		Preload("BodyArts", func(db *gorm.DB) *gorm.DB {
+			return db.Where("profile_id IN ?", profileIDs)
+		}).
+		Preload("BodyArts.BodyArt").
+		Where("id IN ?", profileIDs).
+		Find(&profiles)
+
+	profileResponses := make([]ProfileResponse, len(profiles))
+	for i, profile := range profiles {
+		profileResponses[i] = *utils.MapProfile(&profile, pc.parsedBaseUrl) // Assuming you have the mapProfile function
+	}
+
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ProfileResponse]{
+		Status:  "success",
+		Data:    profileResponses,
+		Results: len(profiles),
+		Page:    query.Page,
 	})
 }
 

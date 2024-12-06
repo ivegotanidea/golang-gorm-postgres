@@ -6,7 +6,9 @@ import (
 )
 
 func MapBodyArts(bodyArts []ProfileBodyArt) []ProfileBodyArtResponse {
+
 	bodyArtResponses := make([]ProfileBodyArtResponse, len(bodyArts))
+
 	for i, bodyArt := range bodyArts {
 		bodyArtResponses[i] = ProfileBodyArtResponse{
 			ProfileID: bodyArt.ProfileID.String(),
@@ -48,9 +50,7 @@ func MapProfileOptions(options []ProfileOption) []ProfileOptionResponse {
 		optionResponses[i] = ProfileOptionResponse{
 			Price:   option.Price,
 			Comment: option.Comment,
-			ProfileTag: ProfileTagResponse{
-				Name: option.ProfileTag.Name,
-			},
+			Name:    option.ProfileTag.Name,
 		}
 	}
 	return optionResponses
