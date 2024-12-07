@@ -372,6 +372,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /images:
+    post:
+      description: "Uploads multiple image files and returns their URLs."
+      tags:
+        - "Image"
+      summary: "Uploads multiple images"
+      requestBody:
+        description: "Uploads multiple image files and returns their URLs."
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - profileID
+                - images
+              properties:
+                profileID:
+                  type: string
+                  description: "Profile ID"
+                images:
+                  type: array
+                  description: "Image files"
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /payments:
     get:
       description: "Retrieves all payments, sorted by payment date in descending order with pagination."
@@ -2304,6 +2349,7 @@ components:
             - $ref: '#/components/schemas/ProfileResponse'
             - $ref: '#/components/schemas/ServiceResponse'
             - $ref: '#/components/schemas/Payment'
+            - $ref: '#/components/schemas/PhotoResponse'
             - type: string
           description: |
             Data contains the result of the successful operation. It can be one of the following types:
@@ -2311,6 +2357,7 @@ components:
             - ProfileResponse
             - ServiceResponse
             - Payment
+            - PhotoResponse
             - string
         status:
           type: string
