@@ -283,3 +283,95 @@ func (pc *DictionaryController) ListIntimateHairCuts(ctx *gin.Context) {
 		Page:    intPage,
 	})
 }
+
+// ListProfileTags godoc
+//
+//	@Summary		Lists all profile tags with pagination, auth required
+//	@Description	Retrieves all intimate hair cuts, supports pagination
+//	@Tags			Profile Tags
+//	@Produce		json
+//	@Param			page	query		string	false	"Page number"
+//	@Param			limit	query		string	false	"Items per page"
+//	@Success		200		{object}	SuccessPageResponse[ProfileTagResponse[]]
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/dict/cuts [get]
+func (pc *DictionaryController) ListProfileTags(ctx *gin.Context) {
+	var page = ctx.DefaultQuery("page", "1")
+	var limit = ctx.DefaultQuery("limit", "10")
+
+	intPage, _ := strconv.Atoi(page)
+	intLimit, _ := strconv.Atoi(limit)
+	offset := (intPage - 1) * intLimit
+
+	var profileTags []ProfileTag
+
+	dbQuery := pc.DB.
+		Limit(intLimit).Offset(offset)
+
+	results := dbQuery.Find(&profileTags)
+
+	if results.Error != nil {
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: results.Error.Error()})
+		return
+	}
+
+	response := make([]ProfileTagResponse, len(profileTags))
+	for i, tag := range profileTags {
+		response[i] = ProfileTagResponse{
+			Name: tag.Name,
+		}
+	}
+
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ProfileTagResponse]{
+		Status:  "success",
+		Data:    response,
+		Results: len(profileTags),
+		Page:    intPage,
+	})
+}
+
+// ListUserTags godoc
+//
+//	@Summary		Lists all user tags with pagination, auth required
+//	@Description	Retrieves all intimate hair cuts, supports pagination
+//	@Tags			User Tags
+//	@Produce		json
+//	@Param			page	query		string	false	"Page number"
+//	@Param			limit	query		string	false	"Items per page"
+//	@Success		200		{object}	SuccessPageResponse[UserTagResponse[]]
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/dict/cuts [get]
+func (pc *DictionaryController) ListUserTags(ctx *gin.Context) {
+	var page = ctx.DefaultQuery("page", "1")
+	var limit = ctx.DefaultQuery("limit", "10")
+
+	intPage, _ := strconv.Atoi(page)
+	intLimit, _ := strconv.Atoi(limit)
+	offset := (intPage - 1) * intLimit
+
+	var userTags []UserTag
+
+	dbQuery := pc.DB.
+		Limit(intLimit).Offset(offset)
+
+	results := dbQuery.Find(&userTags)
+
+	if results.Error != nil {
+		ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: results.Error.Error()})
+		return
+	}
+
+	response := make([]UserTagResponse, len(userTags))
+	for i, tag := range userTags {
+		response[i] = UserTagResponse{
+			Name: tag.Name,
+		}
+	}
+
+	ctx.JSON(http.StatusOK, SuccessPageResponse[[]UserTagResponse]{
+		Status:  "success",
+		Data:    response,
+		Results: len(userTags),
+		Page:    intPage,
+	})
+}
