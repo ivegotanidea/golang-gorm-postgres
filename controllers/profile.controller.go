@@ -596,6 +596,99 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, SuccessResponse[*ProfileResponse]{Status: "success", Data: profileResponse})
 }
 
+// UpdateProfilePhotos godoc
+//
+//	@Summary		Updates an existing profile photos
+//	@Description	Updates the photos of profile with the given ID
+//	@Tags			Profiles
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string					true	"Profile ID"
+//	@Param			body	body		BulkUpdatePhotosRequest	true	"Profile Update Payload"
+//	@Success		200		{object}	SuccessResponse[PhotoResponse]
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		404		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/profiles/update/{id} [put]
+func (pc *ProfileController) UpdateProfilePhotos(ctx *gin.Context) {
+	profileId := ctx.Param("id")
+	currentUser := ctx.MustGet("currentUser").(User)
+
+	// Validate payload
+	var payload BulkUpdatePhotosRequest
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: err.Error()})
+		return
+	}
+
+	// Extract photo IDs from the payload
+	idList := make([]string, len(payload.Photos))
+	updateMap := map[string]UpdatePhotoRequest{}
+	for _, photo := range payload.Photos {
+		idList = append(idList, photo.ID)
+		updateMap[photo.ID] = photo
+	}
+
+	// Start a transaction
+	tx := pc.DB.Begin()
+
+	// Fetch photos belonging to the profile and validate ownership
+	var photos []Photo
+	if err := tx.Where("id IN ?", idList).
+		Where("profile_id = ?", profileId).
+		Find(&photos).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Failed to fetch photos: " + err.Error()})
+		return
+	}
+
+	// Check for missing IDs
+	if len(photos) != len(idList) {
+		tx.Rollback()
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Some photo IDs are invalid or do not belong to this profile"})
+		return
+	}
+
+	// Prepare bulk update query
+	updateQuery := tx.Table("photos")
+	for _, photo := range photos {
+		updateReq := updateMap[photo.ID.String()]
+
+		photoApproved := false
+
+		if currentUser.Role == "moderator" || currentUser.Role == "admin" {
+			photoApproved = updateReq.Approved
+		} else {
+			photoApproved = photo.Approved
+		}
+
+		updateQuery = updateQuery.Updates(map[string]interface{}{
+			"disabled":   updateReq.Disabled,
+			"deleted":    updateReq.Deleted,
+			"approved":   photoApproved,
+			"updated_at": time.Now(),
+			"updated_by": currentUser.ID,
+		}).Where("id = ?", photo.ID)
+
+	}
+
+	if err := updateQuery.Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to update photos: %s", err.Error())})
+		return
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to commit updates: " + err.Error()})
+		return
+	}
+
+	// Map updated photos
+	photoResponse := utils.MapPhotos(photos, pc.parsedBaseUrl)
+	ctx.JSON(http.StatusOK, SuccessResponse[[]PhotoResponse]{Status: "success", Data: photoResponse})
+}
+
 // FindProfileByID godoc
 //
 //	@Summary		Find a profile by ID

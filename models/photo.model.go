@@ -12,6 +12,8 @@ type Photo struct {
 	PhrURL     string    `gorm:"type:varchar(255);null"`
 	PreviewUrl string    `gorm:"type:varchar(255);null"`
 	CreatedAt  time.Time `gorm:"type:timestamp"`
+	UpdatedAt  time.Time `gorm:"type:timestamp"`
+	UpdatedBy  uuid.UUID `gorm:"type:uuid;not null"`
 	Hash       string    `gorm:"type:varchar(255);"`
 	Disabled   bool      `gorm:"type:boolean;default:false"`
 	Approved   bool      `gorm:"type:boolean;default:false"`
@@ -20,6 +22,17 @@ type Photo struct {
 
 type CreatePhotoRequest struct {
 	URL string `json:"url" binding:"required" validate:"required,imageurl"`
+}
+
+type UpdatePhotoRequest struct {
+	ID       string `json:"id" binding:"required" validate:"required,uuid"`
+	Disabled bool   `json:"disabled" binding:"omitempty,oneof=true false"`
+	Approved bool   `json:"approved" binding:"omitempty,oneof=true false"`
+	Deleted  bool   `json:"deleted" binding:"omitempty,oneof=true false"`
+}
+
+type BulkUpdatePhotosRequest struct {
+	Photos []UpdatePhotoRequest `json:"photos" binding:"required"`
 }
 
 type PhotoResponse struct {
