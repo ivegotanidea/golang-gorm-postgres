@@ -12,8 +12,8 @@ type Photo struct {
 	PhrURL     string    `gorm:"type:varchar(255);null"`
 	PreviewUrl string    `gorm:"type:varchar(255);null"`
 	CreatedAt  time.Time `gorm:"type:timestamp"`
-	UpdatedAt  time.Time `gorm:"type:timestamp"`
-	UpdatedBy  uuid.UUID `gorm:"type:uuid;not null"`
+	UpdatedAt  time.Time `gorm:"type:timestamp;null"`
+	UpdatedBy  uuid.UUID `gorm:"type:uuid;null"`
 	Hash       string    `gorm:"type:varchar(255);"`
 	Disabled   bool      `gorm:"type:boolean;default:false"`
 	Approved   bool      `gorm:"type:boolean;default:false"`
