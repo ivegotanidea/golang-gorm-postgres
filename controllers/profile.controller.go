@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/ivegotanidea/golang-gorm-postgres/utils"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -622,7 +623,8 @@ func (pc *ProfileController) UpdateProfilePhotos(ctx *gin.Context) {
 	}
 
 	// Extract photo IDs from the payload
-	idList := make([]string, len(payload.Photos))
+	idList := make([]string, 0, len(payload.Photos))
+
 	updateMap := map[string]UpdatePhotoRequest{}
 	for _, photo := range payload.Photos {
 		idList = append(idList, photo.ID)
@@ -642,11 +644,23 @@ func (pc *ProfileController) UpdateProfilePhotos(ctx *gin.Context) {
 		return
 	}
 
-	// Check for missing IDs
-	if len(photos) != len(idList) {
-		tx.Rollback()
-		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Some photo IDs are invalid or do not belong to this profile"})
-		return
+	// Create a set of valid photo IDs
+	validIDs := make(map[string]struct{}, len(photos))
+	for _, photo := range photos {
+		validIDs[photo.ID.String()] = struct{}{}
+	}
+
+	// Identify invalid IDs
+	invalidIDs := []string{}
+	for _, id := range idList {
+		if _, exists := validIDs[id]; !exists {
+			invalidIDs = append(invalidIDs, id)
+		}
+	}
+
+	// Log the invalid IDs if any
+	if len(invalidIDs) > 0 {
+		log.Printf("User %s attempted to update photos not belonging to profile %s: %v", currentUser.ID, profileId, invalidIDs)
 	}
 
 	// Prepare bulk update query

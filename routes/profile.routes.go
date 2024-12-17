@@ -30,6 +30,8 @@ func (pc *ProfileRouteController) ProfileRoute(rg *gin.RouterGroup) {
 	router.GET("/all", middleware.DeserializeUser(), middleware.AbacMiddleware("profiles", "list"), pc.profileController.ListProfiles)
 
 	router.PUT("/my/:id", middleware.DeserializeUser(), pc.profileController.UpdateOwnProfile)
+	router.POST("/:id/photos", middleware.DeserializeUser(), pc.profileController.UpdateProfilePhotos)
+
 	router.PUT("/update/:id", middleware.DeserializeUser(), middleware.AbacMiddleware("profiles", "update"), pc.profileController.UpdateProfile)
 
 	// todo: should have captcha set
