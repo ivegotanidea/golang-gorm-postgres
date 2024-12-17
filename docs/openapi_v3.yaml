@@ -917,6 +917,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /profiles/{id}/photos:
+    put:
+      description: "Updates photos of profile with the given ID"
+      tags:
+        - "Profiles"
+      summary: "Updates profile photos"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Profile ID"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: "Photos Update Payload"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkUpdatePhotosRequest'
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /profiles/update/{id}:
     put:
       description: "Updates the profile with the given ID, allows updating specific fields"
@@ -1557,6 +1604,20 @@ components:
       properties:
         url:
           type: string
+
+    UpdatePhotoRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        approved:
+          type: boolean
+        deleted:
+          type: boolean
+        disabled:
+          type: boolean
 
     CreateProfileOption:
       type: object
@@ -2377,6 +2438,7 @@ components:
             oneOf:
               - $ref: '#/components/schemas/UserResponse'
               - $ref: '#/components/schemas/ProfileResponse'
+              - $ref: '#/components/schemas/PhotoResponse'
               - $ref: '#/components/schemas/ServiceResponse'
               - $ref: '#/components/schemas/Payment'
               - $ref: '#/components/schemas/CityResponse'
@@ -2541,6 +2603,14 @@ components:
             $ref: '#/components/schemas/CreatePhotoRequest'
         verified:
           type: boolean
+
+    BulkUpdatePhotosRequest:
+      type: object
+      properties:
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdatePhotoRequest'
 
     UpdateUser:
       type: object

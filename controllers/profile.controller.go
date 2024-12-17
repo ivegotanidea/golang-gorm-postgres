@@ -605,12 +605,12 @@ func (pc *ProfileController) UpdateProfile(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		string					true	"Profile ID"
-//	@Param			body	body		BulkUpdatePhotosRequest	true	"Profile Update Payload"
+//	@Param			body	body		BulkUpdatePhotosRequest	true	"Photos Update Payload"
 //	@Success		200		{object}	SuccessResponse[PhotoResponse]
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		404		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
-//	@Router			/profiles/update/{id} [put]
+//	@Router			/profiles/{id}/photos [post]
 func (pc *ProfileController) UpdateProfilePhotos(ctx *gin.Context) {
 	profileId := ctx.Param("id")
 	currentUser := ctx.MustGet("currentUser").(User)
