@@ -2039,7 +2039,7 @@ components:
           nullable: true
         cityId:
           type: integer
-          nullable: true
+          nullable: false
         city:
           $ref: '#/components/schemas/CityResponse'
         bodyTypeId:
