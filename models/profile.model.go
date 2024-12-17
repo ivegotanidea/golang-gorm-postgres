@@ -222,7 +222,7 @@ type ProfileResponse struct {
 	Bio                    string                   `json:"bio"`
 	AddressLatitude        string                   `json:"addressLatitude"`
 	AddressLongitude       string                   `json:"addressLongitude"`
-	CityID                 *int                     `json:"cityId"`
+	CityID                 int                      `json:"cityId"`
 	City                   *CityResponse            `json:"city"`
 	BodyTypeID             *int                     `json:"bodyTypeId"`
 	BodyType               *BodyTypeResponse        `json:"bodyTypeResponse"`

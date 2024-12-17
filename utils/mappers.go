@@ -89,7 +89,7 @@ func MapProfile(newProfile *Profile, baseUrl string) *ProfileResponse {
 		ID:                     newProfile.ID.String(),
 		UpdatedBy:              &newProfile.UpdatedBy,
 		UserID:                 newProfile.UserID.String(),
-		CityID:                 &newProfile.CityID,
+		CityID:                 newProfile.CityID,
 		City:                   MapCity(newProfile.City),
 		Active:                 newProfile.Active,
 		Phone:                  newProfile.Phone,
