@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"github.com/ivegotanidea/golang-gorm-postgres/utils"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -623,11 +622,10 @@ func (pc *ProfileController) UpdateProfilePhotos(ctx *gin.Context) {
 	}
 
 	// Extract photo IDs from the payload
-	idList := make([]string, 0, len(payload.Photos))
-
+	idList := make([]string, len(payload.Photos))
 	updateMap := map[string]UpdatePhotoRequest{}
-	for _, photo := range payload.Photos {
-		idList = append(idList, photo.ID)
+	for i, photo := range payload.Photos {
+		idList[i] = photo.ID
 		updateMap[photo.ID] = photo
 	}
 
@@ -644,57 +642,43 @@ func (pc *ProfileController) UpdateProfilePhotos(ctx *gin.Context) {
 		return
 	}
 
-	// Create a set of valid photo IDs
-	validIDs := make(map[string]struct{}, len(photos))
-	for _, photo := range photos {
-		validIDs[photo.ID.String()] = struct{}{}
-	}
-
-	// Identify invalid IDs
-	invalidIDs := []string{}
-	for _, id := range idList {
-		if _, exists := validIDs[id]; !exists {
-			invalidIDs = append(invalidIDs, id)
-		}
-	}
-
-	// Log the invalid IDs if any
-	if len(invalidIDs) > 0 {
-		log.Printf("User %s attempted to update photos not belonging to profile %s: %v", currentUser.ID, profileId, invalidIDs)
-	}
-
-	// Prepare bulk update query
-	updateQuery := tx.Table("photos")
-	for _, photo := range photos {
-		updateReq := updateMap[photo.ID.String()]
-
-		photoApproved := false
-
+	// Map updates to photos
+	updateData := make([]map[string]interface{}, len(photos))
+	for i, photo := range photos {
+		req := updateMap[photo.ID.String()]
+		approved := photo.Approved
 		if currentUser.Role == "moderator" || currentUser.Role == "admin" {
-			photoApproved = updateReq.Approved
-		} else {
-			photoApproved = photo.Approved
+			approved = req.Approved
 		}
-
-		updateQuery = updateQuery.Updates(map[string]interface{}{
-			"disabled":   updateReq.Disabled,
-			"deleted":    updateReq.Deleted,
-			"approved":   photoApproved,
+		updateData[i] = map[string]interface{}{
+			"id":         photo.ID,
+			"disabled":   req.Disabled,
+			"deleted":    req.Deleted,
+			"approved":   approved,
 			"updated_at": time.Now(),
 			"updated_by": currentUser.ID,
-		}).Where("id = ?", photo.ID)
-
+		}
 	}
 
-	if err := updateQuery.Error; err != nil {
-		tx.Rollback()
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: fmt.Sprintf("Failed to update photos: %s", err.Error())})
-		return
+	// Perform bulk update with a single query
+	for _, update := range updateData {
+		if err := tx.Model(&Photo{}).
+			Where("id = ?", update["id"]).
+			Updates(update).Error; err != nil {
+			tx.Rollback()
+			ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to update photos: " + err.Error()})
+			return
+		}
 	}
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to commit updates: " + err.Error()})
+		return
+	}
+
+	if err := pc.DB.Where("id IN ?", idList).Find(&photos).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: "Failed to reload updated photos: " + err.Error()})
 		return
 	}
 

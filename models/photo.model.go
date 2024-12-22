@@ -36,6 +36,7 @@ type BulkUpdatePhotosRequest struct {
 }
 
 type PhotoResponse struct {
+	ID         string `json:"id"`
 	URL        string `json:"url"`
 	PhrURL     string `json:"phrUrl"`
 	PreviewURL string `json:"previewUrl"`

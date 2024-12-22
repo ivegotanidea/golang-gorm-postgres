@@ -28,12 +28,12 @@ is_token_expired() {
 
 city_count=$(curl -s ${BASE_URL}/dict/cities?limit=500 | jq -r '.results | length')
 
-# iterate cities
+# Iterate cities
 for ((city_id=1; city_id<=city_count; city_id++)); do
 
   page_num=1
 
-  # iterate profiles pages
+  # Iterate profiles pages
   while true; do
     if is_token_expired; then
       echo "Access token expired. Retrieving a new one..."
@@ -59,9 +59,13 @@ for ((city_id=1; city_id<=city_count; city_id++)); do
 
       # Flag to track inactive photos
       all_inactive=true
+      inactive_photo_ids=()
+
+      set -x
 
       # Iterate over each photo
       echo "$photos" | jq -c '.[]' | while read -r photo; do
+        photo_id=$(echo "$photo" | jq -r '.id')
         photo_url=$(echo "$photo" | jq -r '.url')
         photo_disabled=$(echo "$photo" | jq -r '.disabled')
 
@@ -72,13 +76,30 @@ for ((city_id=1; city_id<=city_count; city_id++)); do
         # Check status code of photo URL
         status_code=$(curl --connect-timeout 5 --max-time 10 -L -s -o /dev/null -w "%{http_code}" "$photo_url")
 
-        if [[ "$status_code" -ne 200 ]]; then
-          echo "ID: $id, Photo URL: $photo_url, Status Code: $status_code"
-          echo "Should delete photo $photo_url of profile $id"
+        if [[ "$status_code" -eq 404 ]]; then
+          echo "Queuing photo $photo_url (ID: $photo_id) for disabling due to 404 response."
+          inactive_photo_ids+=("$photo_id")
         else
           all_inactive=false
         fi
       done
+
+      # Disable photos in bulk
+      if [[ ${#inactive_photo_ids[@]} -gt 0 ]]; then
+        bulk_disable_resp_code=$(curl --connect-timeout 5 --max-time 10 -L -s -o /tmp/response -w "%{http_code}" \
+                                 -X POST "${BASE_URL}/${id}/photos" \
+                                 -H "Content-Type: application/json" \
+                                 -b "access_token=${access_token}" \
+                                 -d "$(jq -n --argjson photos "$(printf '%s\n' "${inactive_photo_ids[@]}" | jq -R . | jq -s '[.[] | {id: ., disabled: true}]')" '{photos: $photos}')")
+
+        if [[ "$bulk_disable_resp_code" -ne 200 ]]; then
+          echo "Failed to disable photos for profile $id" && cat /tmp/response && exit 1
+        else
+          echo "Disabled photos for profile $id: ${inactive_photo_ids[*]}"
+        fi
+      fi
+
+      set +x
 
       # If all photos are inactive, report profile as inactive
       if [[ "$all_inactive" == "true" ]]; then
@@ -92,10 +113,10 @@ for ((city_id=1; city_id<=city_count; city_id++)); do
                                "active": false
                              }')
 
-        if [[ "upd_resp_code" -ne 200 ]]; then
+        if [[ "$upd_resp_code" -ne 200 ]]; then
           echo "Can't disable profile $id" && cat /tmp/response && exit 1
         else
-          echo "Profile $id has been disabled"
+          echo "Profile $id has been disabled."
         fi
 
       fi
@@ -106,4 +127,3 @@ for ((city_id=1; city_id<=city_count; city_id++)); do
   done
 
 done
-

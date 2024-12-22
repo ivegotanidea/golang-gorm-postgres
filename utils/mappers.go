@@ -31,6 +31,7 @@ func MapPhotos(photos []Photo, baseUrl string) []PhotoResponse {
 		}
 
 		photoResponses[i] = PhotoResponse{
+			ID:         photo.ID.String(),
 			URL:        photoUrl,
 			PreviewURL: photo.PreviewUrl,
 			PhrURL:     photo.PhrURL,
