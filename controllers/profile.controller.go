@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/ivegotanidea/golang-gorm-postgres/utils"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -640,6 +641,22 @@ func (pc *ProfileController) UpdateProfilePhotos(ctx *gin.Context) {
 		tx.Rollback()
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Failed to fetch photos: " + err.Error()})
 		return
+	}
+
+	validIDs := make(map[string]struct{}, len(photos))
+	for _, photo := range photos {
+		validIDs[photo.ID.String()] = struct{}{}
+	}
+
+	invalidIDs := []string{}
+	for _, id := range idList {
+		if _, exists := validIDs[id]; !exists {
+			invalidIDs = append(invalidIDs, id)
+		}
+	}
+
+	if len(invalidIDs) > 0 {
+		log.Printf("User %s attempted to update photos not belonging to profile %s: %v", currentUser.ID, profileId, invalidIDs)
 	}
 
 	// Map updates to photos
