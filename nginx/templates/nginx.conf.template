@@ -7,19 +7,24 @@ http {
 
     server {
         listen 80;
+        error_page 404      /404.html;
+
+        location /404.html { internal; }
 
         location /status {
           stub_status on;
           allow 127.0.0.1;
           deny all;
+
+          error_page 403 =404 /404.html;
         }
 
         location / {
           access_log   off;
           allow 127.0.0.1;
           deny all;
-
           proxy_pass ${BACKEND_URL};
+          error_page 403 =404 /404.html;
         }
 
         # Main API handling location
