@@ -79,7 +79,7 @@ func CreateOwnerUser(db *gorm.DB) {
 func Migrate() {
 	DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
-	log.Printf("Automigrating tables...")
+	log.Printf("Automigrating BASE models...")
 
 	err := DB.AutoMigrate(
 		// no needs
@@ -91,23 +91,44 @@ func Migrate() {
 		&IntimateHairCut{},
 		&UserTag{},
 		&ProfileTag{},
-		&User{},
-		// ---
+		&User{})
+
+	if err != nil {
+		log.Fatalf("Failed to auto-migrate BASE models: %v", err)
+	}
+
+	log.Printf("Automigrating T-1 models...")
+	err = DB.AutoMigrate(
 		&Profile{},         // needs User
 		&Payment{},         // needs User
 		&Photo{},           // needs Profile
 		&RatedProfileTag{}, // needs ProfileTag
 		&RatedUserTag{},    // needs UserTag
-		&Service{},         // needs User, Profile
-		&ProfileBodyArt{},  // needs Profile, BodyArt
-		&ProfileOption{},   // needs Profile, ProfileTag
-		&ProfileRating{},   // needs User, Profile, Service, RatedProfileTag
-		&UserRating{},      // needs User, Service, RatedProfileTag
 	)
 
-	// Auto-migrate the User model
 	if err != nil {
-		log.Fatalf("Failed to auto-migrate models: %v", err)
+		log.Fatalf("Failed to auto-migrate T-1 models: %v", err)
+	}
+
+	log.Printf("Automigrating T-2 models...")
+	err = DB.AutoMigrate(
+		&Service{},        // needs User, Profile
+		&ProfileBodyArt{}, // needs Profile, BodyArt
+		&ProfileOption{},  // needs Profile, ProfileTag
+	)
+
+	if err != nil {
+		log.Fatalf("Failed to auto-migrate T-2 models: %v", err)
+	}
+
+	log.Printf("Automigrating T-3 models...")
+	err = DB.AutoMigrate(
+		&ProfileRating{}, // needs User, Profile, Service, RatedProfileTag
+		&UserRating{},    // needs User, Service, RatedProfileTag
+	)
+
+	if err != nil {
+		log.Fatalf("Failed to auto-migrate T-3 models: %v", err)
 	}
 
 	fmt.Println("Creating owner users...")
