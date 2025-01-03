@@ -934,7 +934,9 @@ func (pc *ProfileController) ListProfilesNonAuth(ctx *gin.Context) {
 
 	// Use Preloads with explicit filtering by profile_id
 	pc.DB.Preload("Photos", func(db *gorm.DB) *gorm.DB {
-		return db.Where("photos.profile_id IN ?", profileIDs)
+		return db.Where("photos.profile_id IN ?", profileIDs).
+			Where("photos.disabled = ?", false).
+			Where("photos.deleted = ?", false)
 	}).
 		Preload("ProfileOptions", func(db *gorm.DB) *gorm.DB {
 			return db.Where("profile_id IN ?", profileIDs)
