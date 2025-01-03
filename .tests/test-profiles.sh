@@ -3,7 +3,7 @@
 BASE_URL="http://s2t5zmt3q3kibulra383.xyz/api/v1"
 PROFILES_URL="${BASE_URL}/profiles"
 
-profile_id="fbfe31ab-eb3d-4146-9e63-c97ec72399ce"
+profile_id="8aaa936d-9eec-4f06-9a2b-c2f3c7de7a4e"
 
 TELEGRAM_USER_ID=${1:-6794234746}
 PASSWORD=${2:-h5sh3d}
@@ -55,7 +55,7 @@ echo "$ids_and_photos" | jq -c '. | select(.photos != null)' | while read -r pro
     echo "Disabling profile $id photos ${#inactive_photo_ids[@]} of ${#photos[@]}..."
 
     set -x
-    bulk_disable_resp_code=$(curl --connect-timeout 5 --max-time 10 -L -w "%{http_code}" \
+    bulk_disable_resp_code=$(curl --connect-timeout 5 -s o /tmp/response --max-time 10 -L -w "%{http_code}" \
                              -X POST "${PROFILES_URL}/${id}/photos" \
                              -H "Content-Type: application/json" \
                              -b "access_token=${access_token}" \
