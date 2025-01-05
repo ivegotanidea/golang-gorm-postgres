@@ -1648,6 +1648,7 @@ components:
     CreateProfileRequest:
       type: object
       required:
+        - sex
         - age
         - bio
         - bust
@@ -1732,16 +1733,6 @@ components:
             $ref: '#/components/schemas/CreateProfileOption'
         weight:
           type: integer
-        contacts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContactResponse'
-          nullable: true
-        prices:
-          type: array
-          items:
-            $ref: '#/components/schemas/PriceResponse'
-          nullable: true
 
     CreateRatedProfileTagRequest:
       type: object
