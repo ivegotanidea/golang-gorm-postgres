@@ -39,11 +39,6 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 	// Get the current user
 	currentUser := ctx.MustGet("currentUser").(User)
 
-	if currentUser.Role != "user" {
-		ctx.JSON(http.StatusForbidden, ErrorResponse{Status: "error", Message: "unauthorized"})
-		return
-	}
-
 	var payload *CreateProfileRequest
 
 	// Bind and validate the input payload
