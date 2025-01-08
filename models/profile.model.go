@@ -17,7 +17,8 @@ type Profile struct {
 	IntimateHairCut   *IntimateHairCut `gorm:"foreignKey:IntimateHairCutID"`
 	CityID            int              `gorm:"type:integer;not null;default:0"`
 	City              *City            `gorm:"foreignKey:CityID"`
-	ParsedUrl         string           `gorm:"type:varchar(255);not null;default:''"`
+	ParsedUrl         string           `gorm:"type:varchar(255);default:null"`
+	ParsedID          *int             `gorm:"type:integer;default:null;index:idx_parsed_id,unique,where:parsed_id IS NOT NULL"`
 	ID                uuid.UUID        `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	UserID            uuid.UUID        `gorm:"type:uuid;not null"`
 	Active            bool             `gorm:"type:boolean;default:true"`
@@ -80,6 +81,9 @@ type CreateProfileRequest struct {
 	Height int     `json:"height"  binding:"required" validate:"gte=0,lte=300"`
 	Weight int     `json:"weight"  binding:"required" validate:"gte=0,lte=150"`
 	Bust   float64 `json:"bust"  binding:"required" validate:"gte=0,lte=10"`
+
+	ParsedUrl string `json:"parsedUrl" binding:"omitempty" validate:"uri"`
+	ParsedID  *int   `json:"parsedId" binding:"omitempty" validate:"gte=0,lte=9999999"`
 
 	EthnosID          *int `json:"ethnosId"  binding:"required" validate:"gte=0"`
 	HairColorID       *int `json:"hairColorId"  binding:"omitempty" validate:"gte=0"`

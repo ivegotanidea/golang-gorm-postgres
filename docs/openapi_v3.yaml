@@ -1697,6 +1697,12 @@ components:
           type: string
         name:
           type: string
+        sex:
+          type: string
+        parsedUrl:
+          type: string
+        parsedId:
+          type: integer
         phone:
           type: string
         photos:

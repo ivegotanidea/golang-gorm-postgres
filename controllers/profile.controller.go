@@ -52,6 +52,7 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 
 	// Create the profile
 	now := time.Now()
+
 	newProfile := Profile{
 		UserID:       currentUser.ID,
 		CreatedAt:    now,
@@ -69,6 +70,8 @@ func (pc *ProfileController) CreateProfile(ctx *gin.Context) {
 		Bio:          payload.Bio,          // required, no need to check
 		ContactPhone: payload.ContactPhone, // required, no need to check
 		ContactTG:    payload.ContactTG,    // required, no need to check
+		ParsedUrl:    payload.ParsedUrl,
+		ParsedID:     payload.ParsedID,
 	}
 
 	// Process optional fields (omitempty)
