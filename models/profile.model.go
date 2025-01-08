@@ -86,7 +86,7 @@ type CreateProfileRequest struct {
 	BodyTypeID        *int `json:"bodyTypeId"  binding:"omitempty" validate:"gte=0"`
 	IntimateHairCutID *int `json:"intimateHairCutId"  binding:"omitempty" validate:"gte=0"`
 
-	Bio string `json:"bio"  binding:"required" validate:"min=100,max=2000"`
+	Bio string `json:"bio"  binding:"omitempty" validate:"min=100,max=2000"`
 
 	AddressLatitude  string `json:"latitude,omitempty" validate:"latitude"`
 	AddressLongitude string `json:"longitude,omitempty" validate:"longitude"`
