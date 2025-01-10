@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BASE_URL=http://localhost:8888/api/v1
+BASE_URL=http://localhost/api/v1
 TELEGRAM_USER_ID=${1:-6794234746}
 PASSWORD=${2:-h5sh3d}
 PROFILE_ID=${3:-7e852ab6-878f-4f5b-84d2-2ee2749bfcee}
