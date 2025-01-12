@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/ivegotanidea/golang-gorm-postgres/controllers"
+	"github.com/ivegotanidea/golang-gorm-postgres/middleware"
 )
 
 type DictionaryRouteController struct {
@@ -19,8 +20,14 @@ func (dc *DictionaryRouteController) DictionaryRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("dict")
 
+	// CRUD
 	router.GET("/", dc.dictionaryController.ListDict)
 
+	router.POST("/", middleware.AbacMiddleware("dicts", "add"), nil)
+	router.PUT("/", middleware.AbacMiddleware("dicts", "update"), nil)
+	router.DELETE("/", middleware.AbacMiddleware("dicts", "delete"), nil)
+
+	// old style
 	router.GET("/cities", dc.dictionaryController.ListCities)
 	router.GET("/ethnos", dc.dictionaryController.ListEthnos)
 	router.GET("/bodies", dc.dictionaryController.ListBodyTypes)
@@ -29,5 +36,4 @@ func (dc *DictionaryRouteController) DictionaryRoute(rg *gin.RouterGroup) {
 	router.GET("/cuts", dc.dictionaryController.ListIntimateHairCuts)
 	router.GET("/user/tags", dc.dictionaryController.ListUserTags)
 	router.GET("/profile/tags", dc.dictionaryController.ListProfileTags)
-
 }
