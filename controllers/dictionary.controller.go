@@ -294,7 +294,7 @@ func (pc *DictionaryController) ListIntimateHairCuts(ctx *gin.Context) {
 //	@Param			limit	query		string	false	"Items per page"
 //	@Success		200		{object}	SuccessPageResponse[ProfileTagResponse[]]
 //	@Failure		502		{object}	ErrorResponse
-//	@Router			/dict/cuts [get]
+//	@Router			/dict/profile/tags [get]
 func (pc *DictionaryController) ListProfileTags(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
@@ -340,7 +340,7 @@ func (pc *DictionaryController) ListProfileTags(ctx *gin.Context) {
 //	@Param			limit	query		string	false	"Items per page"
 //	@Success		200		{object}	SuccessPageResponse[UserTagResponse[]]
 //	@Failure		502		{object}	ErrorResponse
-//	@Router			/dict/cuts [get]
+//	@Router			/dict/user/tags [get]
 func (pc *DictionaryController) ListUserTags(ctx *gin.Context) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")

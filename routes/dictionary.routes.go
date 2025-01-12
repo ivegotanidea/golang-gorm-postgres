@@ -25,5 +25,7 @@ func (dc *DictionaryRouteController) DictionaryRoute(rg *gin.RouterGroup) {
 	router.GET("/arts", dc.dictionaryController.ListBodyArts)
 	router.GET("/colors", dc.dictionaryController.ListHairColors)
 	router.GET("/cuts", dc.dictionaryController.ListIntimateHairCuts)
+	router.GET("/user/tags", dc.dictionaryController.ListUserTags)
+	router.GET("/profile/tags", dc.dictionaryController.ListProfileTags)
 
 }

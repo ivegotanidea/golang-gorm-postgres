@@ -306,6 +306,8 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 		"Сделаю куннилингус",
 		"Обслуживаю девишники/вечеринки. Вечер:",
 		"Обслуживаю вечеринки. Вечер:",
+		"Сделаю минет за рулем",
+		"Снимусь на видео за",
 	}
 
 	var tags []models.ProfileTag

@@ -372,6 +372,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /dict/user/tags:
+    get:
+      description: "Retrieves all user tags, supports pagination."
+      tags:
+        - "Dict"
+      summary: "Lists all user tags with pagination, auth required."
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dict/profile/tags:
+    get:
+      description: "Retrieves all profile tags, supports pagination."
+      tags:
+        - "Dict"
+      summary: "Lists all profile tags with pagination, auth required."
+      parameters:
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /images:
     post:
       description: "Uploads multiple image files and returns their URLs."
