@@ -19,6 +19,8 @@ func (dc *DictionaryRouteController) DictionaryRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("dict")
 
+	router.GET("/", dc.dictionaryController.ListDict)
+
 	router.GET("/cities", dc.dictionaryController.ListCities)
 	router.GET("/ethnos", dc.dictionaryController.ListEthnos)
 	router.GET("/bodies", dc.dictionaryController.ListBodyTypes)

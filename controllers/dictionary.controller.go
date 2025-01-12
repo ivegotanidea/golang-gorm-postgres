@@ -17,6 +17,42 @@ func NewDictionaryController(DB *gorm.DB) DictionaryController {
 	return DictionaryController{DB}
 }
 
+// ListDict godoc
+//
+//	@Summary		Lists all dict objects with pagination, auth required
+//	@Description	Retrieves all dict objects, supports pagination
+//	@Tags			Dict
+//	@Produce		json
+//	@Param			page	query		string	false	"Page number"
+//	@Param			limit	query		string	false	"Items per page"
+//	@Success		200		{object}	SuccessPageResponse
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/dict [get]
+func (pc *DictionaryController) ListDict(ctx *gin.Context) {
+
+	var dictType = ctx.DefaultQuery("type", "")
+
+	if dictType == "city" {
+		pc.ListCities(ctx)
+	} else if dictType == "ethnos" {
+		pc.ListEthnos(ctx)
+	} else if dictType == "body" {
+		pc.ListBodyTypes(ctx)
+	} else if dictType == "art" {
+		pc.ListBodyArts(ctx)
+	} else if dictType == "color" {
+		pc.ListHairColors(ctx)
+	} else if dictType == "cut" {
+		pc.ListIntimateHairCuts(ctx)
+	} else if dictType == "userTag" {
+		pc.ListUserTags(ctx)
+	} else if dictType == "profileTag" {
+		pc.ListProfileTags(ctx)
+	} else {
+		ctx.JSON(http.StatusUnprocessableEntity, nil)
+	}
+}
+
 // ListCities godoc
 //
 //	@Summary		Lists all cities with pagination, auth required

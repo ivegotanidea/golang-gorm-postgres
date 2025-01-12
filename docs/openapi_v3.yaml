@@ -161,6 +161,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /dict:
+    get:
+      description: "Retrieves dict objects, supports pagination."
+      tags:
+        - "Dict"
+      summary: "Lists all dict objects pagination, auth required"
+      parameters:
+        - name: "type"
+          in: "query"
+          description: "Dict type"
+          required: true
+          schema:
+            type: string
+            enum:
+              - "city"
+              - "ethnos"
+              - "body"
+              - "art"
+              - "color"
+              - "cut"
+              - "userTag"
+              - "profileTag"
+        - name: "page"
+          in: "query"
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: "limit"
+          in: "query"
+          description: "Limit per page"
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessPageResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /dict/cities:
     get:
       description: "Retrieves all cities, supports pagination."
@@ -2506,12 +2555,15 @@ components:
               - $ref: '#/components/schemas/PhotoResponse'
               - $ref: '#/components/schemas/ServiceResponse'
               - $ref: '#/components/schemas/Payment'
+
               - $ref: '#/components/schemas/CityResponse'
               - $ref: '#/components/schemas/EthnosResponse'
               - $ref: '#/components/schemas/BodyTypeResponse'
               - $ref: '#/components/schemas/BodyArtResponse'
               - $ref: '#/components/schemas/HairColorResponse'
               - $ref: '#/components/schemas/IntimateHairCutResponse'
+              - $ref: '#/components/schemas/UserTagResponse'
+              - $ref: '#/components/schemas/ProfileTagResponse'
               - type: string
           description: |
             Data contains the data payload for the current page. It can be an array of:
