@@ -2362,7 +2362,13 @@ components:
     ProfileTagResponse:
       type: object
       properties:
+        id:
+          type: integer
         name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
           type: string
 
     RatedProfileTag:
@@ -2867,7 +2873,14 @@ components:
     UserTagResponse:
       type: object
       properties:
+        id:
+          type: integer
         name:
           type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+
 security:
   - BearerAuth: []

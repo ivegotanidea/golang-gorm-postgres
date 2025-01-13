@@ -354,7 +354,10 @@ func (pc *DictionaryController) ListProfileTags(ctx *gin.Context) {
 	response := make([]ProfileTagResponse, len(profileTags))
 	for i, tag := range profileTags {
 		response[i] = ProfileTagResponse{
-			Name: tag.Name,
+			ID:      tag.ID,
+			Name:    tag.Name,
+			AliasEn: tag.AliasEn,
+			AliasRu: tag.AliasRu,
 		}
 	}
 
@@ -400,7 +403,10 @@ func (pc *DictionaryController) ListUserTags(ctx *gin.Context) {
 	response := make([]UserTagResponse, len(userTags))
 	for i, tag := range userTags {
 		response[i] = UserTagResponse{
-			Name: tag.Name,
+			ID:      tag.ID,
+			Name:    tag.Name,
+			AliasRu: tag.AliasRu,
+			AliasEn: tag.AliasEn,
 		}
 	}
 

@@ -263,57 +263,58 @@ func loginUserGetAccessToken(t *testing.T, password string, telegramUserId int64
 }
 
 func populateProfileTags(db gorm.DB) []models.ProfileTag {
-	var profileTags = []string{
-		"Классика",
-		"Минет c/без резинки",
-		"Глубокий минет с резинкой",
-		"Глубокий минет c/без резинки c окончанием",
-		"Разрешу куннилингус",
-		"Минет c/без резинки c окончанием",
-		"Минет с резинкой",
-		"Массаж любительский",
-		"Массаж профессиональный",
-		"Вагинальный фистинг",
-		"Расслабляющий массаж",
-		"Поцелуи в губы",
-		"Массаж простаты",
-		"Классический массаж",
-		"Поеду отдыхать (в клуб, ресторан и.т.д.). Вечер:",
-		"Тайский боди массаж",
-		"Глубокий минет c/без резинки",
-		"Анилингус, побалую язычком очко",
-		"Услуги Госпоже",
-		"Услуги семейным парам",
-		"Французский поцелуй",
-		"Эротический массаж",
-		"Секс по телефону",
-		"Обслуживаю мальчишники. Вечер:",
-		"Групповой секс",
-		"Стриптиз любительский",
-		"Ветка сакуры",
-		"Снимусь на видео",
-		"Анальный секс",
-		"Ролевые игры, наряды",
-		"Фото на память",
-		"Сделаю минет",
-		"Стриптиз профессиональный",
-		"Глубокий минет без резинки c окончанием",
-		"Минет без резинки c окончанием",
-		"Глубокий минет без резинки",
-		"Минет без резинки",
-		"Обслуживаю девушек",
-		"Обслуживаю парней",
-		"Сделаю куннилингус",
-		"Обслуживаю девишники/вечеринки. Вечер:",
-		"Обслуживаю вечеринки. Вечер:",
-		"Сделаю минет за рулем",
-		"Снимусь на видео за",
+	var profileTags = []models.ProfileTag{
+		{Name: "classic", AliasRu: "Классика", AliasEn: "Classic"},
+		{Name: "blowjob", AliasRu: "Минет c/без резинки", AliasEn: "Blowjob with/without condom"},
+		{Name: "deep-throat-condo", AliasRu: "Глубокий минет с резинкой", AliasEn: "Deep throat with condom"},
+		{Name: "deep-throat-cum", AliasRu: "Глубокий минет c/без резинки c окончанием", AliasEn: "Deep throat with/without condom with finish"},
+		{Name: "allow-cunnilingus", AliasRu: "Разрешу куннилингус", AliasEn: "Allow cunnilingus"},
+		{Name: "blowjob-cum", AliasRu: "Минет c/без резинки c окончанием", AliasEn: "Blowjob with/without condom with finish"},
+		{Name: "blowjob-with", AliasRu: "Минет с резинкой", AliasEn: "Blowjob with condom"},
+		{Name: "massage-amateur", AliasRu: "Массаж любительский", AliasEn: "Amateur massage"},
+		{Name: "massage-pro", AliasRu: "Массаж профессиональный", AliasEn: "Professional massage"},
+		{Name: "vaginal-fisting", AliasRu: "Вагинальный фистинг", AliasEn: "Vaginal fisting"},
+		{Name: "relaxing-massage", AliasRu: "Расслабляющий массаж", AliasEn: "Relaxing massage"},
+		{Name: "kissing", AliasRu: "Поцелуи в губы", AliasEn: "Kissing"},
+		{Name: "prostate-massage", AliasRu: "Массаж простаты", AliasEn: "Prostate massage"},
+		{Name: "classic-massage", AliasRu: "Классический массаж", AliasEn: "Classic massage"},
+		{Name: "evening-out", AliasRu: "Поеду отдыхать (в клуб, ресторан и.т.д.). Вечер:", AliasEn: "Evening out (club, restaurant, etc.). Price:"},
+		{Name: "thai-body-massage", AliasRu: "Тайский боди массаж", AliasEn: "Thai body massage"},
+		{Name: "deep-throat", AliasRu: "Глубокий минет c/без резинки", AliasEn: "Deep throat with/without condom"},
+		{Name: "anilingus", AliasRu: "Анилингус, побалую язычком очко", AliasEn: "Anilingus"},
+		{Name: "mistress", AliasRu: "Услуги Госпоже", AliasEn: "Mistress services"},
+		{Name: "couples", AliasRu: "Услуги семейным парам", AliasEn: "Services for couples"},
+		{Name: "french-kiss", AliasRu: "Французский поцелуй", AliasEn: "French kiss"},
+		{Name: "erotic-massage", AliasRu: "Эротический массаж", AliasEn: "Erotic massage"},
+		{Name: "phone-sex", AliasRu: "Секс по телефону", AliasEn: "Phone sex"},
+		{Name: "stag-men", AliasRu: "Обслуживаю мальчишники. Вечер:", AliasEn: "Bachelor party service. Price:"},
+		{Name: "group-sex", AliasRu: "Групповой секс", AliasEn: "Group sex"},
+		{Name: "striptease-amateur", AliasRu: "Стриптиз любительский", AliasEn: "Amateur striptease"},
+		{Name: "sakura", AliasRu: "Ветка сакуры", AliasEn: "Sakura branch"},
+		{Name: "video", AliasRu: "Снимусь на видео", AliasEn: "Video shooting"},
+		{Name: "anal", AliasRu: "Анальный секс", AliasEn: "Anal sex"},
+		{Name: "role-play", AliasRu: "Ролевые игры, наряды", AliasEn: "Role play, costumes"},
+		{Name: "photo", AliasRu: "Фото на память", AliasEn: "Photo memory"},
+		{Name: "do-blowjob", AliasRu: "Сделаю минет", AliasEn: "Will do blowjob"},
+		{Name: "striptease-pro", AliasRu: "Стриптиз профессиональный", AliasEn: "Professional striptease"},
+		{Name: "deep-throat-nocondo-cum", AliasRu: "Глубокий минет без резинки c окончанием", AliasEn: "Deep throat without condom with finish"},
+		{Name: "blowjob-nocondo-finish", AliasRu: "Минет без резинки c окончанием", AliasEn: "Blowjob without condom with finish"},
+		{Name: "deep-throat-nocondo", AliasRu: "Глубокий минет без резинки", AliasEn: "Deep throat without condom"},
+		{Name: "bj-raw", AliasRu: "Минет без резинки", AliasEn: "Blowjob without condom"},
+		{Name: "girls", AliasRu: "Обслуживаю девушек", AliasEn: "Service for girls"},
+		{Name: "guys", AliasRu: "Обслуживаю парней", AliasEn: "Service for guys"},
+		{Name: "cuni", AliasRu: "Сделаю куннилингус", AliasEn: "Will do cunnilingus"},
+		{Name: "stag-all", AliasRu: "Обслуживаю девишники/вечеринки. Вечер:", AliasEn: "Bachelorette/party service. Price:"},
+		{Name: "party-service", AliasRu: "Обслуживаю вечеринки. Вечер:", AliasEn: "Party service. Price:"},
+		{Name: "car-blowjob", AliasRu: "Сделаю минет за рулем", AliasEn: "Car blowjob"},
 	}
 
 	var tags []models.ProfileTag
 	for _, profileTag := range profileTags {
 		tag := models.ProfileTag{
-			Name: profileTag,
+			Name:    profileTag.Name,
+			AliasEn: profileTag.AliasEn,
+			AliasRu: profileTag.AliasRu,
 		}
 		tags = append(tags, tag)
 	}
@@ -348,19 +349,21 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 }
 
 func populateUserTags(db gorm.DB) []models.UserTag {
-	var userTag = []string{
-		"Гигиена",
-		"Опрятность",
-		"Щедрость",
-		"Пунктуальность",
-		"Соблюдение границ",
-		"Общительность",
+	var userTag = []models.UserTag{
+		{Name: "hygiene", AliasRu: "Гигиена", AliasEn: "Hygiene"},
+		{Name: "neat", AliasRu: "Опрятность", AliasEn: "Neatness"},
+		{Name: "generous", AliasRu: "Щедрость", AliasEn: "Generosity"},
+		{Name: "punctual", AliasRu: "Пунктуальность", AliasEn: "Punctuality"},
+		{Name: "boundaries", AliasRu: "Соблюдение границ", AliasEn: "Respect boundaries"},
+		{Name: "sociable", AliasRu: "Общительность", AliasEn: "Sociability"},
 	}
 
 	var tags []models.UserTag
 	for _, userTag := range userTag {
 		tag := models.UserTag{
-			Name: userTag,
+			Name:    userTag.Name,
+			AliasEn: userTag.AliasEn,
+			AliasRu: userTag.AliasRu,
 		}
 		tags = append(tags, tag)
 	}
