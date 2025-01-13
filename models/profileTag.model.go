@@ -2,9 +2,9 @@ package models
 
 type ProfileTag struct {
 	ID      int    `gorm:"type:integer;primaryKey"`
-	Name    string `gorm:"size:30;not null;unique"`
-	AliasRu string `gorm:"size:30;"`
-	AliasEn string `gorm:"size:30;"`
+	Name    string `gorm:"size:100;not null;unique"`
+	AliasRu string `gorm:"size:100;"`
+	AliasEn string `gorm:"size:100;"`
 }
 
 type ProfileTagResponse struct {
