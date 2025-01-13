@@ -444,6 +444,9 @@ func populateCities(db gorm.DB) []models.City {
 		{Name: "pavlodar", AliasRu: "Павлодар", AliasEn: "Pavlodar"},
 		{Name: "ekibastuz", AliasRu: "Экибастуз", AliasEn: "Ekibastuz"},
 		{Name: "saryagash", AliasRu: "Сарыагаш", AliasEn: "Saryagash"},
+		{Name: "baykonur", AliasRu: "Байконыр", AliasEn: "Baykonur"},
+		{Name: "jitiqara", AliasRu: "Житикара", AliasEn: "Jitiqara"},
+		{Name: "aral", AliasRu: "Аральск", AliasEn: "Aral"},
 	}
 
 	tx := db.Begin()
