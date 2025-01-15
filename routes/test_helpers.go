@@ -365,7 +365,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			  { "enabled": false, "aliasRu": "вечеринки", "aliasEn": "parties" },
 			  { "enabled": false, "aliasRu": "поеду отдыхать (в клуб, ресторан и.т.д.)", "aliasEn": "escort" },
 			  { "enabled": false, "aliasRu": "подружка", "aliasEn": "girlfriend experience" },
-			  { "enabled": false, "aliasRu": "бойфренд", "aliasEn": "boyfriend experience" },
+			  { "enabled": false, "aliasRu": "бойфренд", "aliasEn": "boyfriend experience" }
 			]`),
 		},
 		{
@@ -374,7 +374,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			AliasEn: "Kissing",
 			Flags: datatypes.JSON(`[
 			  { "enabled": false, "aliasRu": "в губы", "aliasEn": "classic" },
-			  { "enabled": false, "aliasRu": "французские", "aliasEn": "french" },
+			  { "enabled": false, "aliasRu": "французские", "aliasEn": "french" }
 			]`),
 		},
 		{
@@ -386,7 +386,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			  { "enabled": false, "aliasRu": "без презерватива", "aliasEn": "no condom" },
 			  { "enabled": false, "aliasRu": "с окончанием", "aliasEn": "cumming" },
 			  { "enabled": false, "aliasRu": "глубокий", "aliasEn": "deepthroat" },
-			  { "enabled": false, "aliasRu": "в машине", "aliasEn": "in the car" },
+			  { "enabled": false, "aliasRu": "в машине", "aliasEn": "in the car" }
 			]`),
 		},
 		{
@@ -395,7 +395,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			AliasEn: "Striptease",
 			Flags: datatypes.JSON(`[
 			  { "enabled": false, "aliasRu": "профессиональный", "aliasEn": "pro" },
-			  { "enabled": false, "aliasRu": "любительский", "aliasEn": "amateur" },
+			  { "enabled": false, "aliasRu": "любительский", "aliasEn": "amateur" }
 			]`),
 		},
 		{
@@ -406,11 +406,11 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			  { "enabled": false, "aliasRu": "профессиональный", "aliasEn": "pro" },
 			  { "enabled": false, "aliasRu": "любительский", "aliasEn": "amateur" },
 			  { "enabled": false, "aliasRu": "простаты", "aliasEn": "prostate" },
-			  { "enabled": false, aliasRu: "расслабляющий", aliasEn: "relaxing" },
-			  { "enabled": false, aliasRu: "классический", aliasEn: "classic" },
-			  { "enabled": false, aliasRu: "эротический", aliasEn: "erotic" },
-			  { "enabled": false, aliasRu: "тайский боди", aliasEn: "thai body" },
-			  { "enabled": false, aliasRu: "ветка сакуры", aliasEn: "sakura branch" },
+			  { "enabled": false, "aliasRu": "расслабляющий", "aliasEn": "relaxing" },
+			  { "enabled": false, "aliasRu": "классический", "aliasEn": "classic" },
+			  { "enabled": false, "aliasRu": "эротический", "aliasEn": "erotic" },
+			  { "enabled": false, "aliasRu": "тайский боди", "aliasEn": "thai body" },
+			  { "enabled": false, "aliasRu": "ветка сакуры", "aliasEn": "sakura branch" }
 			]`),
 		},
 		{
@@ -419,7 +419,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			AliasEn: "Cunnilingus",
 			Flags: datatypes.JSON(`[
 			  { "enabled": false, "aliasRu": "сделаю", "aliasEn": "will do" },
-			  { "enabled": false, "aliasRu": "разрешу", "aliasEn": "allow" },
+			  { "enabled": false, "aliasRu": "разрешу", "aliasEn": "allow" }
 			]`),
 		},
 		{
@@ -428,7 +428,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			AliasEn: "Anilingus",
 			Flags: datatypes.JSON(`[
 			  { "enabled": false, "aliasRu": "сделаю", "aliasEn": "will do" },
-			  { "enabled": false, "aliasRu": "разрешу", "aliasEn": "allow" },
+			  { "enabled": false, "aliasRu": "разрешу", "aliasEn": "allow" }
 			]`),
 		},
 		{
@@ -437,7 +437,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			AliasEn: "Anal",
 			Flags: datatypes.JSON(`[
 			  { "enabled": false, "aliasRu": "сделаю", "aliasEn": "will do" },
-			  { "enabled": false, "aliasRu": "разрешу", "aliasEn": "allow" },
+			  { "enabled": false, "aliasRu": "разрешу", "aliasEn": "allow" }
 			]`),
 		},
 		{
@@ -447,7 +447,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			Flags: datatypes.JSON(`[
 			  { "enabled": false, "aliasRu": "вагинальный", "aliasEn": "vaginal" },
 			  { "enabled": false, "aliasRu": "сделаю", "aliasEn": "will do" },
-			  { "enabled": false, "aliasRu": "разрешу", "aliasEn": "allow" },
+			  { "enabled": false, "aliasRu": "разрешу", "aliasEn": "allow" }
 			]`),
 		},
 		{
@@ -457,7 +457,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			Flags: datatypes.JSON(`[
 			  { "enabled": false, "aliasRu": "секс по телефону", "aliasEn": "phone sex" },
 			  { "enabled": false, "aliasRu": "фото на память", "aliasEn": "memory photo" },
-			  { "enabled": false, "aliasRu": "снимусь на видео", "aliasEn": "memory video" },
+			  { "enabled": false, "aliasRu": "снимусь на видео", "aliasEn": "memory video" }
 			]`),
 		},
 	}

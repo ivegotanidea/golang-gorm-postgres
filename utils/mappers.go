@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	. "github.com/ivegotanidea/golang-gorm-postgres/models"
+	"log"
 	"strings"
 )
 
@@ -50,7 +51,7 @@ func MapProfileOptions(options []ProfileOption) []ProfileOptionResponse {
 
 	for i, option := range options {
 		optionResponses[i] = ProfileOptionResponse{
-			Price:   option.Price,
+			Price:   &option.Price,
 			Comment: option.Comment,
 			Name:    option.ProfileTag.Name,
 		}
@@ -352,9 +353,14 @@ func MapProfileTag(tag *ProfileTag) *ProfileTagResponse {
 		return nil
 	}
 
-	var flags map[string]any
-	if err := json.Unmarshal(tag.Flags, &flags); err != nil {
-		flags = map[string]any{} // Default to empty map if unmarshalling fails
+	var flags []ProfileTagFlagResponse
+	// Safely unmarshal the JSON `Flags` field
+
+	if len(tag.Flags) > 0 {
+		if err := json.Unmarshal(tag.Flags, &flags); err != nil {
+			log.Printf("Error unmarshalling flags for ProfileTag ID %d: %v", tag.ID, err)
+			flags = []ProfileTagFlagResponse{} // Default to an empty slice
+		}
 	}
 
 	return &ProfileTagResponse{
