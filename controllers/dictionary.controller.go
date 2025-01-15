@@ -353,12 +353,7 @@ func (pc *DictionaryController) ListProfileTags(ctx *gin.Context) {
 
 	response := make([]ProfileTagResponse, len(profileTags))
 	for i, tag := range profileTags {
-		response[i] = ProfileTagResponse{
-			ID:      tag.ID,
-			Name:    tag.Name,
-			AliasEn: tag.AliasEn,
-			AliasRu: tag.AliasRu,
-		}
+		response[i] = *utils.MapProfileTag(&tag)
 	}
 
 	ctx.JSON(http.StatusOK, SuccessPageResponse[[]ProfileTagResponse]{

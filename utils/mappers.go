@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"strings"
 )
@@ -343,5 +344,24 @@ func MapProfileRating(profileRating *ProfileRating) *ProfileRatingResponse {
 		UpdatedAt:         profileRating.UpdatedAt,
 		RatedProfileTags:  ratedProfileTags,
 		UpdatedBy:         profileRating.UpdatedBy,
+	}
+}
+
+func MapProfileTag(tag *ProfileTag) *ProfileTagResponse {
+	if tag == nil {
+		return nil
+	}
+
+	var flags map[string]any
+	if err := json.Unmarshal(tag.Flags, &flags); err != nil {
+		flags = map[string]any{} // Default to empty map if unmarshalling fails
+	}
+
+	return &ProfileTagResponse{
+		ID:      tag.ID,
+		Name:    tag.Name,
+		AliasRu: tag.AliasRu,
+		AliasEn: tag.AliasEn,
+		Flags:   flags,
 	}
 }
