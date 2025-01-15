@@ -14,10 +14,18 @@ type ProfileOption struct {
 	Flags        datatypes.JSON `gorm:"index;type:jsonb;default:'{}'::jsonb"` // JSON column
 }
 
+type CreateProfileOptionFlagRequest struct {
+	Name    string `json:"name"`
+	AliasRu string `json:"aliasRu"`
+	AliasEn string `json:"aliasEn"`
+	Price   *int64 `json:"price"`
+}
+
 type CreateProfileOptionRequest struct {
-	ProfileTagID int    `json:"profileTagId" binding:"required" validate:"required,int,gte=0"`
-	Price        int64  `json:"price,omitempty" validate:"min=0"`
-	Comment      string `json:"comment,omitempty" validate:"max=50"`
+	ProfileTagID int                              `json:"profileTagId" binding:"required" validate:"required,int,gte=0"`
+	Price        int64                            `json:"price,omitempty" validate:"min=0"`
+	Comment      string                           `json:"comment,omitempty" validate:"max=50"`
+	Flags        []CreateProfileOptionFlagRequest `json:"flags"`
 }
 
 type ProfileOptionFlagResponse struct {
