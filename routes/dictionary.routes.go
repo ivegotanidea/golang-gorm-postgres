@@ -24,8 +24,8 @@ func (dc *DictionaryRouteController) DictionaryRoute(rg *gin.RouterGroup) {
 	router.GET("/", dc.dictionaryController.ListDict)
 
 	router.POST("/", middleware.DeserializeUser(), middleware.AbacMiddleware("dicts", "add"), dc.dictionaryController.CreateDictObject)
-	router.PUT("/", middleware.AbacMiddleware("dicts", "update"), nil)
-	router.DELETE("/", middleware.AbacMiddleware("dicts", "delete"), nil)
+	router.PUT("/", middleware.DeserializeUser(), middleware.AbacMiddleware("dicts", "update"), dc.dictionaryController.UpdateDictObject)
+	router.DELETE("/:type/:id", middleware.DeserializeUser(), middleware.AbacMiddleware("dicts", "delete"), dc.dictionaryController.DeleteDictObject)
 
 	// old style
 	router.GET("/cities", dc.dictionaryController.ListCities)

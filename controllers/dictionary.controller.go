@@ -248,7 +248,7 @@ func mapToStruct(input any, output any) error {
 	return json.Unmarshal(bytes, output)
 }
 
-// CreateDict godoc
+// CreateDictObject godoc
 //
 //	@Summary		Creates a new dictionary object
 //	@Description	Creates a new dictionary object of the specified type
@@ -274,6 +274,7 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(User)
 	now := time.Now()
 
+	var result int
 	switch dictType {
 	case "city":
 		var data City
@@ -292,6 +293,7 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 			}
 			return
 		}
+		result = data.ID
 	case "ethnos":
 		var data Ethnos
 		if err := mapToStruct(payload.Data, &data); err != nil {
@@ -304,6 +306,7 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
 			return
 		}
+		result = data.ID
 	case "profileTag":
 		var data ProfileTag
 		if err := mapToStruct(payload.Data, &data); err != nil {
@@ -316,6 +319,7 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
 			return
 		}
+		result = data.ID
 	case "userTag":
 		var data UserTag
 		if err := mapToStruct(payload.Data, &data); err != nil {
@@ -328,6 +332,7 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
 			return
 		}
+		result = data.ID
 	case "body":
 		var data BodyType
 		if err := mapToStruct(payload.Data, &data); err != nil {
@@ -340,6 +345,7 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
 			return
 		}
+		result = data.ID
 	case "art":
 		var data BodyArt
 		if err := mapToStruct(payload.Data, &data); err != nil {
@@ -352,6 +358,7 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
 			return
 		}
+		result = data.ID
 	case "color":
 		var data HairColor
 		if err := mapToStruct(payload.Data, &data); err != nil {
@@ -364,6 +371,7 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
 			return
 		}
+		result = data.ID
 	case "cut":
 		var data IntimateHairCut
 		if err := mapToStruct(payload.Data, &data); err != nil {
@@ -376,12 +384,13 @@ func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
 			return
 		}
+		result = data.ID
 	default:
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Unsupported dictionary type: " + dictType})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, nil)
+	ctx.JSON(http.StatusCreated, result)
 }
 
 // ListDict godoc

@@ -176,11 +176,12 @@ paths:
 
       responses:
         "201":
-          description: Dictionary object created successfully
+          description: Dictionary object created successfully, returns the created object's ID as an integer.
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                type: integer
+
         "400":
           description: Bad request
           content:

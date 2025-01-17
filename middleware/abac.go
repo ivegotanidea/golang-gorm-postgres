@@ -8,6 +8,7 @@ import (
 )
 
 func AbacMiddleware(obj string, act string) gin.HandlerFunc {
+
 	return func(c *gin.Context) {
 
 		user, exists := c.Get("currentUser")
