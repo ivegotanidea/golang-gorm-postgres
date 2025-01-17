@@ -20,6 +20,14 @@ func NewDictionaryController(DB *gorm.DB) DictionaryController {
 	return DictionaryController{DB}
 }
 
+func mapToStruct(input any, output any) error {
+	bytes, err := json.Marshal(input)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(bytes, output)
+}
+
 // CreateDict godoc
 //
 //	@Summary		Creates a new dictionary object
@@ -154,14 +162,6 @@ func (pc *DictionaryController) CreateDict(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, nil)
-}
-
-func mapToStruct(input any, output any) error {
-	bytes, err := json.Marshal(input)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(bytes, output)
 }
 
 // ListDict godoc
