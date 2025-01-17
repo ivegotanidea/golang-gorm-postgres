@@ -23,7 +23,7 @@ func (dc *DictionaryRouteController) DictionaryRoute(rg *gin.RouterGroup) {
 	// CRUD
 	router.GET("/", dc.dictionaryController.ListDict)
 
-	router.POST("/", middleware.DeserializeUser(), middleware.AbacMiddleware("dicts", "add"), dc.dictionaryController.CreateDict)
+	router.POST("/", middleware.DeserializeUser(), middleware.AbacMiddleware("dicts", "add"), dc.dictionaryController.CreateDictObject)
 	router.PUT("/", middleware.AbacMiddleware("dicts", "update"), nil)
 	router.DELETE("/", middleware.AbacMiddleware("dicts", "delete"), nil)
 

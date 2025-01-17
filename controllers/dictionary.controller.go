@@ -41,7 +41,7 @@ func mapToStruct(input any, output any) error {
 //	@Failure		409		{object}	ErrorResponse
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/dict [post]
-func (pc *DictionaryController) CreateDict(ctx *gin.Context) {
+func (pc *DictionaryController) CreateDictObject(ctx *gin.Context) {
 	var payload CreateDictRequest
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
