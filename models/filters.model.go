@@ -2,7 +2,15 @@ package models
 
 import (
 	"github.com/google/uuid"
+	"time"
 )
+
+type CreateDictObjectRequest struct {
+	Name    string `json:"name"`
+	AliasRu string `json:"aliasRu"`
+	AliasEn string `json:"aliasEn"`
+	Flags   any    `json:"flags"`
+}
 
 type Ethnos struct {
 	ID      int    `gorm:"primaryKey"`
@@ -10,6 +18,13 @@ type Ethnos struct {
 	AliasRu string `gorm:"size:30;not null"`
 	AliasEn string `gorm:"size:30;not null"`
 	Sex     string `gorm:"size:10;not null"`
+
+	// todo set not null
+	CreatedAt time.Time `gorm:"type:timestamp;"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+
+	UpdatedAt time.Time `gorm:"type:timestamp;"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
 type EthnosResponse struct {
@@ -25,6 +40,13 @@ type BodyType struct {
 	Name    string `gorm:"size:30;not null;unique"`
 	AliasRu string `gorm:"size:30;not null"`
 	AliasEn string `gorm:"size:30;not null"`
+
+	// todo set not null
+	CreatedAt time.Time `gorm:"type:timestamp;"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+
+	UpdatedAt time.Time `gorm:"type:timestamp;"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
 type BodyTypeResponse struct {
@@ -39,6 +61,13 @@ type BodyArt struct {
 	Name    string `gorm:"size:100;not null;unique"`
 	AliasRu string `gorm:"size:100;not null"`
 	AliasEn string `gorm:"size:100;not null"`
+
+	// todo set not null
+	CreatedAt time.Time `gorm:"type:timestamp;"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+
+	UpdatedAt time.Time `gorm:"type:timestamp;"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
 type BodyArtResponse struct {
@@ -63,6 +92,13 @@ type HairColor struct {
 	Name    string `gorm:"size:30;not null;unique"`
 	AliasRu string `gorm:"size:30;not null"`
 	AliasEn string `gorm:"size:30;not null"`
+
+	// todo set not null
+	CreatedAt time.Time `gorm:"type:timestamp;"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+
+	UpdatedAt time.Time `gorm:"type:timestamp;"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
 // HairColorResponse represents the JSON response for hair color data
@@ -78,6 +114,13 @@ type IntimateHairCut struct {
 	Name    string `gorm:"size:30;not null;unique"`
 	AliasRu string `gorm:"size:30;not null"`
 	AliasEn string `gorm:"size:30;not null"`
+
+	// todo set not null
+	CreatedAt time.Time `gorm:"type:timestamp;"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+
+	UpdatedAt time.Time `gorm:"type:timestamp;"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
 type IntimateHairCutResponse struct {
@@ -91,4 +134,9 @@ type ProfileBodyArtResponse struct {
 	ProfileID string           `json:"profileId"`
 	BodyArtID int              `json:"bodyArtId"`
 	BodyArt   *BodyArtResponse `json:"bodyArtName"`
+}
+
+type CreateDictRequest struct {
+	Type string                  `json:"type" binding:"required"`
+	Data CreateDictObjectRequest `json:"data" binding:"required"`
 }

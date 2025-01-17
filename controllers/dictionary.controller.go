@@ -1,12 +1,15 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"github.com/ivegotanidea/golang-gorm-postgres/utils"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type DictionaryController struct {
@@ -15,6 +18,137 @@ type DictionaryController struct {
 
 func NewDictionaryController(DB *gorm.DB) DictionaryController {
 	return DictionaryController{DB}
+}
+
+func (pc *DictionaryController) CreateDict(ctx *gin.Context) {
+	var payload CreateDictRequest
+
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid JSON payload: " + err.Error()})
+		return
+	}
+
+	dictType := payload.Type
+
+	currentUser := ctx.MustGet("currentUser").(User)
+	now := time.Now()
+
+	switch dictType {
+	case "city":
+		var data City
+		if err := mapToStruct(payload.Data, &data); err != nil {
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid City data: " + err.Error()})
+			return
+		}
+		data.CreatedAt = now
+		data.CreatedBy = currentUser.ID
+		if err := pc.DB.Create(&data).Error; err != nil {
+
+			if strings.Contains(err.Error(), "duplicate") {
+				ctx.JSON(http.StatusConflict, ErrorResponse{Status: "error", Message: "Duplicating entity"})
+			} else {
+				ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: "Internal server error"})
+			}
+			return
+		}
+	case "ethnos":
+		var data Ethnos
+		if err := mapToStruct(payload.Data, &data); err != nil {
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid Ethnos data: " + err.Error()})
+			return
+		}
+		data.CreatedAt = now
+		data.CreatedBy = currentUser.ID
+		if err := pc.DB.Create(&data).Error; err != nil {
+			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
+			return
+		}
+	case "profileTag":
+		var data ProfileTag
+		if err := mapToStruct(payload.Data, &data); err != nil {
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid ProfileTag data: " + err.Error()})
+			return
+		}
+		data.CreatedAt = now
+		data.CreatedBy = currentUser.ID
+		if err := pc.DB.Create(&data).Error; err != nil {
+			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
+			return
+		}
+	case "userTag":
+		var data UserTag
+		if err := mapToStruct(payload.Data, &data); err != nil {
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid UserTag data: " + err.Error()})
+			return
+		}
+		data.CreatedAt = now
+		data.CreatedBy = currentUser.ID
+		if err := pc.DB.Create(&data).Error; err != nil {
+			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
+			return
+		}
+	case "body":
+		var data BodyType
+		if err := mapToStruct(payload.Data, &data); err != nil {
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid BodyType data: " + err.Error()})
+			return
+		}
+		data.CreatedAt = now
+		data.CreatedBy = currentUser.ID
+		if err := pc.DB.Create(&data).Error; err != nil {
+			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
+			return
+		}
+	case "art":
+		var data BodyArt
+		if err := mapToStruct(payload.Data, &data); err != nil {
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid BodyArt data: " + err.Error()})
+			return
+		}
+		data.CreatedAt = now
+		data.CreatedBy = currentUser.ID
+		if err := pc.DB.Create(&data).Error; err != nil {
+			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
+			return
+		}
+	case "color":
+		var data HairColor
+		if err := mapToStruct(payload.Data, &data); err != nil {
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid HairColor data: " + err.Error()})
+			return
+		}
+		data.CreatedAt = now
+		data.CreatedBy = currentUser.ID
+		if err := pc.DB.Create(&data).Error; err != nil {
+			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
+			return
+		}
+	case "cut":
+		var data IntimateHairCut
+		if err := mapToStruct(payload.Data, &data); err != nil {
+			ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid IntimateHairCut data: " + err.Error()})
+			return
+		}
+		data.CreatedAt = now
+		data.CreatedBy = currentUser.ID
+		if err := pc.DB.Create(&data).Error; err != nil {
+			ctx.JSON(http.StatusBadGateway, ErrorResponse{Status: "error", Message: err.Error()})
+			return
+		}
+	default:
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Unsupported dictionary type: " + dictType})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, nil)
+}
+
+func mapToStruct(input any, output any) error {
+	bytes, err := json.Marshal(input)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(bytes, output)
 }
 
 // ListDict godoc

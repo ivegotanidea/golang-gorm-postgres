@@ -162,6 +162,53 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /dict:
+    post:
+      summary: Create a dictionary object
+      description: Create a dictionary object of a specific type (e.g., City, Ethnos, etc.)
+      tags:
+        - Dictionary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - city
+                    - ethnos
+                    - profileTag
+                    - userTag
+                    - body
+                    - art
+                    - color
+                    - cut
+                  description: The type of dictionary object to create
+                data:
+                  oneOf:
+                    - $ref: '#/components/schemas/CreateDictObjectRequest'
+      responses:
+        "201":
+          description: Dictionary object created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "502":
+          description: Database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
     get:
       description: "Retrieves dict objects, supports pagination."
       tags:
@@ -2622,6 +2669,18 @@ components:
       required:
         - access_token
         - status
+
+    CreateDictObjectRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+        flags:
+          type: object
 
     UpdateOwnProfileRequest:
       type: object
