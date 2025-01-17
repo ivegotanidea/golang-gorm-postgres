@@ -11,7 +11,6 @@ type ProfileTag struct {
 }
 
 type ProfileTagFlagResponse struct {
-	Name    string `json:"name"`
 	AliasRu string `json:"aliasRu"`
 	AliasEn string `json:"aliasEn"`
 }

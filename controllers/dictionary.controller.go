@@ -332,6 +332,9 @@ func (pc *DictionaryController) ListIntimateHairCuts(ctx *gin.Context) {
 //	@Failure		502		{object}	ErrorResponse
 //	@Router			/dict/profile/tags [get]
 func (pc *DictionaryController) ListProfileTags(ctx *gin.Context) {
+
+	// to create proper profile tag that would be shown in api response
+	// you shouldn't leave flags property empty
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")
 
@@ -342,6 +345,7 @@ func (pc *DictionaryController) ListProfileTags(ctx *gin.Context) {
 	var profileTags []ProfileTag
 
 	dbQuery := pc.DB.
+		Where("flags != '{}'").
 		Limit(intLimit).Offset(offset)
 
 	results := dbQuery.Find(&profileTags)
