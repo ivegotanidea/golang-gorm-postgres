@@ -172,23 +172,8 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - city
-                    - ethnos
-                    - profileTag
-                    - userTag
-                    - body
-                    - art
-                    - color
-                    - cut
-                  description: The type of dictionary object to create
-                data:
-                  oneOf:
-                    - $ref: '#/components/schemas/CreateDictObjectRequest'
+              $ref: '#/components/schemas/CreateDictRequest'
+
       responses:
         "201":
           description: Dictionary object created successfully
@@ -204,6 +189,51 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "502":
           description: Database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Updates a dictionary object
+      description: Modifies the fields (`name`, `aliasRu`, `aliasEn`, `flags`) of a dictionary object of the specified type.
+      tags:
+        - Dict
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDictRequest'
+
+      responses:
+        '200':
+          description: Dictionary object updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: string
+                    example: Dictionary object updated successfully.
+        '400':
+          description: Invalid request or JSON payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Object not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
           content:
             application/json:
               schema:
@@ -257,6 +287,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /dict/{type}/{id}:
+    delete:
+      summary: Deletes a dictionary object
+      description: Deletes a dictionary object of the specified type and ID
+      tags:
+        - Dict
+      parameters:
+        - in: path
+          name: type
+          schema:
+            type: string
+          required: true
+          description: Type of the dictionary object (e.g., city, ethnos, profileTag, userTag, body, art, color, cut)
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID of the dictionary object to delete
+      responses:
+        '200':
+          description: Object successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid input or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Object not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /dict/cities:
     get:
       description: "Retrieves all cities, supports pagination."
@@ -2670,7 +2746,37 @@ components:
         - access_token
         - status
 
+    CreateDictRequest:
+      type: object
+      properties:
+        type:
+          type: string
+        data:
+          $ref: '#/components/schemas/CreateDictObjectRequest'
+
     CreateDictObjectRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        aliasRu:
+          type: string
+        aliasEn:
+          type: string
+        flags:
+          type: object
+
+    UpdateDictRequest:
+      type: object
+      properties:
+        type:
+          type: string
+        id:
+          type: integer
+        data:
+          $ref: '#/components/schemas/UpdateDictObjectRequest'
+
+    UpdateDictObjectRequest:
       type: object
       properties:
         name:

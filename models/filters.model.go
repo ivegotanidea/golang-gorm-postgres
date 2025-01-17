@@ -9,7 +9,14 @@ type CreateDictObjectRequest struct {
 	Name    string `json:"name"`
 	AliasRu string `json:"aliasRu"`
 	AliasEn string `json:"aliasEn"`
-	Flags   any    `json:"flags"`
+	Flags   any    `json:"flags,omitempty"`
+}
+
+type UpdateDictObjectRequest struct {
+	Name    string `json:"name"`
+	AliasRu string `json:"aliasRu"`
+	AliasEn string `json:"aliasEn"`
+	Flags   any    `json:"flags,omitempty"`
 }
 
 type Ethnos struct {
@@ -139,4 +146,10 @@ type ProfileBodyArtResponse struct {
 type CreateDictRequest struct {
 	Type string                  `json:"type" binding:"required"`
 	Data CreateDictObjectRequest `json:"data" binding:"required"`
+}
+
+type UpdateDictRequest struct {
+	Type string                  `json:"type" binding:"required"`
+	ID   int                     `json:"id" binding:"required"`
+	Data UpdateDictObjectRequest `json:"data" binding:"required"`
 }

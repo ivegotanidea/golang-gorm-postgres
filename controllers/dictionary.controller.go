@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	. "github.com/ivegotanidea/golang-gorm-postgres/models"
 	"github.com/ivegotanidea/golang-gorm-postgres/utils"
 	"gorm.io/gorm"
@@ -18,6 +19,225 @@ type DictionaryController struct {
 
 func NewDictionaryController(DB *gorm.DB) DictionaryController {
 	return DictionaryController{DB}
+}
+
+// DeleteDictObject godoc
+//
+//	@Summary		Deletes a dictionary object
+//	@Description	Deletes a dictionary object of the specified type and ID
+//	@Tags			Dict
+//	@Accept			json
+//	@Produce		json
+//	@Param			type	path		string	true	"Type of the dictionary object (e.g., city, ethnos, profileTag, userTag, body, art, color, cut)"
+//	@Param			id		path		int		true	"ID of the dictionary object to delete"
+//	@Success		200		{object}	SuccessResponse
+//	@Failure		400		{object}	ErrorResponse	"Invalid input or request"
+//	@Failure		404		{object}	ErrorResponse	"Object not found"
+//	@Failure		500		{object}	ErrorResponse	"Internal server error"
+//	@Router			/dict/{type}/{id} [delete]
+func (dc *DictionaryController) DeleteDictObject(ctx *gin.Context) {
+	dictType := ctx.Param("type")
+	objectID, err := strconv.Atoi(ctx.Param("id"))
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid object ID"})
+		return
+	}
+
+	switch dictType {
+	case "city":
+		if err := dc.DB.Delete(&City{}, objectID).Error; err != nil {
+			handleDeleteError(ctx, err)
+			return
+		}
+	case "ethnos":
+		if err := dc.DB.Delete(&Ethnos{}, objectID).Error; err != nil {
+			handleDeleteError(ctx, err)
+			return
+		}
+	case "profileTag":
+		if err := dc.DB.Delete(&ProfileTag{}, objectID).Error; err != nil {
+			handleDeleteError(ctx, err)
+			return
+		}
+	case "userTag":
+		if err := dc.DB.Delete(&UserTag{}, objectID).Error; err != nil {
+			handleDeleteError(ctx, err)
+			return
+		}
+	case "body":
+		if err := dc.DB.Delete(&BodyType{}, objectID).Error; err != nil {
+			handleDeleteError(ctx, err)
+			return
+		}
+	case "art":
+		if err := dc.DB.Delete(&BodyArt{}, objectID).Error; err != nil {
+			handleDeleteError(ctx, err)
+			return
+		}
+	case "color":
+		if err := dc.DB.Delete(&HairColor{}, objectID).Error; err != nil {
+			handleDeleteError(ctx, err)
+			return
+		}
+	case "cut":
+		if err := dc.DB.Delete(&IntimateHairCut{}, objectID).Error; err != nil {
+			handleDeleteError(ctx, err)
+			return
+		}
+	default:
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Unsupported dictionary type: " + dictType})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, SuccessResponse[any]{Status: "success"})
+}
+
+func handleDeleteError(ctx *gin.Context, err error) {
+	if strings.Contains(err.Error(), "not found") {
+		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "Object not found"})
+	} else {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: err.Error()})
+	}
+}
+
+// UpdateDictObject godoc
+//
+//	@Summary		Updates an existing dictionary object
+//	@Description	Modifies the fields (name, aliasRu, aliasEn, flags) of a dictionary object of the specified type.
+//	@Tags			Dict
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		UpdateDictRequest	true	"Dictionary update payload"
+//	@Success		200		{object}	SuccessResponse
+//	@Failure		400		{object}	ErrorResponse	"Invalid request or JSON payload."
+//	@Failure		404		{object}	ErrorResponse	"Object not found."
+//	@Failure		500		{object}	ErrorResponse	"Internal server error."
+//	@Router			/dict [put]
+func (dc *DictionaryController) UpdateDictObject(ctx *gin.Context) {
+	var payload UpdateDictRequest
+
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Invalid JSON payload: " + err.Error()})
+		return
+	}
+
+	dictType := payload.Type
+	objectID := payload.ID
+	updateData := payload.Data
+
+	currentUser := ctx.MustGet("currentUser").(User)
+	switch dictType {
+	case "city":
+		if err := dc.updateCity(objectID, updateData, currentUser.ID); err != nil {
+			handleUpdateError(ctx, err)
+			return
+		}
+	case "ethnos":
+		if err := dc.updateEthnos(objectID, updateData, currentUser.ID); err != nil {
+			handleUpdateError(ctx, err)
+			return
+		}
+	case "profileTag":
+		if err := dc.updateProfileTag(objectID, updateData, currentUser.ID); err != nil {
+			handleUpdateError(ctx, err)
+			return
+		}
+	case "userTag":
+		if err := dc.updateUserTag(objectID, updateData, currentUser.ID); err != nil {
+			handleUpdateError(ctx, err)
+			return
+		}
+	case "body":
+		if err := dc.updateBodyType(objectID, updateData, currentUser.ID); err != nil {
+			handleUpdateError(ctx, err)
+			return
+		}
+	case "art":
+		if err := dc.updateBodyArt(objectID, updateData, currentUser.ID); err != nil {
+			handleUpdateError(ctx, err)
+			return
+		}
+	case "color":
+		if err := dc.updateHairColor(objectID, updateData, currentUser.ID); err != nil {
+			handleUpdateError(ctx, err)
+			return
+		}
+	case "cut":
+		if err := dc.updateIntimateHairCut(objectID, updateData, currentUser.ID); err != nil {
+			handleUpdateError(ctx, err)
+			return
+		}
+	default:
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Status: "error", Message: "Unsupported dictionary type: " + dictType})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, SuccessResponse[any]{Status: "success"})
+}
+
+func (dc *DictionaryController) updateCity(objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	return dc.updateDictObject(&City{}, objectID, data, updatedBy)
+}
+
+func (dc *DictionaryController) updateEthnos(objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	return dc.updateDictObject(&Ethnos{}, objectID, data, updatedBy)
+}
+
+func (dc *DictionaryController) updateProfileTag(objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	return dc.updateDictObject(&ProfileTag{}, objectID, data, updatedBy)
+}
+
+func (dc *DictionaryController) updateUserTag(objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	return dc.updateDictObject(&UserTag{}, objectID, data, updatedBy)
+}
+
+func (dc *DictionaryController) updateBodyType(objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	return dc.updateDictObject(&BodyType{}, objectID, data, updatedBy)
+}
+
+func (dc *DictionaryController) updateBodyArt(objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	return dc.updateDictObject(&BodyArt{}, objectID, data, updatedBy)
+}
+
+func (dc *DictionaryController) updateHairColor(objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	return dc.updateDictObject(&HairColor{}, objectID, data, updatedBy)
+}
+
+func (dc *DictionaryController) updateIntimateHairCut(objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	return dc.updateDictObject(&IntimateHairCut{}, objectID, data, updatedBy)
+}
+
+func (dc *DictionaryController) updateDictObject(model interface{}, objectID int, data UpdateDictObjectRequest, updatedBy uuid.UUID) error {
+	updates := make(map[string]interface{})
+
+	if data.Name != "" {
+		updates["name"] = data.Name
+	}
+
+	if data.AliasRu != "" {
+		updates["alias_ru"] = data.AliasRu
+	}
+
+	if data.AliasEn != "" {
+		updates["alias_en"] = data.AliasEn
+	}
+	if data.Flags != nil {
+		flagsJSON, _ := json.Marshal(data.Flags)
+		updates["flags"] = string(flagsJSON)
+	}
+	updates["updated_at"] = time.Now()
+	updates["updated_by"] = updatedBy
+
+	return dc.DB.Model(model).Where("id = ?", objectID).Updates(updates).Error
+}
+
+func handleUpdateError(ctx *gin.Context, err error) {
+	if strings.Contains(err.Error(), "not found") {
+		ctx.JSON(http.StatusNotFound, ErrorResponse{Status: "error", Message: "Object not found"})
+	} else {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Status: "error", Message: err.Error()})
+	}
 }
 
 func mapToStruct(input any, output any) error {
