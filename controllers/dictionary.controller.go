@@ -20,6 +20,19 @@ func NewDictionaryController(DB *gorm.DB) DictionaryController {
 	return DictionaryController{DB}
 }
 
+// CreateDict godoc
+//
+//	@Summary		Creates a new dictionary object
+//	@Description	Creates a new dictionary object of the specified type
+//	@Tags			Dict
+//	@Accept			json
+//	@Produce		nil
+//	@Param			body	body		CreateDictRequest	true	"Dictionary creation payload"
+//	@Success		201		{object}	SuccessResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		409		{object}	ErrorResponse
+//	@Failure		502		{object}	ErrorResponse
+//	@Router			/dict [post]
 func (pc *DictionaryController) CreateDict(ctx *gin.Context) {
 	var payload CreateDictRequest
 
