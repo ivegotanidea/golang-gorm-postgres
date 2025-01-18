@@ -358,6 +358,7 @@ func populateProfileTags(db gorm.DB) []models.ProfileTag {
 			Flags: datatypes.JSON(`[
 			  { "enabled": false, "aliasRu": "девушек", "aliasEn": "girls" },
 			  { "enabled": false, "aliasRu": "парней", "aliasEn": "men" },
+			  { "enabled": false, "aliasRu": "классика", "aliasEn": "classic" },
 			  { "enabled": false, "aliasRu": "групповой секс", "aliasEn": "group sex" },
 			  { "enabled": false, "aliasRu": "пары", "aliasEn": "couples" },
 			  { "enabled": false, "aliasRu": "мальчишники", "aliasEn": "men parties" },
