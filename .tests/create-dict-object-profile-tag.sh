@@ -64,7 +64,13 @@ modify_response=$(curl -s -w "%{http_code}" -o /tmp/modify_response --location -
       \"name\": \"los angeles\",
       \"aliasRu\": \"LA City\",
       \"aliasEn\": \"LAC\"
-    }
+    },
+    \"flags\": [
+      {
+        \"aliasRu\": \"мил\",
+        \"aliasEn\": \"mil\"
+      }
+    ]
   }")
 http_code=$(echo $modify_response | tail -n1)
 modify_body=$(cat /tmp/modify_response)
