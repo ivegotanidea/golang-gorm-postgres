@@ -75,7 +75,7 @@ if [[ "$http_code" -ne 200 && "$http_code" -ne 409 ]]; then
     exit 1
 fi
 
-echo "City modified successfully."
+echo "ProfileTag modified successfully."
 
 # Verify modification
 verify_response=$(curl -s -w "%{http_code}" -o /tmp/verify_response --location --request GET "${BASE_URL}/dict/?type=profileTag&page=1&limit=500" \
@@ -110,7 +110,7 @@ if [[ "$http_code" -ne 200 || $(echo "$delete_body" | jq -r '.status') != "succe
     exit 1
 fi
 
-echo "City deleted successfully."
+echo "ProfileTag deleted successfully."
 
 # Verify deletion
 verify_delete_response=$(curl -s -w "%{http_code}" -o /tmp/verify_delete_response \
@@ -122,10 +122,10 @@ verify_delete_body=$(cat /tmp/verify_delete_response)
 
 deleted_profile_tag=$(echo "$verify_delete_body" | jq ".data[] | select(.id == $created_profile_tag_id)")
 
-if [[ "$http_code" -ne 200 || -n "deleted_profile_tag" ]]; then
-    echo "City still exists after deletion. HTTP Code: $http_code"
+if [[ "$http_code" -ne 200 || -n "$deleted_profile_tag" ]]; then
+    echo "ProfileTag still exists after deletion. HTTP Code: $http_code"
     echo "Response: $verify_delete_body"
     exit 1
 fi
 
-echo "Deletion verified successfully. City no longer exists."
+echo "Deletion verified successfully. ProfileTag no longer exists."
